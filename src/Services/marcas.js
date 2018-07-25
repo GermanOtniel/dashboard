@@ -29,3 +29,17 @@ export function getMarcas(){
     return marcas
   })
 }
+
+export function getMarcasByBrand(){
+  //console.log("peticion");
+  //  localhost  
+  // herokuapp  '/auth/profile/'
+  return fetch( baseURL + '/marca/bybrand' )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(marcas=>{
+    return marcas
+  })
+}

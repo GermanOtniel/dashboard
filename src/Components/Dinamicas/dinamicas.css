@@ -1,0 +1,8 @@
+.senDinamica{
+  display: flex;
+  justify-content: center;
+  align-items: center;}
+
+.margin{
+  display: inline-block;
+}

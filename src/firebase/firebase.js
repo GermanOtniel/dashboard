@@ -1,7 +1,7 @@
 import firebase from "firebase";
 // Initialize Firebase
 var config = {
-  apiKey: "back1.5",
+  apiKey: "back",
   authDomain: "filetest-210500.firebaseapp.com",
   databaseURL: "https://filetest-210500.firebaseio.com",
   projectId: "filetest-210500",
