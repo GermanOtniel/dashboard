@@ -1,0 +1,8 @@
+.padreDetail {
+  display: flex;
+  justify-content: center;
+}
+.hijoDetail {
+  padding: 10px;
+  margin: 10px;
+}

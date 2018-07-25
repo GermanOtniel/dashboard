@@ -17,7 +17,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
-import { createDinamic } from '../../Services/dinamicas';
+import { createDinamic, getDinamics } from '../../Services/dinamicas';
 import { getUser } from '../../Services/authDash';
 import DatePicker from 'material-ui/DatePicker';
 import { getSingleBrand } from '../../Services/brands';
@@ -65,18 +65,29 @@ class Dinamicas extends Component {
 
   state={
     open:false,
-    open2:false,
     centros:[],
     zonas:[],
     brandId:{},
     marcas:[],
     newDinamic:{},
+    dinamics:[],
     newObj:{},
     newObj2:{},
     textFieldDisabled:true,
     textFieldDisabled2:true,
     chipData: [],
-    chipData2:[]
+    chipData2:[],
+    iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
+    fixedHeader: true,
+    fixedFooter: true,
+    stripedRows: true,
+    showRowHover: true,
+    selectable: true,
+    multiSelectable: false,
+    enableSelectAll: true,
+    deselectOnClickaway: true,
+    showCheckboxes: true,
+    height: '300px'
   }
   handleRequestDelete = (label) => {
     this.chipData = this.state.chipData;
@@ -89,12 +100,6 @@ class Dinamicas extends Component {
     const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
     this.chipData.splice(chipToDelete, 1);
     this.setState({chipData2: this.chipData});
-  };
-  handleOpen2 = () => {
-    this.setState({open2: true});
-  };
-  handleClose2 = () => {
-    this.setState({open2: false});
   };
   componentWillMount(){
     const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -116,7 +121,18 @@ class Dinamicas extends Component {
      .then(zonas=>{
       this.setState({zonas})
      })
-     .catch(e=>alert(e))
+     .catch(e=>console.log(e))
+    getDinamics()
+     .then(dinamics=>{
+       let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+       for(let i= 0; i < dinamics.length;i++) 
+        {
+          dinamics[i].brand = brands[i]
+        }
+       this.setState({dinamics})
+       console.log(this.state.dinamics)
+     })
+     .catch(e=>console.log(e))
    }
 
 
@@ -208,9 +224,6 @@ getFile = e => {
   //   this.setState({total});
   // })
 };
-getZone = (e) => {
-  this.handleClose2();
-}
 sendDinamic = (e) => {
   const { newDinamic } = this.state;
   newDinamic.brand = this.state.brandId._id;
@@ -249,17 +262,6 @@ renderChip2(data) {
     <div>
        <Dash/>
        <div className="zona-container">
-       <div>
-          <RaisedButton
-            label="Seleccionar Zona para tu Dinámica"
-            labelPosition="before"
-            primary={true}
-            icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
-            style={styles.button}
-            labelStyle={{fontSize:'18px'}}
-            onClick={this.handleOpen2}
-          /> 
-         </div>
          <div>
           <RaisedButton
             label="CREA UNA DINAMICA"
@@ -272,6 +274,59 @@ renderChip2(data) {
           /> 
          </div>
        </div>
+       <div>
+       <div>
+       <Table
+          height={this.state.height}
+          fixedHeader={this.state.fixedHeader}
+          fixedFooter={this.state.fixedFooter}
+          selectable={this.state.selectable}
+          multiSelectable={this.state.multiSelectable}
+        >
+          <TableHeader
+            displaySelectAll={this.state.showCheckboxes}
+            adjustForCheckbox={this.state.showCheckboxes}
+            enableSelectAll={this.state.enableSelectAll}
+          >
+            <TableRow>
+              <TableHeaderColumn colSpan="7" style={{textAlign: 'center'}}>
+                Marcas Existentes
+              </TableHeaderColumn>
+            </TableRow>
+            <TableRow>
+              <TableHeaderColumn>Modalidad</TableHeaderColumn>
+              <TableHeaderColumn>BRAND</TableHeaderColumn>
+              <TableHeaderColumn>Nombre</TableHeaderColumn>
+              <TableHeaderColumn>Status</TableHeaderColumn>
+              <TableHeaderColumn>Fecha de Inicio</TableHeaderColumn>
+              <TableHeaderColumn>Fecha de Término</TableHeaderColumn>
+              <TableHeaderColumn>Ver</TableHeaderColumn>
+
+            </TableRow>
+          </TableHeader>
+          <TableBody
+            displayRowCheckbox={this.state.showCheckboxes}
+            deselectOnClickaway={this.state.deselectOnClickaway}
+            showRowHover={this.state.showRowHover}
+            stripedRows={this.state.stripedRows}
+          >
+            {this.state.dinamics.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
+.map( (dinamic, index) => (
+              <TableRow key={dinamic._id} data={dinamic}>
+                <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
+                <TableRowColumn>{dinamic.brand}</TableRowColumn>
+                <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
+                <TableRowColumn>{dinamic.status}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaInicio}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaFin}</TableRowColumn>
+                <TableRowColumn>Ver Detalle</TableRowColumn>
+
+              </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+       </div>
+       </div>
        <div >
           <Dialog
             title="Crea una Dinámica"
@@ -279,7 +334,6 @@ renderChip2(data) {
             open={this.state.open}
             onRequestClose={this.handleClose}
             autoScrollBodyContent={true}
-
           >
           <RadioButtonGroup onChange={this.onChange} name="modalidad" >
           <RadioButton 
@@ -292,10 +346,10 @@ renderChip2(data) {
           label="Puntos"
           onClick={this.handleOpen3}
           />
-        </RadioButtonGroup>
-        <div className="padre">
-        <div className="margin">
-        <TextField
+          </RadioButtonGroup>
+          <div className="padre">
+          <div className="margin">
+          <TextField
             hintText="Meta = Unidades por vender"
             floatingLabelText="Meta a vender"
             name="meta"
@@ -303,7 +357,7 @@ renderChip2(data) {
             onChange={this.onChange}
             disabled={this.state.textFieldDisabled2}
           />
-        <TextField
+          <TextField
             hintText="Recuerde unidad = 1 copa"
             floatingLabelText="Puntos por unidad"
             name="puntos"
@@ -311,8 +365,8 @@ renderChip2(data) {
             onChange={this.onChange}
             disabled={this.state.textFieldDisabled}
           />
-        </div>
-        </div>
+          </div>
+          </div>
           <TextField
             hintText="Sea específico en pocas palabras"
             floatingLabelText="Nombre de la Dinámica"
@@ -344,9 +398,7 @@ renderChip2(data) {
             onChange={this.handleChange2}
           />
           </div>
-          </div> 
-          
-            
+          </div>  
             <AutoComplete
             floatingLabelText="Selecciona Marca(s)"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -354,11 +406,10 @@ renderChip2(data) {
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequestMarca}
           />
-          <div style={styles2.wrapper}>
+            <div style={styles2.wrapper}>
               {this.state.chipData.map(this.renderChip, this)}
             </div>
-
-            <AutoComplete
+          <AutoComplete
             floatingLabelText="Activa/Inactiva"
             filter={AutoComplete.noFilter}
             openOnFocus={true}
@@ -366,9 +417,16 @@ renderChip2(data) {
             dataSource={dataSource2}
             onNewRequest={this.onNewRequest2}
           />
-          
           <div>
             <div className="margin">
+            <AutoComplete
+              floatingLabelText="Selecciona la Zona"
+              filter={AutoComplete.caseInsensitiveFilter}
+              dataSource={this.state.zonas.map(zona => zona)}
+              dataSourceConfig={ {text: 'nombre', value: '_id'}  }
+              onNewRequest={this.onNewRequestZona}
+            /> 
+            <br/>
             <AutoComplete
             floatingLabelText="Selecciona Centro(s) de Consumo"
             hintText="Antes Seleccione Zona"
@@ -392,38 +450,12 @@ renderChip2(data) {
           > 
             <input onChange={this.getFile} name="imagenPremio" type="file" style={styles.uploadInput} />
           </FlatButton>
-    <br/>
-    <div className="senDinamica">
-    <RaisedButton onClick={this.sendDinamic}  label="Crear Dinámica" secondary={true}  />
+          <br/>
+          <div className="senDinamica">
+          <RaisedButton onClick={this.sendDinamic}  label="Crear Dinámica" secondary={true}  />
+        </div>
+      </Dialog> 
     </div>
-          
-        </Dialog> 
-         </div>
-         <div>
-          <Dialog
-            title="Selecciona la Zona"
-            modal={false}
-            open={this.state.open2}
-            onRequestClose={this.handleClose2}
-          >
-          <Paper  zDepth={2}>
-          <AutoComplete
-            floatingLabelText="Selecciona la Zona"
-            filter={AutoComplete.caseInsensitiveFilter}
-            dataSource={this.state.zonas.map(zona => zona)}
-            dataSourceConfig={ {text: 'nombre', value: '_id'}  }
-            onNewRequest={this.onNewRequestZona}
-          />                                
-          <Divider />
-    </Paper>
-    <div className="senDinamica">
-    
-    <RaisedButton onClick={this.getZone}  label="Seleccionar" secondary={true}  />
-
-    </div>          
-        </Dialog> 
-         </div>
-         
     </div>
     );
   }

@@ -23,3 +23,13 @@ export function createDinamic(formulario){
     return dinamica
   })
 }
+export function getDinamics(){
+  return fetch( baseURL + '/dinamica/' )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(dinamicas=>{
+    return dinamicas
+  })
+}

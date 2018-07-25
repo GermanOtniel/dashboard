@@ -9,6 +9,8 @@ import Centros from './Components/Centros/Centros';
 import Dinamicas from './Components/Dinamicas/Dinamicas';
 import Brands from './Components/Brands/Brands';
 import Marcas from './Components/Marcas/Marcas';
+import Evidencias from './Components/Tickets/Evidencias';
+import EvidenciaDetail from './Components/Tickets/EvidenciaDetail';
 
 
 
@@ -24,6 +26,8 @@ export const Routes = () => {
       <Route  path="/dinamicas" component={Dinamicas}/>
       <Route  path="/brands" component={Brands}/>
       <Route  path="/marcas" component={Marcas}/>
+      <Route  path="/tickets" component={Evidencias}/>
+      <Route  path="/evidencia/:id" component={EvidenciaDetail}/>
     </Switch>
   );
 }
