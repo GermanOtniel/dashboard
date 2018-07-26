@@ -1,5 +1,5 @@
 const baseURL = 'http://localhost:3000';
-
+//SE UTILIZA EN EL COMPONENTE DE {{{{{{{MARCAS}}}}}}}
 export function createMarca(formulario){
   return fetch(  baseURL + '/marca/new' ,{
     method:'post',
@@ -16,10 +16,8 @@ export function createMarca(formulario){
     return marca
   })
 }
+//SE UTILIZA EN EL COMPONENTE DE {{{{{MARCAS}}}}}
 export function getMarcas(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/marca/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -30,6 +28,7 @@ export function getMarcas(){
   })
 }
 
+//CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}
 export function getMarcasByBrand(){
   //console.log("peticion");
   //  localhost  
@@ -43,3 +42,4 @@ export function getMarcasByBrand(){
     return marcas
   })
 }
+//CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}

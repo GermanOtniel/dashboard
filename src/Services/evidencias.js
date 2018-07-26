@@ -1,5 +1,7 @@
 const baseURL = 'http://localhost:3000';
 
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{{{EVIDENCIAS}}}}}}}
 export function getEvidences(){
   return fetch( baseURL + '/evidencia/' )
   .then(res=>{
@@ -10,6 +12,8 @@ export function getEvidences(){
     return evidencias
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{{{EVIDENCIA_DETAIL}}}}}}}
 export function getSingleEvidence(id) {
   return fetch( baseURL + '/evidencia/' + id)
   .then(r=>r.json())
@@ -17,6 +21,7 @@ export function getSingleEvidence(id) {
     return dinamic
   })
 }
+//SE UTILIZA EN EL COMPONENTE DE {{{{{{{EVIDENCIA_DETAIL}}}}}}}
 export function sendEvidencia(evidence,id){
   return fetch(baseURL + '/evidencia/evi/' + id , {
       method:'post',

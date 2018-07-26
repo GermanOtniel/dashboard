@@ -46,13 +46,14 @@ class Evidencias extends Component {
   componentWillMount(){
     getEvidences()
      .then(evidencias=>{
-      let dinamicas = evidencias.map(evidencia=> evidencia.dinamica.nombreDinamica);
+      let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
       let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
       for(let i= 0; i < evidencias.length;i++) 
         {
           evidencias[i].creador = nombre[i]
           evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
-          evidencias[i].dinamica = dinamicas[i]
+          evidencias[i].dinamica = dinamicas[i].nombreDinamica
+          
         }
     this.setState({evidencias})
      })

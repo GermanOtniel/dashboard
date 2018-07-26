@@ -37,6 +37,7 @@ class EvidenciaDetail extends Component{
       evidence.fecha = evidence.created_at.slice(0,10);
       evidence.hora = evidence.created_at.slice(11,19);
       evidence.correo = evidence.creador.correo;
+      evidence.descripcion = evidence.dinamica.descripcion
       this.setState({evidence,evidencia})
     })
     .catch(e=>alert(e));
@@ -53,6 +54,7 @@ class EvidenciaDetail extends Component{
     evidencia.fecha = null;
     evidencia.hora = null;
     evidencia.correo = null;
+    evidencia.descripcion = null;
     sendEvidencia(evidencia,id)
     .then(evidencia=>{
       this.props.history.push('/tickets');
@@ -71,6 +73,7 @@ class EvidenciaDetail extends Component{
             <div className="padreDetail">
             <div className="hijoDetail">
             <img src={evidence.archivo}/>
+            <div>
             <SelectField
               floatingLabelStyle={{fontSize:25}}
               floatingLabelText="Acción"
@@ -80,6 +83,7 @@ class EvidenciaDetail extends Component{
               <MenuItem value="Aprobada" primaryText="Aprobada" />
               <MenuItem value="Desaprobada" primaryText="Desaprobada" />
             </SelectField>
+            </div>
             <div>
             <RaisedButton
               backgroundColor="#a4c639"
@@ -90,13 +94,18 @@ class EvidenciaDetail extends Component{
             </div>
             </div>
             <div className="hijoDetail">
-           <u>Mensaje Adjunto: </u><h4>{evidence.mensaje}</h4>
-            <u>Cantidad Vendida: </u><h4>{evidence.cantidadProducto}</h4>    
-            <u>Modalidad: </u><h4>{evidence.modalidad}</h4>
-            <u>Fecha: </u><h4>{evidence.fecha}</h4>
-            <u>Hora: </u><h4>{evidence.hora}</h4>        
-            <u>Usuario: </u><h4>{evidence.dueño}</h4> 
-            <u>Correo del Usuario: </u><h4>{evidence.correo}</h4>                                               
+           <u>Mensaje del Usuario: </u><h4>{evidence.mensaje}</h4>
+            <u>Cantidad Vendida: </u><h4>{evidence.cantidadProducto}</h4>
+            <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
+            <u>Modalidad: </u><b>{evidence.modalidad}</b>
+            <br/><br/>        
+            <u>Fecha: </u><b>{evidence.fecha}</b>
+            <br/><br/>        
+            <u>Hora: </u><b>{evidence.hora}</b>
+            <br/><br/>        
+            <u>Usuario: </u><b>{evidence.dueño}</b> 
+            <br/><br/>        
+            <u>Correo del Usuario: </u><b>{evidence.correo}</b>                                               
             </div>
             </div>
           </Paper>

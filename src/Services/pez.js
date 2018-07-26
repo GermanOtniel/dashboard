@@ -1,9 +1,7 @@
 const baseURL = 'http://localhost:3000';
 
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ CENTROS }}}}}
 export function getZonas(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/zona/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -13,10 +11,9 @@ export function getZonas(){
     return zonas
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ ZONAS }}}}}
 export function getCountry(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/pais/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -26,10 +23,9 @@ export function getCountry(){
     return paises
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ ZONAS }}}}}
 export function getStates(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/estado/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -39,10 +35,9 @@ export function getStates(){
     return estados
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ CENTROS }}}}}
 export function getCenters(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/ctrconsumo/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -52,6 +47,8 @@ export function getCenters(){
     return centros
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ CENTROS }}}}}
 export function createCenter(formulario){
   return fetch(  baseURL + '/ctrconsumo/new' ,{
     method:'post',
@@ -68,6 +65,8 @@ export function createCenter(formulario){
     return centro
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ ZONAS }}}}}
 export function createState(formulario){
   return fetch(  baseURL + '/estado/new' ,{
     method:'post',
@@ -84,6 +83,8 @@ export function createState(formulario){
     return state
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE {{{{{ ZONAS }}}}}
 export function createZone(formulario){
   return fetch(  baseURL + '/zona/new' ,{
     method:'post',

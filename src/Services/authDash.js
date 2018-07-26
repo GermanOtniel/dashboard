@@ -1,8 +1,7 @@
 const baseURL = 'http://localhost:3000';
 
+//SE USA EN EL COMPONENTE DE {{{{{{{{{SIGNUP}}}}}}}}}
 export function signup(userData){
-  // localhost 
-  //herokuapp '/auth/signup'
     return fetch(baseURL + '/dash/signup', {
         method:'post',
         headers:{
@@ -19,9 +18,8 @@ export function signup(userData){
         return user;
     });
 }
+//SE USA EN EL COMPONENTE DE {{{{{{LOGIN}}}}}}
 export function login(userData){
-  //  localhost 
-  // herokuapp  '/auth/login'
     return fetch( baseURL + '/dash/login' ,{
       method:'post',
       headers:{
@@ -39,11 +37,8 @@ export function login(userData){
       return user;
     })
   }
-
+//SE USA EN EL COMPONENTE DE {{{{{{{DINAMICAS}}}}}}}
   export function getUser(id){
-    //console.log("peticion");
-    //  localhost  
-    // herokuapp  '/auth/profile/'
     return fetch( baseURL + '/auth/profile/' + id )
     .then(res=>{
       if(!res.ok) return Promise.reject(res.statusText);

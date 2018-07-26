@@ -1,5 +1,6 @@
 const baseURL = 'http://localhost:3000';
 
+//SE USA EN EL COMPONENTE DE BRANDS {{{{{BRANDS}}}}}
 export function createBrand(formulario){
   return fetch(  baseURL + '/brand/new' ,{
     method:'post',
@@ -16,6 +17,8 @@ export function createBrand(formulario){
     return brand
   })
 }
+//SE USA EN EL COMPONENTE DE BRANDS {{{{{BRANDS}}}}}
+
 export function getBrands(){
   //console.log("peticion");
   //  localhost  
@@ -29,6 +32,7 @@ export function getBrands(){
     return brands
   })
 }
+//SE UTILIZA EN EL COMPONENTE DE {{{{DINAMICAS}}}} 
 export function getSingleBrand(id){
   return fetch( baseURL + '/brand/'+ id )
   .then(res=>{

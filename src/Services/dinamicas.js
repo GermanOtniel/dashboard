@@ -1,5 +1,6 @@
 const baseURL = 'http://localhost:3000';
 
+//CREO QUE NO SIRVE PARA NADA 
 export function zoneById(id) {
    return fetch( baseURL + '/zona/one' )
   .then(r=>r.json())
@@ -7,6 +8,9 @@ export function zoneById(id) {
     return zona
   })
 }
+// REPITO CREO QUE NO SIRVE PARA NADA
+
+//SE UTILIZA EN EL COMPONENTE DE DINAMICAS
 export function createDinamic(formulario){
   return fetch(  baseURL + '/dinamica/new' ,{
     method:'post',
@@ -23,6 +27,8 @@ export function createDinamic(formulario){
     return dinamica
   })
 }
+
+//SE UTILIZA EN EL COMPONENTE DE DINAMICAS
 export function getDinamics(){
   return fetch( baseURL + '/dinamica/' )
   .then(res=>{
