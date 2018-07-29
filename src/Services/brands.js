@@ -35,6 +35,13 @@ export function getBrands(){
 //SE UTILIZA EN EL COMPONENTE DE {{{{DINAMICAS}}}} 
 export function getSingleBrand(id){
   return fetch( baseURL + '/brand/'+ id )
+  .then(brand=>{
+    return brand
+  })
+  .catch(e=>console.log(e))
+}
+export function getBrand(id){
+  return fetch( baseURL + '/brand/' + id )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()

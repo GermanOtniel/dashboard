@@ -39,7 +39,7 @@ export function login(userData){
   }
 //SE USA EN EL COMPONENTE DE {{{{{{{DINAMICAS}}}}}}}
   export function getUser(id){
-    return fetch( baseURL + '/auth/profile/' + id )
+    return fetch( baseURL + '/dash/profile/' + id )
     .then(res=>{
       if(!res.ok) return Promise.reject(res.statusText);
       return res.json()

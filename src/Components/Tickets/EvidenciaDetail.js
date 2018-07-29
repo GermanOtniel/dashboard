@@ -6,6 +6,7 @@ import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
+import TextField from 'material-ui/TextField';
 import './evidencias.css';
 
 const style = {
@@ -13,7 +14,7 @@ const style = {
   width: '80%',
   margin: 20,
   textAlign: 'center',
-  display: 'inline-block',
+  display: 'inline-block'
 };
 const style2 = {
   margin: 12,
@@ -24,7 +25,8 @@ class EvidenciaDetail extends Component{
   state={
     evidence:{},
     evidencia:{},
-    value:null
+    value:null,
+    textFieldDisabled:true
   }
 
   componentWillMount(){
@@ -43,10 +45,27 @@ class EvidenciaDetail extends Component{
     .catch(e=>alert(e));
   }
   handleChange = (event, index, value) => {
-    let {evidencia} = this.state;
-    evidencia.status = value
-    this.setState({evidencia,value})
+    if( value === "Desaprobada")
+      {
+        let {evidencia} = this.state;
+        evidencia.status = value
+        this.setState({textFieldDisabled:false,evidencia,value})
+      }
+      else if ( value === "Aprobada")
+      {
+        let {evidencia} = this.state;
+        evidencia.status = value
+        this.setState({textFieldDisabled:true,evidencia,value})
+      }
   };
+  onChange = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const {evidencia} = this.state;
+    evidencia[field] = value;
+    console.log(evidencia);
+    this.setState({evidencia});
+  }
   sendEvidence = (e) => {
     let { evidencia } = this.state;
     let id = this.props.match.params.id
@@ -71,10 +90,11 @@ class EvidenciaDetail extends Component{
           <Paper style={style} >
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
             <div className="padreDetail">
-            <div className="hijoDetail">
+            <div>
             <img src={evidence.archivo}/>
             <div>
-            <SelectField
+              <div className="padreDetail">
+              <SelectField
               floatingLabelStyle={{fontSize:25}}
               floatingLabelText="Acción"
               value={this.state.value}
@@ -83,6 +103,16 @@ class EvidenciaDetail extends Component{
               <MenuItem value="Aprobada" primaryText="Aprobada" />
               <MenuItem value="Desaprobada" primaryText="Desaprobada" />
             </SelectField>
+            <TextField
+            floatingLabelStyle={{fontSize:15}}
+            hintText="¿Explicale porqué?"
+            floatingLabelText="¿Desaprobada?"
+            name="nota"
+            type="text"
+            onChange={this.onChange}
+            disabled={this.state.textFieldDisabled}
+          />
+              </div>
             </div>
             <div>
             <RaisedButton

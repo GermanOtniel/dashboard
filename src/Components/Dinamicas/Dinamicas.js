@@ -20,7 +20,7 @@ import { getZonas} from '../../Services/pez';
 import { createDinamic, getDinamics } from '../../Services/dinamicas';
 import { getUser } from '../../Services/authDash';
 import DatePicker from 'material-ui/DatePicker';
-import { getSingleBrand } from '../../Services/brands';
+import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
 import firebase from '../../firebase/firebase';
@@ -67,7 +67,6 @@ class Dinamicas extends Component {
     open:false,
     centros:[],
     zonas:[],
-    brandId:{},
     marcas:[],
     newDinamic:{},
     dinamics:[],
@@ -102,35 +101,33 @@ class Dinamicas extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
-    const id = `${JSON.parse(localStorage.getItem('user'))._id}`;
-    getUser(id)
-    .then(user=>{
-      let {brandId} = this.state;
-      brandId = user.brand;
-      this.setState({brandId})
-      getSingleBrand(this.state.brandId._id)
+    //ID DEL BRAND
+    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
+    //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
+    getBrand(id)
       .then(brand=>{
+        //console.log(brand)
         let {marcas} = this.state;
         marcas = brand.marcas
         this.setState({marcas})
       })
       .catch(e=>console.log(e))
-    })
-    .catch(e=>console.log(e))
+    //TRAEMOS LAS ZONAS PARA TENER LAS ZONAS PARA EL AUTOCOMPLETE DE ZONAS
     getZonas()
      .then(zonas=>{
       this.setState({zonas})
      })
      .catch(e=>console.log(e))
+     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
     getDinamics()
      .then(dinamics=>{
+       //console.log(dinamics.map(dinamic => dinamic));
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
         {
           dinamics[i].brand = brands[i]
         }
        this.setState({dinamics})
-       console.log(this.state.dinamics)
      })
      .catch(e=>console.log(e))
    }
@@ -140,7 +137,7 @@ class Dinamicas extends Component {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,newObj:{},newObj2:{},chipData:[]});
+    this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[]});
   };
   handleClose3 = () => {
     this.setState({textFieldDisabled: true,textFieldDisabled2:false});
@@ -202,7 +199,7 @@ onChange = (e) => {
 }
 getFile = e => {
   const file = e.target.files[0];
-  const brand = this.state.brandId.nombre;
+  const brand = `${JSON.parse(localStorage.getItem('user'))._id}`;
   const date = new Date();
   const date2 = String(date).slice(15,24)
   //aqui lo declaro
@@ -213,9 +210,11 @@ getFile = e => {
   //aqui agreggo el exito y el error
   uploadTask
   .then(r=>{
+    console.log(r.downloadURL)
     const {newDinamic} = this.state;
     newDinamic.imagenPremio =  r.downloadURL;
     this.setState({newDinamic})
+    console.log(this.state.newDinamic.imagenPremio)
   })
   .catch(e=>console.log(e)) //task
   //aqui reviso el progreso
@@ -226,13 +225,13 @@ getFile = e => {
 };
 sendDinamic = (e) => {
   const { newDinamic } = this.state;
-  newDinamic.brand = this.state.brandId._id;
+  newDinamic.brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
   createDinamic(newDinamic)
   .then(dinamic=>{
-    console.log(dinamic)
+    //console.log(dinamic)
+    this.handleClose();
   })
   .catch(e=>console.log(e))
-  this.handleClose();
 }
 renderChip(data) {
   return (
@@ -451,9 +450,11 @@ renderChip2(data) {
             <input onChange={this.getFile} name="imagenPremio" type="file" style={styles.uploadInput} />
           </FlatButton>
           <br/>
+          <span>Espera la imagen tarda unos segundos en cargarse...</span>
+          <br/><br/>
           <div className="senDinamica">
           <RaisedButton onClick={this.sendDinamic}  label="Crear Dinámica" secondary={true}  />
-        </div>
+          </div>
       </Dialog> 
     </div>
     </div>
