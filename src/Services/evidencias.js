@@ -38,3 +38,11 @@ export function sendEvidencia(evidence,id){
       return evidencia;
   });
 }
+
+export function getEvidencesByDinamic(id) {
+  return fetch( baseURL + '/evidencia/dinamica/' + id)
+  .then(r=>r.json())
+  .then(evidencias=>{
+    return evidencias
+  })
+}

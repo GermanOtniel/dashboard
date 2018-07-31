@@ -3,7 +3,9 @@ import AppBar from 'material-ui/AppBar';
 import FontIcon from 'material-ui/FontIcon';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
+import Dinamicas from '../Dinamicas/Dinamicas';
 import {Link} from 'react-router-dom';
+import {outUserDash} from '../../Services/authDash';
 import './dash.css';
 
 const styleMenu = {
@@ -17,6 +19,7 @@ class Dash extends Component {
   state={
     open:false
   }
+ 
 
   handleToggle = () => this.setState({open: !this.state.open});
   render() {
@@ -24,7 +27,7 @@ class Dash extends Component {
      <div>
         <AppBar
           title={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="200" height="73" alt="Logo de 1puntocinco"/>}
-          iconElementRight={<a href=""><FontIcon className="material-icons icon" color="white">exit_to_app</FontIcon></a>}
+          iconElementRight={<FontIcon className="material-icons icon" color="white">exit_to_app</FontIcon>}
           onLeftIconButtonClick={this.handleToggle}
         />
       <div>
@@ -52,7 +55,7 @@ class Dash extends Component {
           <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">assistant</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/marcas`}>Marcas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">work</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/brands`}>Brands</Link></MenuItem>
-        
+
         </div>
           </Drawer>
       </div>

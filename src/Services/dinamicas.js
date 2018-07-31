@@ -39,3 +39,11 @@ export function getDinamics(){
     return dinamicas
   })
 }
+
+export function getSingleDinamic(id) {
+  return fetch( baseURL + '/dinamica/' + id)
+  .then(r=>r.json())
+  .then(dinamic=>{
+    return dinamic
+  })
+}

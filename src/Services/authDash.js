@@ -48,3 +48,31 @@ export function login(userData){
       return user
     })
   }
+
+  export function editUser(user,id){
+    return fetch( baseURL + '/dash/user/' + id,{
+      method:'post',
+      headers:{
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify(user)
+    })
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+    })
+    .then(user=>{
+      return user;
+    });
+  }
+
+  export function outUserDash(){
+    return fetch( baseURL + '/dash/logout' )
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res.statusText);
+      return 
+    })
+    .then(logoutUser=>{
+      return 'Saliste'
+    })
+  }

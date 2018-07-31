@@ -1,0 +1,9 @@
+.img{
+  max-width: 600px;
+  min-width: 400px;
+  max-height: 400px;
+  min-height: 300px
+}
+.reportDinamicDetailHijo{
+    float: left
+}
