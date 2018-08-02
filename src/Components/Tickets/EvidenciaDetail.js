@@ -7,6 +7,8 @@ import RaisedButton from 'material-ui/RaisedButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
+import Avatar from 'material-ui/Avatar';
+import Chip from 'material-ui/Chip';
 import './evidencias.css';
 
 const style = {
@@ -25,6 +27,7 @@ class EvidenciaDetail extends Component{
   state={
     evidence:{},
     evidencia:{},
+    marcas:[],
     value:null,
     textFieldDisabled:true
   }
@@ -33,6 +36,8 @@ class EvidenciaDetail extends Component{
      let id = this.props.match.params.id
     getSingleEvidence(id)
     .then(evidence=>{
+      console.log(evidence)
+      let marcas = evidence.marcas.map(marca=>marca);
       let { evidencia } = this.state;
       evidencia = evidence;
       evidence.dueño = evidence.creador.nombre +' '+ evidence.creador.apellido;
@@ -40,7 +45,8 @@ class EvidenciaDetail extends Component{
       evidence.hora = evidence.created_at.slice(11,19);
       evidence.correo = evidence.creador.correo;
       evidence.descripcion = evidence.dinamica.descripcion
-      this.setState({evidence,evidencia})
+      this.setState({evidence,evidencia,marcas})
+      //console.log(this.state.marcas)
     })
     .catch(e=>alert(e));
   }
@@ -63,7 +69,7 @@ class EvidenciaDetail extends Component{
     const value = e.target.value;
     const {evidencia} = this.state;
     evidencia[field] = value;
-    console.log(evidencia);
+    //console.log(evidencia);
     this.setState({evidencia});
   }
   sendEvidence = (e) => {
@@ -82,7 +88,7 @@ class EvidenciaDetail extends Component{
   }
 
   render(){
-    const {evidence} = this.state;
+    const {evidence,marcas} = this.state;
       return (
         <div>
           <Dash/>
@@ -125,7 +131,22 @@ class EvidenciaDetail extends Component{
             </div>
             <div className="hijoDetail">
            <u>Mensaje del Usuario: </u><h4>{evidence.mensaje}</h4>
-            <u>Cantidad Vendida: </u><h4>{evidence.cantidadProducto}</h4>
+            <u>Cantidad Vendida según Usuario: </u>
+            <br/><br/>
+            <div className="padreDetail">
+            {marcas.map( (marca, index) => (
+              <div  key={index}>
+              <Chip
+              >
+              <Avatar  src={marca._id.imagen} />
+                <span className="span">{marca._id.nombre+" "}</span>
+                 <b className="b">{  marca.ventas + " "}</b> <span> Ventas</span>
+              </Chip> 
+              <br/>
+              </div>
+              ))}
+            </div>
+            
             <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
             <u>Modalidad: </u><b>{evidence.modalidad}</b>
             <br/><br/>        

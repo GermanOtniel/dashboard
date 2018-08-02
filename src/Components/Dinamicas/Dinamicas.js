@@ -3,9 +3,7 @@ import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
-import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
 import {
@@ -18,7 +16,6 @@ import {
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
 import { createDinamic, getDinamics } from '../../Services/dinamicas';
-import { getUser } from '../../Services/authDash';
 import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
@@ -65,10 +62,12 @@ class Dinamicas extends Component {
 
   state={
     open:false,
+    open2:false,
     centros:[],
     zonas:[],
     marcas:[],
     newDinamic:{},
+    putosMarcas:[],
     dinamics:[],
     newObj:{},
     newObj2:{},
@@ -139,21 +138,61 @@ class Dinamicas extends Component {
   handleClose = () => {
     this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[]});
   };
-  handleClose3 = () => {
-    this.setState({textFieldDisabled: true,textFieldDisabled2:false});
+  handleOpen2 = () => {
+    this.setState({open2: true});
   };
-  handleOpen3 = () => {
-    this.setState({textFieldDisabled: false,textFieldDisabled2:true});
+
+  handleClose2 = () => {
+    this.setState({open2: false});
   };
+  // handleClose3 = () => {
+  //   this.setState({textFieldDisabled: true,textFieldDisabled2:false});
+  // };
+  // handleOpen3 = () => {
+  //   this.setState({textFieldDisabled: false,textFieldDisabled2:true});
+  // };
  
 
- onNewRequestMarca = (chosenRequest) => {
+  onNewRequestMarca = (chosenRequest) => {
     let { chipData } = this.state;
     let { newDinamic } = this.state;
+    if(newDinamic.modalidad === "Puntos"){
     chipData.push(chosenRequest);
-    newDinamic.marcas = chipData;
-    this.setState({chipData,newDinamic})
+    //newDinamic.marcas = chipData;
+    console.log(chipData)
+    this.setState({chipData})
+    }
+    else if(newDinamic.modalidad === "Ventas"){
+    chipData.push(chosenRequest);
+    //newDinamic.marcas = chipData;
+    console.log(chipData)
+    this.setState({chipData})
+    }
+    else{
+      this.handleOpen2();
+    }
 }
+onChangeMarca = (e) => {
+  const field = e.target.name;
+  const value = e.target.value;
+  const {chipData} =this.state;
+  const {newDinamic} = this.state;
+  for(let i = 0; i<chipData.length;i++){
+    if(field === chipData[i]._id){
+      chipData[i].puntosVentas = value
+    }
+  }
+  newDinamic.marcaPuntosVentas = chipData;
+  this.setState({newDinamic,chipData})
+}
+//  onNewRequestMarca = (chosenRequest) => {
+//     let { chipData } = this.state;
+//     let { newDinamic } = this.state;
+//     chipData.push(chosenRequest);
+//     newDinamic.marcas = chipData;
+//     console.log(chipData)
+//     this.setState({chipData,newDinamic})
+// }
 onNewRequestCentro = (chosenRequest) => {
   let { chipData2 } = this.state;
   let { newDinamic } = this.state;
@@ -195,8 +234,18 @@ onChange = (e) => {
   const value = e.target.value;
   const {newDinamic} = this.state;
   newDinamic[field] = value;
+  console.log(newDinamic)
   this.setState({newDinamic}); 
 }
+
+// onChangeMarcasPuntos = (e) => {
+//   const field = e.target.name;
+//   const value = e.target.value;
+//   const {putosMarcas} = this.state;
+//   newDinamic.putosMarcas[field] = {value};
+//   console.log(newDinamic)
+//   this.setState({newDinamic}); 
+// }
 getFile = e => {
   const file = e.target.files[0];
   const brand = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -235,13 +284,21 @@ sendDinamic = (e) => {
 }
 renderChip(data) {
   return (
+   <div key={data.nombre}>
     <Chip
-      key={data._id}
-      onRequestDelete={() => this.handleRequestDelete(data._id)}
+      
+      onRequestDelete={() => this.handleRequestDelete(data.nombre)}
       style={styles2.chip}
     >
       {data.nombre}
     </Chip>
+    <TextField
+    onChange={this.onChangeMarca}
+    name={`${data._id}`}
+    type="number"
+    hintText="Puntos o Ventas por Marca"
+  />
+    </div>
   );
 }
 renderChip2(data) {
@@ -256,7 +313,14 @@ renderChip2(data) {
   );
 }
   render() {
-    
+    const actions = [
+      <FlatButton
+        label="Entendido"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose2}
+      />,
+    ];
     return (
     <div>
        <Dash/>
@@ -348,22 +412,22 @@ renderChip2(data) {
           </RadioButtonGroup>
           <div className="padre">
           <div className="margin">
-          <TextField
+          {/* <TextField
             hintText="Meta = Unidades por vender"
             floatingLabelText="Meta a vender"
             name="meta"
             type="number"
             onChange={this.onChange}
             disabled={this.state.textFieldDisabled2}
-          />
-          <TextField
+          /> */}
+          {/* <TextField
             hintText="Recuerde unidad = 1 copa"
             floatingLabelText="Puntos por unidad"
             name="puntos"
             type="number"
             onChange={this.onChange}
             disabled={this.state.textFieldDisabled}
-          />
+          /> */}
           </div>
           </div>
           <TextField
@@ -398,8 +462,11 @@ renderChip2(data) {
           />
           </div>
           </div>  
+          <hr/>
+          <b>Para seleccionar otra marca borra la primera y repite el proceso.</b>
             <AutoComplete
             floatingLabelText="Selecciona Marca(s)"
+
             filter={AutoComplete.caseInsensitiveFilter}
             dataSource={this.state.marcas.map(marca => marca)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
@@ -408,6 +475,7 @@ renderChip2(data) {
             <div style={styles2.wrapper}>
               {this.state.chipData.map(this.renderChip, this)}
             </div>
+            <hr/>
           <AutoComplete
             floatingLabelText="Activa/Inactiva"
             filter={AutoComplete.noFilter}
@@ -417,7 +485,10 @@ renderChip2(data) {
             onNewRequest={this.onNewRequest2}
           />
           <div>
+          <hr/>
             <div className="margin">
+            <b>Primero debes de Seleccionar la Zona</b>
+            <br/>
             <AutoComplete
               floatingLabelText="Selecciona la Zona"
               filter={AutoComplete.caseInsensitiveFilter}
@@ -425,6 +496,8 @@ renderChip2(data) {
               dataSourceConfig={ {text: 'nombre', value: '_id'}  }
               onNewRequest={this.onNewRequestZona}
             /> 
+            <br/>
+            <b>Para seleccionar otra Centro de Consumo borra el primero y repite el proceso.</b>
             <br/>
             <AutoComplete
             floatingLabelText="Selecciona Centro(s) de Consumo"
@@ -438,6 +511,7 @@ renderChip2(data) {
             <div style={styles2.wrapper}>
               {this.state.chipData2.map(this.renderChip2, this)}
             </div>
+            <hr/>
           </div>
           <br/>
             <FlatButton
@@ -457,6 +531,17 @@ renderChip2(data) {
           </div>
       </Dialog> 
     </div>
+    <div>
+    <Dialog
+          title="Dialog With Actions"
+          actions={actions}
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+        >
+          Debes de elegir primero una modalidad de la Dinámica.
+        </Dialog>
+        </div>
     </div>
     );
   }
