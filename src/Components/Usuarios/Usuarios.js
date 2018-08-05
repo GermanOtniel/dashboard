@@ -96,7 +96,7 @@ handleClose = () => {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
                 Zonas Existentes
               </TableHeaderColumn>
             </TableRow>
@@ -104,6 +104,7 @@ handleClose = () => {
               <TableHeaderColumn tooltip="Correo Electrónico">Correo Electrónico</TableHeaderColumn>
               <TableHeaderColumn tooltip="Puesto">Puesto</TableHeaderColumn>
               <TableHeaderColumn tooltip="Fecha de Alta">Fecha de Registro</TableHeaderColumn>
+              <TableHeaderColumn tooltip="Fecha de Alta">Nombre</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
 
             </TableRow>
@@ -120,6 +121,7 @@ handleClose = () => {
                 <TableRowColumn>{user.correo}</TableRowColumn>
                 <TableRowColumn>{user.puesto}</TableRowColumn>
                 <TableRowColumn>{user.created_at}</TableRowColumn>
+                <TableRowColumn>{user.nombre}</TableRowColumn>
                 <TableRowColumn><Link to={`/usuario/${user._id}`}>Ver Detalle</Link></TableRowColumn>
               </TableRow>
               ))}
