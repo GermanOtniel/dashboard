@@ -5,6 +5,7 @@ import RaisedButton from 'material-ui/RaisedButton';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import Dialog from 'material-ui/Dialog';
+import {green700,blue500} from 'material-ui/styles/colors';
 import { getUser, editUser } from '../../Services/authDash';
 import { getBrands } from '../../Services/brands';
 import './usuarios.css';
@@ -25,6 +26,12 @@ const styles = {
   },
   autoHidden: {
     display: 'none'
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
   }
 };
 
@@ -89,7 +96,7 @@ class UsuarioDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE USUARIO" fullWidth={true} />
           <div className="userPadreDetail">
             <div>
-            <img width="500px" height="500px" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Fuser.png?alt=media&token=a2e1fe21-da40-43ed-bcd7-09d63e53e8a7"}/>
+            <img width="500px" height="500px" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Ffoto-no-disponible.jpg?alt=media&token=c8c0d7a0-d1f2-418a-89d1-9d7688d0e801"}/>
             </div>
             <div className="userSonDetail">
               <u>Correo del Usuario: </u><h4>{user.correo}</h4>
@@ -110,21 +117,31 @@ class UsuarioDetail extends Component{
             onRequestClose={this.handleClose}
           >
            <AutoComplete
-             floatingLabelText="Type 'r', case insensitive"
+             floatingLabelText="Asignale su BRAND"
              filter={AutoComplete.caseInsensitiveFilter}
              dataSource={this.state.brands.map(brand => brand)}
              dataSourceConfig={ {text: 'nombre', value: '_id'}  }
              onNewRequest={this.onNewRequestBrand}
              style={styles.autoComplete}
+             openOnFocus={true}
+             floatingLabelStyle={styles.floatingLabelFocusStyle}
+             floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+             errorText="Este campo es obligatorio"
+             errorStyle={styles.errorStyle}
             />            
           <Divider />
           <AutoComplete
-             floatingLabelText="Type 'r', case insensitive"
+             floatingLabelText="Asignale su puesto"
+             hintText="Asegúrate primero"
              filter={AutoComplete.caseInsensitiveFilter}
              dataSource={this.state.opciones.map(opcion => opcion)}
              onNewRequest={this.onNewRequest}
              style={styles.autoComplete}
-             /*style={!this.state.centroConsumo ? styles.autoComplete : styles.autoHidden }*/
+             openOnFocus={true}
+             floatingLabelStyle={styles.floatingLabelFocusStyle}
+             floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+             errorText="Este campo es obligatorio"
+             errorStyle={styles.errorStyle}
             /> 
     
           <RaisedButton onClick={this.sendEdit}  label="Enviar Cambios" secondary={true}  />

@@ -110,7 +110,7 @@ sendBrand = (e) => {
             label="CREA UN BRAND"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >map</FontIcon>}
+            icon={<FontIcon className="material-icons">work</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}

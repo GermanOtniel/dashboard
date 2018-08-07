@@ -6,6 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
+import Avatar from 'material-ui/Avatar';
 import {
   Table,
   TableBody,
@@ -20,6 +21,8 @@ import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
 import Chip from 'material-ui/Chip';
+import {green700,blue500} from 'material-ui/styles/colors';
+import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
 import './dinamicas.css';
 
@@ -41,8 +44,15 @@ const styles = {
     left: 0,
     width: '100%',
     opacity: 0,
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
   }
 };
+
 const styles2 = {
   chip: {
     margin: 4,
@@ -85,7 +95,10 @@ class Dinamicas extends Component {
     enableSelectAll: true,
     deselectOnClickaway: true,
     showCheckboxes: true,
-    height: '300px'
+    height: '300px',
+    progresoImagen:0,
+    detalleDinamica:{},
+    marcasDinamica:[]
   }
   handleRequestDelete = (label) => {
     this.chipData = this.state.chipData;
@@ -120,6 +133,7 @@ class Dinamicas extends Component {
      //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
     getDinamics()
      .then(dinamics=>{
+       console.log(dinamics)
        //console.log(dinamics.map(dinamic => dinamic));
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
@@ -145,14 +159,7 @@ class Dinamicas extends Component {
   handleClose2 = () => {
     this.setState({open2: false});
   };
-  // handleClose3 = () => {
-  //   this.setState({textFieldDisabled: true,textFieldDisabled2:false});
-  // };
-  // handleOpen3 = () => {
-  //   this.setState({textFieldDisabled: false,textFieldDisabled2:true});
-  // };
  
-
   onNewRequestMarca = (chosenRequest) => {
     let { chipData } = this.state;
     let { newDinamic } = this.state;
@@ -267,10 +274,11 @@ getFile = e => {
   })
   .catch(e=>console.log(e)) //task
   //aqui reviso el progreso
-  // uploadTask.on('state_changed', (snap)=>{
-  //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
-  //   this.setState({total});
-  // })
+  uploadTask.on('state_changed', (snap)=>{
+    const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
+    this.setState({progresoImagen});
+    console.log(this.state.progresoImagen)
+  })
 };
 sendDinamic = (e) => {
   const { newDinamic } = this.state;
@@ -281,6 +289,21 @@ sendDinamic = (e) => {
     this.handleClose();
   })
   .catch(e=>console.log(e))
+}
+handleOpen3 = () => {
+  this.setState({open3: true});
+};
+
+handleClose3 = () => {
+  this.setState({open3: false});
+};
+detalleDinamica = (dinamic) => {
+  console.log(dinamic)
+  this.handleOpen3()
+  let {detalleDinamica,marcasDinamica} = this.state;
+  detalleDinamica = dinamic;
+  marcasDinamica = dinamic.marcaPuntosVentas;
+  this.setState({detalleDinamica,marcasDinamica})
 }
 renderChip(data) {
   return (
@@ -313,6 +336,14 @@ renderChip2(data) {
   );
 }
   render() {
+    const actions2 = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose3}
+      />,
+    ];
     const actions = [
       <FlatButton
         label="Entendido"
@@ -321,6 +352,7 @@ renderChip2(data) {
         onClick={this.handleClose2}
       />,
     ];
+    const {detalleDinamica,marcasDinamica} = this.state;
     return (
     <div>
        <Dash/>
@@ -330,7 +362,7 @@ renderChip2(data) {
             label="CREA UNA DINAMICA"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
+            icon={<FontIcon className="material-icons">queue_play_next</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
@@ -382,7 +414,7 @@ renderChip2(data) {
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaInicio}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin}</TableRowColumn>
-                <TableRowColumn>Ver Detalle</TableRowColumn>
+                <TableRowColumn><button onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
 
               </TableRow>
               ))}
@@ -433,9 +465,13 @@ renderChip2(data) {
           <TextField
             hintText="Sea específico en pocas palabras"
             floatingLabelText="Nombre de la Dinámica"
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
             onChange={this.onChange}
             name="nombreDinamica"
-            type="text"
+            type="text" 
             fullWidth={true}
           />
           <TextField
@@ -445,6 +481,10 @@ renderChip2(data) {
             name="descripcion"
             type="text"
             fullWidth={true}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />
           <div className="padre">
             <div className="margin">
@@ -452,6 +492,8 @@ renderChip2(data) {
             hintText="Fecha de Inicio"
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           /> 
             </div>
             <div className="margin">
@@ -459,6 +501,8 @@ renderChip2(data) {
             hintText="Fecha de Cierre"
             value={this.state.newObj2.fecha}
             onChange={this.handleChange2}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />
           </div>
           </div>  
@@ -471,6 +515,10 @@ renderChip2(data) {
             dataSource={this.state.marcas.map(marca => marca)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequestMarca}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />
             <div style={styles2.wrapper}>
               {this.state.chipData.map(this.renderChip, this)}
@@ -483,6 +531,10 @@ renderChip2(data) {
             dataSourceConfig={ {text: 'text', value: 'value'}  }
             dataSource={dataSource2}
             onNewRequest={this.onNewRequest2}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />
           <div>
           <hr/>
@@ -495,6 +547,10 @@ renderChip2(data) {
               dataSource={this.state.zonas.map(zona => zona)}
               dataSourceConfig={ {text: 'nombre', value: '_id'}  }
               onNewRequest={this.onNewRequestZona}
+              floatingLabelStyle={styles.floatingLabelFocusStyle}
+              floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+              errorText="Este campo es obligatorio"
+              errorStyle={styles.errorStyle}
             /> 
             <br/>
             <b>Para seleccionar otra Centro de Consumo borra el primero y repite el proceso.</b>
@@ -506,6 +562,10 @@ renderChip2(data) {
             dataSource={this.state.centros.map(centro => centro)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequestCentro}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
             />
             </div>
             <div style={styles2.wrapper}>
@@ -523,8 +583,9 @@ renderChip2(data) {
           > 
             <input onChange={this.getFile} name="imagenPremio" type="file" style={styles.uploadInput} />
           </FlatButton>
-          <br/>
-          <span>Espera la imagen tarda unos segundos en cargarse...</span>
+          <br/><br/>
+          <LinearProgress mode="determinate" value={this.state.progresoImagen} />
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : "Espera la imagen se esta cargando..."}</span>
           <br/><br/>
           <div className="senDinamica">
           <RaisedButton onClick={this.sendDinamic}  label="Crear Dinámica" secondary={true}  />
@@ -533,7 +594,7 @@ renderChip2(data) {
     </div>
     <div>
     <Dialog
-          title="Dialog With Actions"
+          title="Te hace falta algo..."
           actions={actions}
           modal={false}
           open={this.state.open2}
@@ -542,6 +603,48 @@ renderChip2(data) {
           Debes de elegir primero una modalidad de la Dinámica.
         </Dialog>
         </div>
+        <div>
+          <Dialog
+          title="Detalle de Dinamica"
+          actions={actions2}
+          modal={false}
+          open={this.state.open3}
+          onRequestClose={this.handleClose3}
+          autoScrollBodyContent={true}
+        >
+        <img width="300px" height="250px" src={detalleDinamica.imagenPremio} />
+        <hr/>
+        <h5>Nombre de la Dinámica:</h5>
+        <h2>{detalleDinamica.nombreDinamica}</h2>
+        <hr/>
+        <h5>Modalidad de la Dinámica:</h5>
+        <h3>{detalleDinamica.modalidad}</h3>
+        <hr/>
+        <h5>Descripción de la Dinámica:</h5>
+        <b>{detalleDinamica.descripcion}</b>
+        <hr/>
+        <h5>Duración de la Dinámica:</h5>
+        <span>{detalleDinamica.fechaInicio + " - " + detalleDinamica.fechaFin}</span>
+        
+        <br/>
+        <hr/>
+        <br/>
+        <h3>{detalleDinamica.modalidad === "Ventas" ? "Ventas requeridas por marca: " : "Puntos por unidad vendida: "}</h3>     
+        <br/>
+        {marcasDinamica.map( (marca, index) => (
+              <div key={index}>
+              <Chip
+              className="dinamicDetailHijo"
+              >
+              <Avatar src={marca._id.imagen} />
+                {marca._id.nombre}
+                 <b>{ " " + marca.puntosVentas }</b>
+              </Chip> 
+              <br/><br/>
+              </div>
+              ))}
+        </Dialog>
+          </div>
     </div>
     );
   }

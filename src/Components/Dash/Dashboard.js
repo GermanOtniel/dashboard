@@ -3,15 +3,13 @@ import AppBar from 'material-ui/AppBar';
 import FontIcon from 'material-ui/FontIcon';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
-import Dinamicas from '../Dinamicas/Dinamicas';
 import {Link} from 'react-router-dom';
-import {outUserDash} from '../../Services/authDash';
 import './dash.css';
 
 const styleMenu = {
-  fontSize: 15,
-  height: 70,
-  marginTop:25
+  fontSize: 22,
+  height: 50,
+  marginTop:20
 }
 
 class Dash extends Component {
@@ -26,8 +24,7 @@ class Dash extends Component {
     return (
      <div>
         <AppBar
-          title={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="200" height="73" alt="Logo de 1puntocinco"/>}
-          iconElementRight={<FontIcon className="material-icons icon" color="white">exit_to_app</FontIcon>}
+          title={<img src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed" width="200" height="73" alt="Logo de 1puntocinco"/>}
           onLeftIconButtonClick={this.handleToggle}
         />
       <div>

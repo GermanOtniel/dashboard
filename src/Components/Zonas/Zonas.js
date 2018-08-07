@@ -7,6 +7,7 @@ import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
+import {green700,blue500} from 'material-ui/styles/colors';
 import {
   Table,
   TableBody,
@@ -24,6 +25,12 @@ const styles = {
     margin: 12,
     width: 400,
     height:70
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
   }
 };
 
@@ -216,12 +223,28 @@ onChange2 = (e) => {
           <AutoComplete
             floatingLabelText="Selecciona el país"
             filter={AutoComplete.caseInsensitiveFilter}
+            openOnFocus={true}
             dataSource={this.state.country.map(country => country)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequest}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />            
           <Divider />
-            <TextField onChange={this.onChange} name="nombre" hintText="Nombre del Estado" type="text"  underlineShow={false} />
+            <TextField 
+            onChange={this.onChange} 
+            name="nombre" 
+            floatingLabelText="Nombre del Estado"
+            hintText="Cuida la ortografía" 
+            type="text"  
+            underlineShow={false} 
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
+            />
             <Divider />
     </Paper>
           <RaisedButton onClick={this.sendEdit}  label="Crear Estado" secondary={true}  />
@@ -242,9 +265,25 @@ onChange2 = (e) => {
             dataSource={this.state.estados.map(state => state)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequest2}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
+            openOnFocus={true}
           />            
           <Divider />
-            <TextField onChange={this.onChange2} name="nombre" hintText="Nombre de la Zona" type="text"  underlineShow={false} />
+            <TextField 
+            onChange={this.onChange2} 
+            name="nombre" 
+            floatingLabelText="Nombre de la Zona"
+            hintText="Cuida la ortografía" 
+            type="text"  
+            underlineShow={false} 
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
+            />
             <Divider />
     </Paper>
           <RaisedButton onClick={this.sendZona}  label="Crear Zona" secondary={true}  />

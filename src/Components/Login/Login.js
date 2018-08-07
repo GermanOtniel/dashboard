@@ -73,7 +73,7 @@ class Login extends Component {
         <AppBar
           iconElementLeft={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="180" height="60" alt=""/>}
           iconElementRight={
-         <a href="http://1puntocinco.com/"><FontIcon className="material-icons icon" color="white">live_help</FontIcon></a>}
+         <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons icon" color="white">live_help</FontIcon></a>}
         />
        </div>
        <div className="paper">

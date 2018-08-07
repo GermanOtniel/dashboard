@@ -128,7 +128,7 @@ class Reportes extends Component {
             label="REPORTES"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
+            icon={<FontIcon className="material-icons">signal_cellular_alt</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 

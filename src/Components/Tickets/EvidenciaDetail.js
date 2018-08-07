@@ -97,7 +97,7 @@ class EvidenciaDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
             <div className="padreDetail">
             <div>
-            <img src={evidence.archivo}/>
+            <img width="550" src={evidence.archivo}/>
             <div>
               <div className="padreDetail">
               <SelectField
@@ -150,6 +150,8 @@ class EvidenciaDetail extends Component{
             <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
             <u>Modalidad: </u><b>{evidence.modalidad}</b>
             <br/><br/>        
+            <u>Status: </u><b className="b">{evidence.status}</b>
+            <br/><br/>
             <u>Fecha: </u><b>{evidence.fecha}</b>
             <br/><br/>        
             <u>Hora: </u><b>{evidence.hora}</b>

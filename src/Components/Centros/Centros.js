@@ -15,6 +15,7 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
+import {green700,blue500} from 'material-ui/styles/colors';
 import { getZonas, createCenter, getCenters } from '../../Services/pez';
 import './centros.css';
 
@@ -23,6 +24,12 @@ const styles = {
     margin: 12,
     width: 400,
     height:70
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
   }
 };
 const dataSource2 = [
@@ -92,7 +99,6 @@ onChange = (e) => {
   const {newCenter} = this.state;
   newCenter[field] = value;
   this.setState({newCenter}); 
-  console.log(newCenter)
 }
 
 sendCenter = (e) => {
@@ -177,28 +183,40 @@ sendCenter = (e) => {
           <AutoComplete
             floatingLabelText="Selecciona la Zona"
             filter={AutoComplete.caseInsensitiveFilter}
+            openOnFocus={true}
             dataSource={this.state.zonas.map(zona => zona)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequest}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />  
           <Divider/>
           <AutoComplete
-            floatingLabelText="showAllItems"
+            floatingLabelText="Estatus"
             filter={AutoComplete.noFilter}
             openOnFocus={true}
             dataSourceConfig={ {text: 'text', value: 'value'}  }
             dataSource={dataSource2}
             onNewRequest={this.onNewRequest2}
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />
           <Divider />
           <TextField
             hintText="Ej. La Cervecería Polanco"
             floatingLabelText="Nombre del Centro de Consumo (Sea específico)"
-            multiLine={true}
-            rows={2}
+            fullWidth={true}
             onChange={this.onChange}
             name="nombre"
             type="text"
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
           />                     
           <Divider />
     </Paper>

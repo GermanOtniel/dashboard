@@ -6,6 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
+import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
 import { getBrands } from '../../Services/brands';
 import { createMarca,getMarcas } from '../../Services/marcas';
@@ -69,6 +70,7 @@ class Marcas extends Component {
     deselectOnClickaway: true,
     showCheckboxes: true,
     height: '300px',
+    progresoImagen:0
   }
   componentWillMount(){
     getBrands()
@@ -125,11 +127,11 @@ getFile = e => {
     this.setState({newMarca})
   })
   .catch(e=>console.log(e)) //task
-  //aqui reviso el progreso
-  // uploadTask.on('state_changed', (snap)=>{
-  //   const total = (snap.bytesTransferred / snap.totalBytes) * 100;
-  //   this.setState({total});
-  // })
+  uploadTask.on('state_changed', (snap)=>{
+    const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
+    this.setState({progresoImagen});
+    //console.log(this.state.progresoImagen)
+  })
 };
 handleChange = (event, date) => {
   const {newMarca} = this.state;
@@ -161,7 +163,7 @@ createMarca(this.state.newMarca)
             label="CREA UNA MARCA"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >map</FontIcon>}
+            icon={<FontIcon className="material-icons">assistant</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
@@ -240,15 +242,22 @@ createMarca(this.state.newMarca)
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
           />
-          <Divider />
+          <br/>
           <FlatButton
             label="Elige una Imagen"
             labelPosition="before"
             style={styles2.uploadButton}
             containerElement="label"
+            backgroundColor="#00897B"
           > 
             <input onChange={this.getFile} name="imagen" type="file" style={styles2.uploadInput} />
           </FlatButton>
+          <br/><br/>
+          <LinearProgress mode="determinate" value={this.state.progresoImagen} />
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : "Espera la imagen se esta cargando..."}</span>
+          <br/><br/>
+          
+          
     </Paper>
           <RaisedButton onClick={this.sendMarca}  label="Crear Marca" secondary={true}  />
           

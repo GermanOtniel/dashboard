@@ -72,7 +72,7 @@ class Evidencias extends Component {
             label="EVIDENCIAS"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >map</FontIcon>}
+            icon={<FontIcon className="material-icons">insert_photo</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 

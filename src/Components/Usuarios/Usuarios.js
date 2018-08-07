@@ -76,7 +76,7 @@ handleClose = () => {
             label="EDITAR USUARIOS"
             labelPosition="before"
             primary={true}
-            icon={<FontIcon className="material-icons" >map</FontIcon>}
+            icon={<FontIcon className="material-icons">face</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 
