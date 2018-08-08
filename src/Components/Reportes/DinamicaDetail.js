@@ -60,6 +60,8 @@ class DinamicaDetail extends Component{
       //console.log(dinamica)
         let marcas = dinamica.marcaPuntosVentas.map(marca=>marca._id);
         let { centros } = this.state;
+      dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
+      dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
       centros = dinamica.centroConsumo.map(centro=>centro);
       this.setState({dinamica, centros,marcas})
       getEvidencesByDinamic(id)
@@ -169,10 +171,12 @@ class DinamicaDetail extends Component{
             <b>Descripción:</b>
             <h6>{dinamica.descripcion}</h6>
             <b>Modalidad de la Dinámica:</b>
-            <p>{dinamica.modalidad}</p>
-            <b>Tiempo de Duración:</b>
-            <b>{dinamica.fechaInicio}</b>/<b>{dinamica.fechaFin}</b>
             <br/>
+            <span className="modalidadReporte">{dinamica.modalidad}</span>
+            <br/><br/>
+            <b>Tiempo de Duración:</b>
+            <br/>
+            <b>{dinamica.fechaInicio}</b>/<b>{dinamica.fechaFin}</b>
             <br/>
               <h4>Centros de Consumo:</h4>
               <div className="padreDetail" >

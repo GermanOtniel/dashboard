@@ -115,7 +115,7 @@ handleClose = () => {
             showRowHover={this.state.showRowHover}
             stripedRows={this.state.stripedRows}
           >
-            {this.state.users.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
+            {this.state.users.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
 .map( (user, index) => (
               <TableRow key={user._id} data={user}>
                 <TableRowColumn>{user.correo}</TableRowColumn>

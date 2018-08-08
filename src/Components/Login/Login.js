@@ -44,7 +44,7 @@ class Login extends Component {
   sendUser = (e) => {
     login(this.state.user)
     .then(user=>{
-      if(user.puesto === "SUPERADMIN" || user.puesto === "GERENTE" || user.puesto === "SUPERVISOR" )this.props.history.push("/home");
+      if(user.puesto === "SUPERADMIN" || user.puesto === "GERENTE" || user.puesto === "SUPERVISOR" )this.props.history.push("/dinamicas");
       else{
         this.handleOpen();
       }

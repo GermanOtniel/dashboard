@@ -73,9 +73,11 @@ class Dinamicas extends Component {
   state={
     open:false,
     open2:false,
+    open3:false,
     centros:[],
     zonas:[],
     marcas:[],
+    dinamicasFilter:[],
     newDinamic:{},
     putosMarcas:[],
     dinamics:[],
@@ -140,7 +142,8 @@ class Dinamicas extends Component {
         {
           dinamics[i].brand = brands[i]
         }
-       this.setState({dinamics})
+       //this.setState({dinamics})
+       this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
    }
@@ -220,8 +223,9 @@ onNewRequestZona = (chosenRequest) => {
 handleChange = (event, date) => {
   console.log(date)
   let {newDinamic} = this.state;
-  let fecha = String(date);
-  newDinamic.fechaInicio = fecha.slice(4,15);
+  //let fecha = String(date);
+  //newDinamic.fechaInicio = fecha.slice(4,15);
+  newDinamic.fechaInicio = date;
   this.setState({newDinamic});
   const {newObj} = this.state;
   newObj.fecha = date;
@@ -229,8 +233,9 @@ handleChange = (event, date) => {
 };
 handleChange2 = (event, date) => {
   let {newDinamic} = this.state;
-  let fecha = String(date);
-  newDinamic.fechaFin = fecha.slice(4,15);
+  //let fecha = String(date);
+  //newDinamic.fechaFin = fecha.slice(4,15);
+  newDinamic.fechaFin = date;
   this.setState({newDinamic});
   const {newObj2} = this.state;
   newObj2.fecha = date;
@@ -302,8 +307,19 @@ detalleDinamica = (dinamic) => {
   this.handleOpen3()
   let {detalleDinamica,marcasDinamica} = this.state;
   detalleDinamica = dinamic;
+  detalleDinamica.fechaInicio = dinamic.fechaInicio.slice(0,10)
+  detalleDinamica.fechaFin = dinamic.fechaFin.slice(0,10)
   marcasDinamica = dinamic.marcaPuntosVentas;
   this.setState({detalleDinamica,marcasDinamica})
+}
+
+filterList = (e) =>{
+  var updatedList = this.state.dinamics.map(dinamic=>dinamic);
+  updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
+    return item.nombreDinamica.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({dinamicasFilter: updatedList})
 }
 renderChip(data) {
   return (
@@ -370,6 +386,11 @@ renderChip2(data) {
          </div>
        </div>
        <div>
+       <div className="buscador">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Busca una dinámica" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <Table
           height={this.state.height}
@@ -405,15 +426,15 @@ renderChip2(data) {
             showRowHover={this.state.showRowHover}
             stripedRows={this.state.stripedRows}
           >
-            {this.state.dinamics.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
+            {this.state.dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
 .map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaInicio}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaFin}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><button onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
 
               </TableRow>
@@ -434,12 +455,10 @@ renderChip2(data) {
           <RadioButton 
           value="Ventas"
           label="Ventas"
-          onClick={this.handleClose3}
           />
           <RadioButton 
           value="Puntos"
           label="Puntos"
-          onClick={this.handleOpen3}
           />
           </RadioButtonGroup>
           <div className="padre">
@@ -507,7 +526,8 @@ renderChip2(data) {
           </div>
           </div>  
           <hr/>
-          <b>Para seleccionar otra marca borra la primera y repite el proceso.</b>
+          <b>Para seleccionar otra Marca borra la primera y repite el proceso.</b>
+          <br/>
             <AutoComplete
             floatingLabelText="Selecciona Marca(s)"
 
@@ -624,7 +644,7 @@ renderChip2(data) {
         <b>{detalleDinamica.descripcion}</b>
         <hr/>
         <h5>Duración de la Dinámica:</h5>
-        <span>{detalleDinamica.fechaInicio + " - " + detalleDinamica.fechaFin}</span>
+        <span>{detalleDinamica.fechaInicio}<b> hasta </b>{detalleDinamica.fechaFin}</span>
         
         <br/>
         <hr/>

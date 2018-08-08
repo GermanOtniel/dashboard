@@ -170,15 +170,15 @@ class Reportes extends Component {
             showRowHover={this.state.showRowHover}
             stripedRows={this.state.stripedRows}
           >
-            {this.state.dinamics.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
+            {this.state.dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
 .map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaInicio}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaFin}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><Link to={`/dinamica/${dinamic._id}`}>Ver Detalle</Link></TableRowColumn>
 
               </TableRow>
