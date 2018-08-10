@@ -71,6 +71,7 @@ class Login extends Component {
      <div className="padreLogin">
        <div>
         <AppBar
+          style={{backgroundColor: "#78909C"}}
           iconElementLeft={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="180" height="60" alt=""/>}
           iconElementRight={
          <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons icon" color="white">live_help</FontIcon></a>}
@@ -79,7 +80,7 @@ class Login extends Component {
        <div className="paper">
         <Paper>
           <br/><br/>
-        <FloatingActionButton secondary={true} >
+        <FloatingActionButton backgroundColor="#0D47A1" >
         <FontIcon className="material-icons">https</FontIcon>
         </FloatingActionButton>
         <br/>
@@ -101,7 +102,7 @@ class Login extends Component {
         />
         <br/><br/>
         <div className="hijoPaper">
-        <RaisedButton onClick={this.sendUser} label="Ingresar" secondary={true}  />
+        <RaisedButton onClick={this.sendUser} label="Ingresar" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
         <br/>
         <h5>Si aún no estás registrado <Link to="/signup" className="linkReg">Regístrate</Link></h5>
         <br/>

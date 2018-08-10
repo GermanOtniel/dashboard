@@ -29,17 +29,17 @@ export function getMarcas(){
 }
 
 //CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}
-export function getMarcasByBrand(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
-  return fetch( baseURL + '/marca/bybrand' )
-  .then(res=>{
-    if(!res.ok) return Promise.reject(res.statusText);
-    return res.json()
-  })
-  .then(marcas=>{
-    return marcas
-  })
-}
+// export function getMarcasByBrand(){
+//   //console.log("peticion");
+//   //  localhost  
+//   // herokuapp  '/auth/profile/'
+//   return fetch( baseURL + '/marca/bybrand' )
+//   .then(res=>{
+//     if(!res.ok) return Promise.reject(res.statusText);
+//     return res.json()
+//   })
+//   .then(marcas=>{
+//     return marcas
+//   })
+// }
 //CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}

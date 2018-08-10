@@ -47,3 +47,21 @@ export function getSingleDinamic(id) {
     return dinamic
   })
 }
+
+//SE UTILIZA EN el componente de DINAMICA DETAIL PARA HACER A UN USUARIO GANADOR POR BUENAS VENTAS
+export function makeWinner(user,id){
+  return fetch(baseURL + '/dinamica/winnerdash/' + id , {
+      method:'post',
+      headers:{
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(user)
+  })
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(dinamica=>{
+      return dinamica;
+  });
+}

@@ -46,10 +46,6 @@ const styles2 = {
   },
 };
 
-const dataSource2 = [
-  {text: "Activa",value:"Activa"},
-  {text:"Inactiva",value:"Inactiva"}
-]
 
 class Reportes extends Component {
 
@@ -59,6 +55,7 @@ class Reportes extends Component {
     dinamics:[],
     newObj:{},
     newObj2:{},
+    dinamicasFilter:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
     fixedFooter: true,
@@ -84,6 +81,18 @@ class Reportes extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
+    //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+    getDinamics()
+     .then(dinamics=>{
+       //console.log(dinamics.map(dinamic => dinamic));
+       let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+       for(let i= 0; i < dinamics.length;i++) 
+        {
+          dinamics[i].brand = brands[i]
+        }
+       this.setState({dinamicasFilter:dinamics,dinamics})
+     })
+     .catch(e=>console.log(e))
     //ID DEL BRAND
     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
     //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
@@ -101,20 +110,16 @@ class Reportes extends Component {
       this.setState({zonas})
      })
      .catch(e=>console.log(e))
-     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-    getDinamics()
-     .then(dinamics=>{
-       //console.log(dinamics.map(dinamic => dinamic));
-       let brands = dinamics.map(dinamic => dinamic.brand.nombre);
-       for(let i= 0; i < dinamics.length;i++) 
-        {
-          dinamics[i].brand = brands[i]
-        }
-       this.setState({dinamics})
-     })
-     .catch(e=>console.log(e))
+     
    }
-
+   filterList = (e) =>{
+    var updatedList = this.state.dinamics.map(dinamic=>dinamic);
+    updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
+      return item.nombreDinamica.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1;
+    });
+    this.setState({dinamicasFilter: updatedList})
+  }
  
 
   render() {
@@ -127,13 +132,19 @@ class Reportes extends Component {
           <RaisedButton
             label="REPORTES"
             labelPosition="before"
-            primary={true}
+            labelColor="#FAFAFA"
+            backgroundColor="#0D47A1"
             icon={<FontIcon className="material-icons">signal_cellular_alt</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 
          </div>
        </div>
+       <div className="buscador">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Busca una dinámica" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <div>
        <Table
@@ -150,7 +161,7 @@ class Reportes extends Component {
           >
             <TableRow>
               <TableHeaderColumn colSpan="7" style={{textAlign: 'center'}}>
-                Marcas Existentes
+                Reportes de Dinámicas
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
@@ -168,9 +179,8 @@ class Reportes extends Component {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
-            {this.state.dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
+            {this.state.dinamicasFilter.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
 .map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
@@ -179,7 +189,7 @@ class Reportes extends Component {
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
-                <TableRowColumn><Link to={`/dinamica/${dinamic._id}`}>Ver Detalle</Link></TableRowColumn>
+                <TableRowColumn><Link to={`/dinamica/${dinamic._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
 
               </TableRow>
               ))}

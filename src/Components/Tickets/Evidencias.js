@@ -30,6 +30,7 @@ class Evidencias extends Component {
     fecha:"",
     newObj:{},
     evidencias:[],
+    evidenciasFilter:[],
     marcas:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
@@ -55,10 +56,19 @@ class Evidencias extends Component {
           evidencias[i].dinamica = dinamicas[i].nombreDinamica
           
         }
-    this.setState({evidencias})
+    this.setState({evidencias,evidenciasFilter:evidencias})
      })
      .catch(e=>console.log(e))
    }
+
+   filterList = (e) =>{
+    var updatedList = this.state.evidencias.map(evidencia=>evidencia);
+    updatedList = updatedList.map(evidencia=>evidencia).filter(function(item){
+      return item.dinamica.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1;
+    });
+    this.setState({evidenciasFilter: updatedList})
+  }
 
 
   render() {
@@ -71,13 +81,19 @@ class Evidencias extends Component {
           <RaisedButton
             label="EVIDENCIAS"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">insert_photo</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 
          </div>
        </div>
+       <div className="buscadorEvidencias">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Evidencias por Dinámica" type="text" onChange={this.filterList}/>
+      </div>
     
        <div>
        <Table
@@ -111,11 +127,10 @@ class Evidencias extends Component {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
           {/* value.sort((a, b) => new Date(b.created_at) - new Date(a.created_at)) */}
 
-            {this.state.evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+            {this.state.evidenciasFilter.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
 .map( (evidencia, index) => (
               <TableRow key={evidencia._id} data={evidencia}>
                 <TableRowColumn>{evidencia.created_at}</TableRowColumn>
@@ -123,7 +138,7 @@ class Evidencias extends Component {
                 <TableRowColumn>{evidencia.status}</TableRowColumn>
                 <TableRowColumn>{evidencia.creador}</TableRowColumn>
                 <TableRowColumn>{evidencia.modalidad}</TableRowColumn>
-                <TableRowColumn><Link to={`/evidencia/${evidencia._id}`}>Ver Detalle</Link></TableRowColumn>
+                <TableRowColumn><Link to={`/evidencia/${evidencia._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
 
               </TableRow>
               ))}

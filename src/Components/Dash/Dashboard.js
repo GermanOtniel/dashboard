@@ -25,6 +25,7 @@ class Dash extends Component {
     return (
      <div>
         <AppBar
+          style={{backgroundColor: "#78909C"}}
           title={<img src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed" width="200" height="73" alt="Logo de 1puntocinco"/>}
           onLeftIconButtonClick={this.handleToggle}
         />

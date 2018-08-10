@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import { getSingleDinamic } from '../../Services/dinamicas';
 import { getEvidencesByDinamic } from '../../Services/evidencias';
+import { makeWinner } from '../../Services/dinamicas';
 import Dash from '../Dash/Dashboard';
 import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
@@ -49,8 +50,10 @@ class DinamicaDetail extends Component{
     centros:[],
     marcas:[],
     open: false,
+    open2:false,
     detalleCreador: {},
-    marcasCreador: []
+    marcasCreador: [],
+    posibleGanador:{}
   }
 
   componentWillMount(){
@@ -132,6 +135,14 @@ class DinamicaDetail extends Component{
   handleClose = () => {
     this.setState({open: false});
   };
+  handleOpen2 = (detalleCreador) => {
+    //console.log(detalleCreador)
+    this.setState({open2: true,posibleGanador:detalleCreador});
+  };
+
+  handleClose2 = () => {
+    this.setState({open2: false});
+  };
   detalleVenta = (creador) => {
     this.handleOpen()
     let {detalleCreador,marcasCreador} = this.state;
@@ -140,7 +151,16 @@ class DinamicaDetail extends Component{
     this.setState({detalleCreador,marcasCreador})
    //console.log(detalleCreador,marcasCreador)
   } 
-  
+  enviarGanador = (ganador) => {
+    let idDinamica = this.state.dinamica._id;
+    //dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
+    //console.log(idDinamica, '    ', ganador)
+    makeWinner(ganador,idDinamica)
+    .then(dinamic=>{
+    })
+    .catch(e=>console.log(e))
+    this.handleClose2()
+  } 
 
   render(){
     const actions = [
@@ -149,6 +169,19 @@ class DinamicaDetail extends Component{
         primary={true}
         keyboardFocused={true}
         onClick={this.handleClose}
+      />,
+    ];
+    const actions2 = [
+      <FlatButton
+        label="Cancelar acción"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose2}
+      />,
+      <FlatButton
+        label="Continuar"
+        primary={true}
+        onClick={() => this.enviarGanador(this.state.posibleGanador)}
       />,
     ];
     const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador} = this.state;
@@ -237,7 +270,7 @@ class DinamicaDetail extends Component{
         <img width="300px" height="250px" src={detalleCreador.fotoPerfil} />
         <h2>{detalleCreador.nombre + " " + detalleCreador.apellido}</h2>
         <h3>{detalleCreador.correo}</h3>
-        <b className="bDetalleCreador">{detalleCreador.ganador === true ? "Este usuario HA CUMPLIDO con las metas de esta dinámica" : "Este usuario AÚN NO cumple con las metas de esta dinámica."}</b>
+        <b className="bDetalleCreador">{detalleCreador.ganador === true  ? "Este usuario HA CUMPLIDO con las metas de esta dinámica" : (dinamica.modalidad === "Ventas" ? "Este usuario AÚN NO cumple con las metas de esta dinámica.": "Esta es una dinámica de modalidad Puntos")}</b>
         <br/><br/>
         {marcasCreador.map( (marca, index) => (
               <div key={index}>
@@ -246,13 +279,32 @@ class DinamicaDetail extends Component{
               >
               <Avatar src={marca._id.imagen} />
                 {marca._id.nombre}
-                 <b>{" " + marca.puntosUsuario + " ventas" + "   /  " + marca.puntosVentas + " meta" }</b> 
+                 <b>{dinamica.modalidad === "Ventas" ? " " + marca.puntosUsuario + " ventas" + "   /  " + marca.puntosVentas + " meta" : " " + marca.puntosUsuario + " ventas" + "   /  " + marca.puntosVentas + " puntos por Venta" }</b> 
               </Chip> 
               <br/><br/>
               </div>
               ))}
               <b>Ventas totales: {detalleCreador.total}</b>
+              <br/><br/>
+              <FlatButton style={dinamica.modalidad === "Ventas" ? {display:"block"} : {display:"none"}} onClick={() => this.handleOpen2(detalleCreador)} backgroundColor="#BDBDBD" label="Convertir en Ganador" />
+
         </Dialog>
+          </div>
+          <div>
+          <div>
+            <Dialog
+              title="¿Estás seguro?"
+              actions={actions2}
+              modal={false}
+              open={this.state.open2}
+              onRequestClose={this.handleClose2}
+            >
+              Esta acción solo debe de efectuarse cuando el rendimiento del usuario es 
+              muy bueno, a pesar de no haber cumplido con las metas de la dinámica.
+              <br/><br/>
+              <b>¿Estás seguro de querer continuar con esta acción?</b>
+            </Dialog>
+      </div>
           </div>
         </div>
       );

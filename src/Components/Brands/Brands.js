@@ -109,7 +109,8 @@ sendBrand = (e) => {
           <RaisedButton
             label="CREA UN BRAND"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">work</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -148,7 +149,6 @@ sendBrand = (e) => {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
             {this.state.brands.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (brand, index) => (
@@ -171,7 +171,7 @@ sendBrand = (e) => {
             open={this.state.open}
             onRequestClose={this.handleClose}
           >
-          <Paper  zDepth={2}>           
+                     
             <TextField onChange={this.onChange} name="nombre" hintText="Nombre del Brand" type="text"  underlineShow={false} />
             <Divider />
             <AutoComplete
@@ -184,12 +184,16 @@ sendBrand = (e) => {
           />            
           <Divider />
           <DatePicker
-            hintText="Controlled Date Input"
+            hintText="Fecha de Alta"
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
           />
-    </Paper>
-          <RaisedButton onClick={this.sendBrand}  label="Crear Brand" secondary={true}  />
+          <RaisedButton 
+          onClick={this.sendBrand}  
+          label="Crear Brand" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA"  
+          />
           
         </Dialog> 
          </div>

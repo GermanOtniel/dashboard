@@ -34,6 +34,7 @@ const styles = {
   },
   uploadButton: {
     verticalAlign: 'middle',
+    color: '#FAFAFA'
   },
   uploadInput: {
     cursor: 'pointer',
@@ -115,12 +116,23 @@ class Dinamicas extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
+     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+     getDinamics()
+     .then(dinamics=>{
+       let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+       for(let i= 0; i < dinamics.length;i++) 
+        {
+          dinamics[i].brand = brands[i]
+        }
+       //this.setState({dinamics})
+       this.setState({dinamicasFilter:dinamics,dinamics})
+     })
+     .catch(e=>console.log(e))
     //ID DEL BRAND
     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
     //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
     getBrand(id)
       .then(brand=>{
-        //console.log(brand)
         let {marcas} = this.state;
         marcas = brand.marcas
         this.setState({marcas})
@@ -130,20 +142,6 @@ class Dinamicas extends Component {
     getZonas()
      .then(zonas=>{
       this.setState({zonas})
-     })
-     .catch(e=>console.log(e))
-     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-    getDinamics()
-     .then(dinamics=>{
-       console.log(dinamics)
-       //console.log(dinamics.map(dinamic => dinamic));
-       let brands = dinamics.map(dinamic => dinamic.brand.nombre);
-       for(let i= 0; i < dinamics.length;i++) 
-        {
-          dinamics[i].brand = brands[i]
-        }
-       //this.setState({dinamics})
-       this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
    }
@@ -169,13 +167,11 @@ class Dinamicas extends Component {
     if(newDinamic.modalidad === "Puntos"){
     chipData.push(chosenRequest);
     //newDinamic.marcas = chipData;
-    console.log(chipData)
     this.setState({chipData})
     }
     else if(newDinamic.modalidad === "Ventas"){
     chipData.push(chosenRequest);
     //newDinamic.marcas = chipData;
-    console.log(chipData)
     this.setState({chipData})
     }
     else{
@@ -195,14 +191,7 @@ onChangeMarca = (e) => {
   newDinamic.marcaPuntosVentas = chipData;
   this.setState({newDinamic,chipData})
 }
-//  onNewRequestMarca = (chosenRequest) => {
-//     let { chipData } = this.state;
-//     let { newDinamic } = this.state;
-//     chipData.push(chosenRequest);
-//     newDinamic.marcas = chipData;
-//     console.log(chipData)
-//     this.setState({chipData,newDinamic})
-// }
+
 onNewRequestCentro = (chosenRequest) => {
   let { chipData2 } = this.state;
   let { newDinamic } = this.state;
@@ -221,7 +210,6 @@ onNewRequestZona = (chosenRequest) => {
 }
 
 handleChange = (event, date) => {
-  console.log(date)
   let {newDinamic} = this.state;
   //let fecha = String(date);
   //newDinamic.fechaInicio = fecha.slice(4,15);
@@ -246,18 +234,9 @@ onChange = (e) => {
   const value = e.target.value;
   const {newDinamic} = this.state;
   newDinamic[field] = value;
-  console.log(newDinamic)
   this.setState({newDinamic}); 
 }
 
-// onChangeMarcasPuntos = (e) => {
-//   const field = e.target.name;
-//   const value = e.target.value;
-//   const {putosMarcas} = this.state;
-//   newDinamic.putosMarcas[field] = {value};
-//   console.log(newDinamic)
-//   this.setState({newDinamic}); 
-// }
 getFile = e => {
   const file = e.target.files[0];
   const brand = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -271,18 +250,15 @@ getFile = e => {
   //aqui agreggo el exito y el error
   uploadTask
   .then(r=>{
-    console.log(r.downloadURL)
     const {newDinamic} = this.state;
     newDinamic.imagenPremio =  r.downloadURL;
     this.setState({newDinamic})
-    console.log(this.state.newDinamic.imagenPremio)
   })
   .catch(e=>console.log(e)) //task
   //aqui reviso el progreso
   uploadTask.on('state_changed', (snap)=>{
     const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
     this.setState({progresoImagen});
-    console.log(this.state.progresoImagen)
   })
 };
 sendDinamic = (e) => {
@@ -290,7 +266,6 @@ sendDinamic = (e) => {
   newDinamic.brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
   createDinamic(newDinamic)
   .then(dinamic=>{
-    //console.log(dinamic)
     this.handleClose();
   })
   .catch(e=>console.log(e))
@@ -303,7 +278,6 @@ handleClose3 = () => {
   this.setState({open3: false});
 };
 detalleDinamica = (dinamic) => {
-  console.log(dinamic)
   this.handleOpen3()
   let {detalleDinamica,marcasDinamica} = this.state;
   detalleDinamica = dinamic;
@@ -376,8 +350,9 @@ renderChip2(data) {
          <div>
           <RaisedButton
             label="CREA UNA DINAMICA"
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             labelPosition="before"
-            primary={true}
             icon={<FontIcon className="material-icons">queue_play_next</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -424,7 +399,6 @@ renderChip2(data) {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
             {this.state.dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
 .map( (dinamic, index) => (
@@ -435,7 +409,7 @@ renderChip2(data) {
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
-                <TableRowColumn><button onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
+                <TableRowColumn><button className="buttonDinamicasDetalle" onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
 
               </TableRow>
               ))}
@@ -451,6 +425,7 @@ renderChip2(data) {
             onRequestClose={this.handleClose}
             autoScrollBodyContent={true}
           >
+          <h4>Modalidad de la Dinámica</h4>
           <RadioButtonGroup onChange={this.onChange} name="modalidad" >
           <RadioButton 
           value="Ventas"
@@ -461,26 +436,19 @@ renderChip2(data) {
           label="Puntos"
           />
           </RadioButtonGroup>
-          <div className="padre">
-          <div className="margin">
-          {/* <TextField
-            hintText="Meta = Unidades por vender"
-            floatingLabelText="Meta a vender"
-            name="meta"
-            type="number"
-            onChange={this.onChange}
-            disabled={this.state.textFieldDisabled2}
-          /> */}
-          {/* <TextField
-            hintText="Recuerde unidad = 1 copa"
-            floatingLabelText="Puntos por unidad"
-            name="puntos"
-            type="number"
-            onChange={this.onChange}
-            disabled={this.state.textFieldDisabled}
-          /> */}
-          </div>
-          </div>
+          <hr/>
+          <h4>¿Requerira imagen como evidencia?</h4>
+          <RadioButtonGroup onChange={this.onChange} name="imagen" >
+          <RadioButton 
+          value={true}
+          label="Si"
+          />
+          <RadioButton 
+          value={false}
+          label="No"
+          />
+          </RadioButtonGroup>
+          
           <TextField
             hintText="Sea específico en pocas palabras"
             floatingLabelText="Nombre de la Dinámica"
@@ -605,10 +573,15 @@ renderChip2(data) {
           </FlatButton>
           <br/><br/>
           <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : "Espera la imagen se esta cargando..."}</span>
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se esta cargando..." : "Adjunta una imagen")}</span>
           <br/><br/>
           <div className="senDinamica">
-          <RaisedButton onClick={this.sendDinamic}  label="Crear Dinámica" secondary={true}  />
+          <RaisedButton 
+          onClick={this.sendDinamic}  
+          label="Crear Dinámica" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA" 
+          />
           </div>
       </Dialog> 
     </div>
@@ -639,6 +612,7 @@ renderChip2(data) {
         <hr/>
         <h5>Modalidad de la Dinámica:</h5>
         <h3>{detalleDinamica.modalidad}</h3>
+        <b className="imagenDinamicaDetail">{detalleDinamica.imagen ? "Esta dinámica SI requiere imagen como evidencia" : "Esta dinámica NO requiere imagen como evidencia"} </b>
         <hr/>
         <h5>Descripción de la Dinámica:</h5>
         <b>{detalleDinamica.descripcion}</b>

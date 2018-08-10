@@ -5,8 +5,8 @@
 
 .padreLogin{
   background-color: rgb(218, 218, 218);
-  width: 100%;
-  height: 100vh
+  width: 100vw;
+  height: auto
 }
 .paper {
   width: 35vw;
@@ -23,4 +23,11 @@
 }
 .linkReg{
   text-decoration: none;
+}
+
+.paperSignup{
+  width: 35vw;
+  margin: auto;
+  text-align: center;
+  margin-top: 7%
 }

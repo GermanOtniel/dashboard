@@ -45,6 +45,7 @@ class EvidenciaDetail extends Component{
       evidence.hora = evidence.created_at.slice(11,19);
       evidence.correo = evidence.creador.correo;
       evidence.descripcion = evidence.dinamica.descripcion
+      evidence.imagen = evidence.dinamica.imagen
       this.setState({evidence,evidencia,marcas})
       //console.log(this.state.marcas)
     })
@@ -97,7 +98,7 @@ class EvidenciaDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
             <div className="padreDetail">
             <div>
-            <img width="550" src={evidence.archivo}/>
+            <img className="imagenEvidenciaDetail" src={evidence.archivo ? evidence.archivo : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340"}/>
             <div>
               <div className="padreDetail">
               <SelectField
@@ -130,7 +131,7 @@ class EvidenciaDetail extends Component{
             </div>
             </div>
             <div className="hijoDetail">
-           <u>Mensaje del Usuario: </u><h4>{evidence.mensaje}</h4>
+           <u>Mensaje del Usuario: </u><h4>{evidence.mensaje ? evidence.mensaje : "El usuario decidio no enviar mensaje" }</h4>
             <u>Cantidad Vendida según Usuario: </u>
             <br/><br/>
             <div className="padreDetail">
@@ -147,9 +148,7 @@ class EvidenciaDetail extends Component{
               ))}
             </div>
             
-            <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
-            <u>Modalidad: </u><b>{evidence.modalidad}</b>
-            <br/><br/>        
+                   
             <u>Status: </u><b className="b">{evidence.status}</b>
             <br/><br/>
             <u>Fecha: </u><b>{evidence.fecha}</b>
@@ -158,7 +157,14 @@ class EvidenciaDetail extends Component{
             <br/><br/>        
             <u>Usuario: </u><b>{evidence.dueño}</b> 
             <br/><br/>        
-            <u>Correo del Usuario: </u><b>{evidence.correo}</b>                                               
+            <u>Correo del Usuario: </u><b>{evidence.correo}</b> 
+            <br/><hr/>
+            <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
+            <u>Modalidad: </u><b>{evidence.modalidad}</b>
+            <br/> <br/>
+            <b className="b">{evidence.imagen ? "Esta Dinámica SI requeria imagen como evidencia" : "Esta Dinámica NO requeria imagen como evidencia" }</b>
+
+                                                           
             </div>
             </div>
           </Paper>

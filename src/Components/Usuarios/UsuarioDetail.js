@@ -102,7 +102,12 @@ class UsuarioDetail extends Component{
               <u>Correo del Usuario: </u><h4>{user.correo}</h4>
               <u>Puesto Actual: </u><h4>{user.puesto}</h4>
               <u>Fecha de Registro: </u><h4>{user.created_at}</h4>                                              
-              <RaisedButton label="Editar Usuario" primary={true} onClick={this.handleOpen} />
+              <RaisedButton   
+                label="Editar Usuario" 
+                backgroundColor="#0D47A1"
+                labelColor="#FAFAFA" 
+                onClick={this.handleOpen} 
+              />
             </div>
 
           </div>
@@ -144,7 +149,12 @@ class UsuarioDetail extends Component{
              errorStyle={styles.errorStyle}
             /> 
     
-          <RaisedButton onClick={this.sendEdit}  label="Enviar Cambios" secondary={true}  />
+          <RaisedButton 
+          onClick={this.sendEdit}  
+          label="Enviar Cambios" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA" 
+          />
           
         </Dialog> 
          </div>

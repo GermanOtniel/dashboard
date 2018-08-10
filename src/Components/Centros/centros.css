@@ -1,0 +1,11 @@
+.buscadorCentros{
+  margin-left: 2%
+}
+
+.buscadorCentros > input {
+  width: 200px;
+  height: 25px;
+  border-color: black;
+  border-radius: 10px;
+  font-size: 13px
+}

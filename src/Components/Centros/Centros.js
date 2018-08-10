@@ -44,6 +44,7 @@ class Centros extends Component {
     open2:false,
     newCenter:{},
     centros:[],
+    centrosFilter:[],
     newZone:{},
     zonas:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
@@ -78,7 +79,7 @@ componentWillMount(){
       {
         centros[i].zona = centross[i]
       }
-     this.setState({centros})
+     this.setState({centrosFilter:centros,centros})
    })
    .catch(e=>console.log(e))
  }
@@ -101,6 +102,15 @@ onChange = (e) => {
   this.setState({newCenter}); 
 }
 
+filterList = (e) =>{
+  var updatedList = this.state.centros.map(dinamic=>dinamic);
+  updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
+    return item.nombre.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({centrosFilter: updatedList})
+}
+
 sendCenter = (e) => {
   createCenter(this.state.newCenter)
   .then(centro=>{
@@ -120,7 +130,8 @@ sendCenter = (e) => {
           <RaisedButton
             label="CREA UN CENTRO DE CONSUMO"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -128,6 +139,11 @@ sendCenter = (e) => {
           /> 
          </div>
        </div>
+       <div className="buscadorCentros">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Centro de Consumo por nombre" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <Table
           height={this.state.height}
@@ -158,9 +174,8 @@ sendCenter = (e) => {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
-            {this.state.centros.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
+            {this.state.centrosFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (centro, index) => (
               <TableRow key={centro._id} data={centro}>
                 <TableRowColumn>{centro._id}</TableRowColumn>
@@ -179,7 +194,7 @@ sendCenter = (e) => {
             open={this.state.open}
             onRequestClose={this.handleClose}
           >
-          <Paper  zDepth={2}>
+          
           <AutoComplete
             floatingLabelText="Selecciona la Zona"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -219,8 +234,13 @@ sendCenter = (e) => {
             errorStyle={styles.errorStyle}
           />                     
           <Divider />
-    </Paper>
-          <RaisedButton onClick={this.sendCenter}  label="Crear Centro" secondary={true}  />
+    
+          <RaisedButton 
+          onClick={this.sendCenter}  
+          label="Crear Centro" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA" 
+          />
           
         </Dialog> 
          </div>

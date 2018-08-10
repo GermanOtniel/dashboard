@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css?family=Lato');
+
 .senDinamica{
   display: flex;
   justify-content: center;
@@ -13,7 +15,19 @@
 .buscador > input {
   width: 200px;
   height: 25px;
-  border-color: black;
+  border-color: rgb(150, 150, 150);
   border-radius: 10px;
   font-size: 17px
+}
+.imagenDinamicaDetail{
+  background-color: yellow;
+  color: black
+}
+.buttonDinamicasDetalle{
+  background-color: rgb(0, 0, 155);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%
 }

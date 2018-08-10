@@ -33,6 +33,7 @@ class Usuarios extends Component {
   state={
     open:false,
     users:[],
+    usuariosFilter:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
     fixedFooter: true,
@@ -54,7 +55,7 @@ class Usuarios extends Component {
           users[i].created_at = users[i].created_at.slice(0,10)
           
         }
-      this.setState({users})
+      this.setState({usuariosFilter:users,users})
     })
     .catch(e=>console.log(e))
  }
@@ -65,6 +66,14 @@ handleClose = () => {
   this.setState({open: false});
 };
 
+filterList = (e) =>{
+  var updatedList = this.state.users.map(dinamic=>dinamic);
+  updatedList = updatedList.map(usuario=>usuario).filter(function(item){
+    return item.correo.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({usuariosFilter: updatedList})
+}
   render() {
     
     return (
@@ -75,13 +84,19 @@ handleClose = () => {
           <RaisedButton
             label="EDITAR USUARIOS"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">face</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
           /> 
          </div>
        </div>
+       <div className="buscador">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Usuario por Correo" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <Table
           height={this.state.height}
@@ -113,16 +128,15 @@ handleClose = () => {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
-            {this.state.users.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
+            {this.state.usuariosFilter.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
 .map( (user, index) => (
               <TableRow key={user._id} data={user}>
                 <TableRowColumn>{user.correo}</TableRowColumn>
                 <TableRowColumn>{user.puesto}</TableRowColumn>
                 <TableRowColumn>{user.created_at}</TableRowColumn>
                 <TableRowColumn>{user.nombre}</TableRowColumn>
-                <TableRowColumn><Link to={`/usuario/${user._id}`}>Ver Detalle</Link></TableRowColumn>
+                <TableRowColumn><Link to={`/usuario/${user._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
               </TableRow>
               ))}
           </TableBody>

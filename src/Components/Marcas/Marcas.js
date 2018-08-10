@@ -31,13 +31,11 @@ const styles = {
     height:70
   }
 };
-const dataSource = [
-  {text: "Activo",value:"Activo"},
-  {text:"Inactivo",value:"Inactivo"}
-]
+
 const styles2 = {
   uploadButton: {
     verticalAlign: 'middle',
+    color: '#FAFAFA'
   },
   uploadInput: {
     cursor: 'pointer',
@@ -59,6 +57,7 @@ class Marcas extends Component {
     newObj:{},
     brands:[],
     marcas:[],
+    marcasFilter:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
     fixedFooter: true,
@@ -85,7 +84,7 @@ class Marcas extends Component {
         {
           marcas[i].brand = marcass[i]
         }
-       this.setState({marcas})
+       this.setState({marcasFilter:marcas,marcas})
      })
      .catch(e=>console.log(e))
    }
@@ -97,7 +96,6 @@ class Marcas extends Component {
   };
  
  onNewRequest = (chosenRequest) => {
-   console.log(chosenRequest)
   const {newMarca} = this.state;
   newMarca.brand =  chosenRequest;
   this.setState({newMarca});
@@ -107,12 +105,10 @@ onChange = (e) => {
   const value = e.target.value;
   const {newMarca} = this.state;
   newMarca[field] = value;
-  console.log(newMarca)
   this.setState({newMarca}); 
 }
 getFile = e => {
   const file = e.target.files[0];
-  console.log(file)
   //aqui lo declaro
   const uploadTask = firebase.storage()
   .ref("marcas")
@@ -121,7 +117,6 @@ getFile = e => {
   //aqui agreggo el exito y el error
   uploadTask
   .then(r=>{
-    console.log(r.downloadURL)
     const {newMarca} = this.state;
     newMarca.imagen =  r.downloadURL;
     this.setState({newMarca})
@@ -130,7 +125,6 @@ getFile = e => {
   uploadTask.on('state_changed', (snap)=>{
     const progresoImagen = (snap.bytesTransferred / snap.totalBytes) * 100;
     this.setState({progresoImagen});
-    //console.log(this.state.progresoImagen)
   })
 };
 handleChange = (event, date) => {
@@ -146,11 +140,17 @@ sendMarca = (e) => {
 createMarca(this.state.newMarca)
 .then(marca=>{
   this.handleClose()
-  console.log(marca)
 })
 .catch(e=>console.log(e))
 };
-
+filterList = (e) =>{
+  var updatedList = this.state.marcas.map(dinamic=>dinamic);
+  updatedList = updatedList.map(marca=>marca).filter(function(item){
+    return item.brand.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({marcasFilter: updatedList})
+}
 
   render() {
     
@@ -162,7 +162,8 @@ createMarca(this.state.newMarca)
           <RaisedButton
             label="CREA UNA MARCA"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">assistant</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -170,6 +171,11 @@ createMarca(this.state.newMarca)
           /> 
          </div>
        </div>
+       <div className="buscador">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Marcas por Brand" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <Table
           height={this.state.height}
@@ -201,9 +207,8 @@ createMarca(this.state.newMarca)
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
-            {this.state.marcas.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
+            {this.state.marcasFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (marca, index) => (
               <TableRow key={marca._id} data={marca}>
                 <TableRowColumn>{marca._id}</TableRowColumn>
@@ -224,7 +229,7 @@ createMarca(this.state.newMarca)
             open={this.state.open}
             onRequestClose={this.handleClose}
           >
-          <Paper  zDepth={2}>           
+                    
             <TextField onChange={this.onChange} name="nombre" hintText="Nombre de la Marca" type="text"  underlineShow={false} />          
           <Divider />
           <AutoComplete
@@ -245,10 +250,10 @@ createMarca(this.state.newMarca)
           <br/>
           <FlatButton
             label="Elige una Imagen"
+            backgroundColor="#00897B"
             labelPosition="before"
             style={styles2.uploadButton}
             containerElement="label"
-            backgroundColor="#00897B"
           > 
             <input onChange={this.getFile} name="imagen" type="file" style={styles2.uploadInput} />
           </FlatButton>
@@ -258,8 +263,13 @@ createMarca(this.state.newMarca)
           <br/><br/>
           
           
-    </Paper>
-          <RaisedButton onClick={this.sendMarca}  label="Crear Marca" secondary={true}  />
+    
+          <RaisedButton 
+          onClick={this.sendMarca}  
+          label="Crear Marca" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA"  
+          />
           
         </Dialog> 
          </div>

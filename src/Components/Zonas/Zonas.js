@@ -3,7 +3,6 @@ import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
-import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
@@ -44,6 +43,7 @@ class Zonas extends Component {
     estados:[],
     newZone:{},
     zonas:[],
+    zonasFilter:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
     fixedFooter: true,
@@ -76,7 +76,7 @@ class Zonas extends Component {
     {
       zonas[i].estado = zonass[i]
     }
-     this.setState({zonas})
+     this.setState({zonasFilter:zonas,zonas})
    })
    .catch(e=>alert(e))
   getCountry()
@@ -90,6 +90,16 @@ class Zonas extends Component {
    })
    .catch(e=>alert(e))
  }
+
+ filterList = (e) =>{
+  var updatedList = this.state.zonas.map(dinamic=>dinamic);
+  updatedList = updatedList.map(zona=>zona).filter(function(item){
+    return item.nombre.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({zonasFilter: updatedList})
+}
+
  onNewRequest = (chosenRequest) => {
   const {newState} = this.state;
   newState.pais =  chosenRequest;
@@ -148,7 +158,8 @@ onChange2 = (e) => {
           <RaisedButton
             label="CREA UN ESTADO"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >map</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -159,7 +170,8 @@ onChange2 = (e) => {
           <RaisedButton
             label="CREA UNA ZONA"
             labelPosition="before"
-            primary={true}
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >place</FontIcon>}
             style={styles.button}
             labelStyle={{fontSize:'18px'}}
@@ -167,6 +179,11 @@ onChange2 = (e) => {
           />
          </div>
        </div>
+       <div className="buscador">
+         <span>Buscador: </span>
+         <br/><br/>
+        <input placeholder="Busca una Zona" type="text" onChange={this.filterList}/>
+      </div>
        <div>
        <Table
           height={this.state.height}
@@ -197,9 +214,8 @@ onChange2 = (e) => {
             displayRowCheckbox={this.state.showCheckboxes}
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
-            stripedRows={this.state.stripedRows}
           >
-            {this.state.zonas.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
+            {this.state.zonasFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (zona, index) => (
               <TableRow key={zona._id} data={zona}>
                 <TableRowColumn>{zona._id}</TableRowColumn>
@@ -219,7 +235,6 @@ onChange2 = (e) => {
             open={this.state.open}
             onRequestClose={this.handleClose}
           >
-          <Paper  zDepth={2}>
           <AutoComplete
             floatingLabelText="Selecciona el país"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -239,15 +254,20 @@ onChange2 = (e) => {
             floatingLabelText="Nombre del Estado"
             hintText="Cuida la ortografía" 
             type="text"  
-            underlineShow={false} 
+            underlineShow={true} 
             floatingLabelStyle={styles.floatingLabelFocusStyle}
             floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
             errorText="Este campo es obligatorio"
             errorStyle={styles.errorStyle}
             />
             <Divider />
-    </Paper>
-          <RaisedButton onClick={this.sendEdit}  label="Crear Estado" secondary={true}  />
+    
+          <RaisedButton 
+          onClick={this.sendEdit}  
+          label="Crear Estado" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA"  
+          />
           
         </Dialog> 
          </div>
@@ -258,7 +278,7 @@ onChange2 = (e) => {
             open={this.state.open2}
             onRequestClose={this.handleClose2}
           >
-          <Paper  zDepth={2}>
+          
           <AutoComplete
             floatingLabelText="Selecciona el estado"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -278,15 +298,20 @@ onChange2 = (e) => {
             floatingLabelText="Nombre de la Zona"
             hintText="Cuida la ortografía" 
             type="text"  
-            underlineShow={false} 
+            underlineShow={true} 
             floatingLabelStyle={styles.floatingLabelFocusStyle}
             floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
             errorText="Este campo es obligatorio"
             errorStyle={styles.errorStyle}
             />
             <Divider />
-    </Paper>
-          <RaisedButton onClick={this.sendZona}  label="Crear Zona" secondary={true}  />
+   
+          <RaisedButton 
+          onClick={this.sendZona}  
+          label="Crear Zona" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA" 
+          />
           
         </Dialog> 
          </div>
