@@ -36,7 +36,6 @@ class EvidenciaDetail extends Component{
      let id = this.props.match.params.id
     getSingleEvidence(id)
     .then(evidence=>{
-      console.log(evidence)
       let marcas = evidence.marcas.map(marca=>marca);
       let { evidencia } = this.state;
       evidencia = evidence;
@@ -47,7 +46,6 @@ class EvidenciaDetail extends Component{
       evidence.descripcion = evidence.dinamica.descripcion
       evidence.imagen = evidence.dinamica.imagen
       this.setState({evidence,evidencia,marcas})
-      //console.log(this.state.marcas)
     })
     .catch(e=>alert(e));
   }
@@ -70,7 +68,6 @@ class EvidenciaDetail extends Component{
     const value = e.target.value;
     const {evidencia} = this.state;
     evidencia[field] = value;
-    //console.log(evidencia);
     this.setState({evidencia});
   }
   sendEvidence = (e) => {

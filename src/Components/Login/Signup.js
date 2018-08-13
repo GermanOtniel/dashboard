@@ -26,7 +26,6 @@ class Signup extends Component {
     const {user} = this.state;
     user[field] = value;
     this.setState({user});
-    console.log(this.state.user) 
   }
   
   sendUser = (e) => {

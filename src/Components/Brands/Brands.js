@@ -10,7 +10,6 @@ import TextField from 'material-ui/TextField';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,
@@ -76,7 +75,6 @@ onChange = (e) => {
   const value = e.target.value;
   const {newBrand} = this.state;
   newBrand[field] = value;
-  console.log(newBrand)
   this.setState({newBrand}); 
 }
 handleChange = (event, date) => {
@@ -92,10 +90,8 @@ sendBrand = (e) => {
   createBrand(this.state.newBrand)
   .then(brand=>{
     this.handleClose();
-    console.log(brand)
   })
   .catch(e=>console.log(e))
-  console.log(this.state.newBrand);
 };
 
 

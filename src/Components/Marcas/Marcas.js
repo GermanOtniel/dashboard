@@ -3,7 +3,6 @@ import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
-import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import LinearProgress from 'material-ui/LinearProgress';
@@ -13,7 +12,6 @@ import { createMarca,getMarcas } from '../../Services/marcas';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,

@@ -6,7 +6,6 @@ import {Link} from 'react-router-dom';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,

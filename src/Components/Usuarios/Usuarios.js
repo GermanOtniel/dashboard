@@ -2,16 +2,11 @@ import React, { Component } from 'react';
 import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import Paper from 'material-ui/Paper';
-import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
-import TextField from 'material-ui/TextField';
 import {Link} from 'react-router-dom';
 import { getUsers } from '../../Services/usuarios';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,

@@ -36,16 +36,6 @@ const styles = {
     opacity: 0,
   }
 };
-const styles2 = {
-  chip: {
-    margin: 4,
-  },
-  wrapper: {
-    display: 'flex',
-    flexWrap: 'wrap',
-  },
-};
-
 
 class Reportes extends Component {
 
@@ -84,7 +74,6 @@ class Reportes extends Component {
     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
     getDinamics()
      .then(dinamics=>{
-       //console.log(dinamics.map(dinamic => dinamic));
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
         {
@@ -98,7 +87,6 @@ class Reportes extends Component {
     //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
     getBrand(id)
       .then(brand=>{
-        //console.log(brand)
         let {marcas} = this.state;
         marcas = brand.marcas
         this.setState({marcas})

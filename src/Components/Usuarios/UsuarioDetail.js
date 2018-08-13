@@ -48,7 +48,6 @@ class UsuarioDetail extends Component{
      let id = this.props.match.params.id
     getUser(id)
     .then(user=>{
-      console.log(user)
       this.setState({user})
     })
     .catch(e=>alert(e));
@@ -65,7 +64,6 @@ class UsuarioDetail extends Component{
     this.setState({open: false});
   };
   onNewRequest = (chosenRequest) => {
-    console.log(chosenRequest)
     let { user } = this.state;
     user.puesto = chosenRequest;
     this.setState({user})

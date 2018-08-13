@@ -10,7 +10,6 @@ import {green700,blue500} from 'material-ui/styles/colors';
 import {
   Table,
   TableBody,
-  TableFooter,
   TableHeader,
   TableHeaderColumn,
   TableRow,
@@ -115,7 +114,6 @@ onChange = (e) => {
   const value = e.target.value;
   const {newState} = this.state;
   newState[field] = value;
-  console.log(newState)
   this.setState({newState}); 
 }
 onChange2 = (e) => {
@@ -123,14 +121,12 @@ onChange2 = (e) => {
   const value = e.target.value;
   const {newZone} = this.state;
   newZone[field] = value;
-  console.log(newZone)
   this.setState({newZone}); 
 }
   sendEdit = (e) => {
     const estado = this.state.newState;
     createState(estado)
     .then(state=>{
-      console.log(state)
       this.componentWillMount();
       this.setState({open:false})
 
@@ -141,7 +137,6 @@ onChange2 = (e) => {
     const zona = this.state.newZone;
     createZone(zona)
     .then(zona=>{
-      console.log(zona)
       this.componentWillMount();
       this.setState({open2:false})
 

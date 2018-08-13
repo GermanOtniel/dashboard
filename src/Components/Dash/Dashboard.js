@@ -46,14 +46,14 @@ class Dash extends Component {
             to={`/home`}>Inicio
            </Link>
           </MenuItem>
+          <MenuItem leftIcon={<FontIcon className="material-icons icon">assistant</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/marcas`}>Marcas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">queue_play_next</FontIcon>} style={styleMenu}   onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/dinamicas`}>Dinámicas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons">insert_photo</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/tickets`}>Tickets</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">signal_cellular_alt</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/reportes`}>Reportes</Link></MenuItem>
+          <MenuItem leftIcon={<FontIcon className="material-icons icon">work</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/brands`}>Brands</Link></MenuItem>
+          <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">face</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/usuarios`}>Usuarios</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">room</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/zonas`}>Zonas</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons icon">assistant</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/marcas`}>Marcas</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons icon">work</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/brands`}>Brands</Link></MenuItem>
 
         </div>
           </Drawer>

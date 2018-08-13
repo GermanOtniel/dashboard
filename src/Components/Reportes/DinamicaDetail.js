@@ -60,7 +60,6 @@ class DinamicaDetail extends Component{
      let id = this.props.match.params.id
     getSingleDinamic(id)
     .then(dinamica=>{
-      //console.log(dinamica)
         let marcas = dinamica.marcaPuntosVentas.map(marca=>marca._id);
         let { centros } = this.state;
       dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
@@ -69,18 +68,26 @@ class DinamicaDetail extends Component{
       this.setState({dinamica, centros,marcas})
       getEvidencesByDinamic(id)
       .then(evidencias=>{
-        // for(let ñ = 0; ñ < marcas.length; ñ++){
-        //   console.log(marcas[ñ])
-        // }
+        // El array "creadoresArray" trae a todos los usarios que ya han hecho ventas en esta dinamica. 
+        //Esta lista traera usuarios repetidos.
         let creadoresArray = evidencias.map(evidencia=>evidencia.creador)
+        //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
         var {newCreadores} = this.state;
+        // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
         var lookupObject  = {};
+
+        //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
+
         for(var i in creadoresArray) {
           lookupObject[creadoresArray[i]['_id']] = creadoresArray[i];
         }
         for(i in lookupObject) {
           newCreadores.push(lookupObject[i]);
        }
+       // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
+       
+       
+       // AQUI ACOMODAMOS LAS EVIDENCIAS CONFORME A QUE USUARIO PERTENECEN.
        for(var i = 0; i<newCreadores.length;i++){
         for(var j = 0; j<evidencias.length;j++){
           if( newCreadores[i]._id === evidencias[j].creador._id ){
@@ -91,6 +98,14 @@ class DinamicaDetail extends Component{
           }
         }
       }
+// HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
+
+
+// AHORA QUEREMOS SUMAR SUS EVIDENCIAS RESPECTO A LA MARCA QUE VENDIERON, ES DECIR:
+// SI VENDIERON EN UNA EVIDENCIA 20 COCAS Y DESPUES EN OTRA 3 COCAS, 
+//QUEREMOS QUE SE IDENTIFIQUEN QUE SON VENTAS DEL MISMO PRODUCTO Y QUE SE SUMEN ( 20 + 3 ) = 23
+
+// ESTOS CICLOS LO QUE HACEN ES DARLE LAS MARCAS QUE SE VENDIERON EN ESTA DINAMICA A CADA USUARIO:
       var lookupObject3  = {};
       for(let z = 0; z < newCreadores.length; z++){
         for(var i in newCreadores[z].ventasDinamica) {
@@ -100,6 +115,9 @@ class DinamicaDetail extends Component{
           newCreadores[z].marcas.push(lookupObject3[i]);
        }
       }
+
+      // AQUI SE ADENTRA A CADA USUARIO Y SE EJECUTA EL BUSCAR:
+      // SI SON MARCAS IGUALES QUE SE SUMEN SUS VENTAS 
      for(let x = 0; x < newCreadores.length; x++){
        for (let v = 0; v < newCreadores[x].marcas.length; v++){
           for ( let y = 0; y < newCreadores[x].ventasDinamica.length; y++){
@@ -110,17 +128,21 @@ class DinamicaDetail extends Component{
           }
       }
      }
+           // HASTA AQUI LOGRAMOS TENER YA A CADA USUARIO CON SUS VENTAS YA SUMADAS POR MARCA 
+
+
+           // AQUI REVISAMOS SI EL USUARIO YA ES UN GANADOR 
      for (let ab = 0; ab < newCreadores.length; ab++){
        for( let g = 0; g < dinamica.ganadores.length; g++){
         if(dinamica.ganadores[g] === newCreadores[ab]._id){
           newCreadores[ab].ganador = true
         }
        }
+       // Y SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
        for (let cd = 0; cd < newCreadores[ab].marcas.length; cd++){
           newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
        }
      }
-     console.log(newCreadores)
       this.setState({newCreadores}) 
       })
       .catch(e=>console.log(e))
@@ -149,12 +171,10 @@ class DinamicaDetail extends Component{
     detalleCreador = creador;
     marcasCreador = creador.marcas;
     this.setState({detalleCreador,marcasCreador})
-   //console.log(detalleCreador,marcasCreador)
   } 
   enviarGanador = (ganador) => {
     let idDinamica = this.state.dinamica._id;
     //dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
-    //console.log(idDinamica, '    ', ganador)
     makeWinner(ganador,idDinamica)
     .then(dinamic=>{
     })
