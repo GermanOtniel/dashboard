@@ -1,8 +1,9 @@
-const baseURL = 'http://localhost:3000';
+const baseURL = process.env.REACT_APP_BASE_URL;
+
 
 //SE USA EN EL COMPONENTE DE {{{{{{{{{SIGNUP}}}}}}}}}
 export function signup(userData){
-    return fetch(baseURL + '/dash/signup', {
+    return fetch( + '/dash/signup', {
         method:'post',
         headers:{
             "Content-Type": "application/json"

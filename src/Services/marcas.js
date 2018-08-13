@@ -1,4 +1,4 @@
-const baseURL = 'http://localhost:3000';
+const baseURL = process.env.REACT_APP_BASE_URL;
 //SE UTILIZA EN EL COMPONENTE DE {{{{{{{MARCAS}}}}}}}
 export function createMarca(formulario){
   return fetch(  baseURL + '/marca/new' ,{
