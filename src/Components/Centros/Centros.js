@@ -162,10 +162,10 @@ sendCenter = (e) => {
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Centro</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Zona</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
+              <TableHeaderColumn >Centro</TableHeaderColumn>
+              <TableHeaderColumn >Fecha de Creación</TableHeaderColumn>
+              <TableHeaderColumn >Zona</TableHeaderColumn>
+              <TableHeaderColumn >Editar</TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -177,8 +177,8 @@ sendCenter = (e) => {
             {this.state.centrosFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (centro, index) => (
               <TableRow key={centro._id} data={centro}>
-                <TableRowColumn>{centro._id}</TableRowColumn>
                 <TableRowColumn>{centro.nombre}</TableRowColumn>
+                <TableRowColumn>{centro.created_at.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{centro.zona}</TableRowColumn>
                 <TableRowColumn>Editar</TableRowColumn>
               </TableRow>

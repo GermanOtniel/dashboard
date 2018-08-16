@@ -16,7 +16,8 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
-import { createDinamic, getDinamics } from '../../Services/dinamicas';
+import { createDinamic, getDinamics,getDinamicsByBrand } from '../../Services/dinamicas';
+import { getMarcas } from '../../Services/marcas';
 import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
@@ -116,28 +117,47 @@ class Dinamicas extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
+        //ID DEL BRAND
+    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
      //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-     getDinamics()
+     if(id === "5b71bd925c65d40353ffda4c") {
+       getDinamics()
      .then(dinamics=>{
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
         {
           dinamics[i].brand = brands[i]
         }
-       //this.setState({dinamics})
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
-    //ID DEL BRAND
-    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-    //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
-    getBrand(id)
-      .then(brand=>{
-        let {marcas} = this.state;
-        marcas = brand.marcas
-        this.setState({marcas})
+     //COMO ES SUPER ADMIN PUEDE CREAR DINAMICAS CON LA MARCA QUE SEA 
+     getMarcas()
+     .then(marcas=>{
+       this.setState({marcas})
+     })
+     .catch(e=>console.log(e))
+     }
+     else if (id !== "5b71bd925c65d40353ffda4c"){
+       getDinamicsByBrand(id)
+       .then(dinamics=>{
+        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+        for(let i= 0; i < dinamics.length;i++) 
+         {
+           dinamics[i].brand = brands[i]
+         }
+        this.setState({dinamicasFilter:dinamics,dinamics})
       })
       .catch(e=>console.log(e))
+       //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
+    getBrand(id)
+    .then(brand=>{
+      let {marcas} = this.state;
+      marcas = brand.marcas
+      this.setState({marcas})
+    })
+    .catch(e=>console.log(e))
+     }
     //TRAEMOS LAS ZONAS PARA TENER LAS ZONAS PARA EL AUTOCOMPLETE DE ZONAS
     getZonas()
      .then(zonas=>{
@@ -236,16 +256,31 @@ onChange = (e) => {
   newDinamic[field] = value;
   this.setState({newDinamic}); 
 }
+// getFile = e => {
+//   const file = e.target.files[0];
+//   const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
+//   const date = new Date();
+//   const date2 = String(date).slice(16,24)
+//   const numberRandom = Math.random();
+//   const number = String(numberRandom).slice(2,16)
+// //  console.log('fileeeee: ', file)
+// //  console.log('brandddddd: ', brand)
+// //  console.log('date: ', date2)
+//  console.log('Nombre de la imagen: ', correo+date2+number)
+// };
 
-getFile = e => {
+ getFile = e => {
   const file = e.target.files[0];
-  const brand = `${JSON.parse(localStorage.getItem('user'))._id}`;
+  const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
   const date = new Date();
-  const date2 = String(date).slice(15,24)
+  const date2 = String(date).slice(16,24)
+  const numberRandom = Math.random();
+  const number = String(numberRandom).slice(2,16)
+  const child = correo + date2 + number
   //aqui lo declaro
   const uploadTask = firebase.storage()
   .ref("dinamicas")
-  .child(brand + date2 + file.name)
+  .child(child)
   .put(file);
   //aqui agreggo el exito y el error
   uploadTask
@@ -583,6 +618,7 @@ renderChip2(data) {
           labelColor="#FAFAFA" 
           />
           </div>
+          {/* vidcar.gonzalez@cuamoc.com  */}
       </Dialog> 
     </div>
     <div>

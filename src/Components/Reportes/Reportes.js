@@ -11,9 +11,7 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import { getZonas} from '../../Services/pez';
-import { getDinamics } from '../../Services/dinamicas';
-import { getBrand } from '../../Services/brands';
+import { getDinamics,getDinamicsByBrand } from '../../Services/dinamicas';
 import './reportes.css';
 
 const styles = {
@@ -71,9 +69,24 @@ class Reportes extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
+     //ID DEL BRAND
+     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-    getDinamics()
-     .then(dinamics=>{
+    if(id === "5b71bd925c65d40353ffda4c") {
+      getDinamics()
+    .then(dinamics=>{
+      let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+      for(let i= 0; i < dinamics.length;i++) 
+       {
+         dinamics[i].brand = brands[i]
+       }
+      this.setState({dinamicasFilter:dinamics,dinamics})
+    })
+    .catch(e=>console.log(e))
+    }
+    else if (id !== "5b71bd925c65d40353ffda4c"){
+      getDinamicsByBrand(id)
+      .then(dinamics=>{
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
         {
@@ -82,24 +95,8 @@ class Reportes extends Component {
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
-    //ID DEL BRAND
-    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-    //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
-    getBrand(id)
-      .then(brand=>{
-        let {marcas} = this.state;
-        marcas = brand.marcas
-        this.setState({marcas})
-      })
-      .catch(e=>console.log(e))
-    //TRAEMOS LAS ZONAS PARA TENER LAS ZONAS PARA EL AUTOCOMPLETE DE ZONAS
-    getZonas()
-     .then(zonas=>{
-      this.setState({zonas})
-     })
-     .catch(e=>console.log(e))
-     
-   }
+    } 
+  }
    filterList = (e) =>{
     var updatedList = this.state.dinamics.map(dinamic=>dinamic);
     updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){

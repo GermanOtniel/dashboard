@@ -1,9 +1,21 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
-
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
 
 //SE UTILIZA EN EL COMPONENTE DE {{{{{{{EVIDENCIAS}}}}}}}
 export function getEvidences(){
   return fetch( baseURL + '/evidencia/' )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(evidencias=>{
+    return evidencias
+  })
+}
+export function getEvidencesByBrand(id){
+  return fetch( baseURL + '/evidencia/dash/' + id )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()

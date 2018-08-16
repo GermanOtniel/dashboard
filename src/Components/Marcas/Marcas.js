@@ -7,8 +7,8 @@ import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
-import { getBrands } from '../../Services/brands';
-import { createMarca,getMarcas } from '../../Services/marcas';
+import { getBrands,getBrandsById } from '../../Services/brands';
+import { createMarca,getMarcas,getMarcasByBrand } from '../../Services/marcas';
 import {
   Table,
   TableBody,
@@ -70,21 +70,43 @@ class Marcas extends Component {
     progresoImagen:0
   }
   componentWillMount(){
-    getBrands()
-     .then(brands=>{
-    this.setState({brands})
-     })
-     .catch(e=>console.log(e))
-     getMarcas()
-     .then(marcas=>{
-      var marcass =  marcas.map(marca=> marca.brand.nombre);
-      for(let i= 0; i < marcas.length;i++) 
-        {
-          marcas[i].brand = marcass[i]
-        }
-       this.setState({marcasFilter:marcas,marcas})
-     })
-     .catch(e=>console.log(e))
+           //ID DEL BRAND
+           const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
+           //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+           if(id === "5b71bd925c65d40353ffda4c"){
+            getBrands()
+            .then(brands=>{
+           this.setState({brands})
+            })
+            .catch(e=>console.log(e))
+            getMarcas()
+            .then(marcas=>{
+             var marcass =  marcas.map(marca=> marca.brand.nombre);
+             for(let i= 0; i < marcas.length;i++) 
+               {
+                 marcas[i].brand = marcass[i]
+               }
+              this.setState({marcasFilter:marcas,marcas})
+            })
+            .catch(e=>console.log(e))
+           }
+           else if (id !== "5b71bd925c65d40353ffda4c"){
+            getBrandsById(id)
+            .then(brands=>{
+           this.setState({brands})
+            })
+            .catch(e=>console.log(e))
+            getMarcasByBrand(id)
+            .then(marcas=>{
+             var marcass =  marcas.map(marca=> marca.brand.nombre);
+             for(let i= 0; i < marcas.length;i++) 
+               {
+                 marcas[i].brand = marcass[i]
+               }
+              this.setState({marcasFilter:marcas,marcas})
+            })
+            .catch(e=>console.log(e))
+           }
    }
   handleOpen = () => {
     this.setState({open: true});
@@ -107,10 +129,15 @@ onChange = (e) => {
 }
 getFile = e => {
   const file = e.target.files[0];
+  const date = new Date();
+  const date2 = String(date).slice(16,24)
+  const numberRandom = Math.random();
+  const number = String(numberRandom).slice(2,16)
+  const child = 'marca' + date2 + number
   //aqui lo declaro
   const uploadTask = firebase.storage()
   .ref("marcas")
-  .child(file.name)
+  .child(child)
   .put(file);
   //aqui agreggo el exito y el error
   uploadTask
@@ -188,12 +215,11 @@ filterList = (e) =>{
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
                 Marcas Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Name">Marca</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Name">Brand</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Fecha Alta</TableHeaderColumn>
@@ -209,7 +235,6 @@ filterList = (e) =>{
             {this.state.marcasFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (marca, index) => (
               <TableRow key={marca._id} data={marca}>
-                <TableRowColumn>{marca._id}</TableRowColumn>
                 <TableRowColumn>{marca.nombre}</TableRowColumn>
                 <TableRowColumn>{marca.brand}</TableRowColumn>
                 <TableRowColumn>{marca.fechaAlta}</TableRowColumn>

@@ -198,8 +198,8 @@ onChange2 = (e) => {
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Name">Zona</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Name">Fecha de Creación</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Estado</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
 
@@ -213,8 +213,8 @@ onChange2 = (e) => {
             {this.state.zonasFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (zona, index) => (
               <TableRow key={zona._id} data={zona}>
-                <TableRowColumn>{zona._id}</TableRowColumn>
                 <TableRowColumn>{zona.nombre}</TableRowColumn>
+                <TableRowColumn>{zona.created_at.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{zona.estado}</TableRowColumn>
                 <TableRowColumn>Editar</TableRowColumn>
 

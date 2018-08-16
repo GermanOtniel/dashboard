@@ -1,4 +1,7 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
 
 //SE UTILIZA EN EL COMPONENTE DE {{{{{ CENTROS }}}}}
 export function getZonas(){

@@ -12,7 +12,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import './evidencias.css';
-import { getEvidences } from '../../Services/evidencias';
+import { getEvidences,getEvidencesByBrand } from '../../Services/evidencias';
 
 const styles = {
   button: {
@@ -44,6 +44,13 @@ class Evidencias extends Component {
     height: '300px',
   }
   componentWillMount(){
+    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
+
+    // SI EL USUARIO ES DEL BRAND 1PUNTCINCO ES DECIR ES SUPERADMIN
+    // VAS A USAR EL SERVICIO QUE TRAE TOOOOODAS LAS EVIDENCIAS
+
+    if(id === "5b71bd925c65d40353ffda4c") {
+    console.log("ES SUPERADMIN TRAE TODOS LOS TICKETS")
     getEvidences()
      .then(evidencias=>{
       let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
@@ -58,6 +65,29 @@ class Evidencias extends Component {
     this.setState({evidencias,evidenciasFilter:evidencias})
      })
      .catch(e=>console.log(e))
+    }
+
+    // SI EL USUARIO NO ES UN SUPERADMIN, ES DECIR, ES DE CUALQUIER OTRO BRAND, 
+    // VAS A TRAER LAS EVIDENCIAS QUE SOLO PERTENECEN A ESE BRAND
+    else if (id !== "5b71bd925c65d40353ffda4c"){
+   console.log("NO ES SUPERADMIN SOLO TRAE LO DE SU BRAND")
+   getEvidencesByBrand(id)
+   .then(evidencias=>{
+     console.log(evidencias)
+    let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
+    let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
+    for(let i= 0; i < evidencias.length;i++) 
+      {
+        evidencias[i].creador = nombre[i]
+        evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
+        evidencias[i].dinamica = dinamicas[i].nombreDinamica
+        
+      }
+  this.setState({evidencias,evidenciasFilter:evidencias})
+   })
+   .catch(e=>console.log(e))
+    }  
+    
    }
 
    filterList = (e) =>{
