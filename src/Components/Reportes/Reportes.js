@@ -54,7 +54,9 @@ class Reportes extends Component {
     enableSelectAll: true,
     deselectOnClickaway: true,
     showCheckboxes: true,
-    height: '300px'
+    height: '300px',
+    alReves:false,
+    alReves2:false
   }
   handleRequestDelete = (label) => {
     this.chipData = this.state.chipData;
@@ -79,7 +81,11 @@ class Reportes extends Component {
       for(let i= 0; i < dinamics.length;i++) 
        {
          dinamics[i].brand = brands[i]
+         dinamics[i].fechaI = dinamics[i].fechaInicio.slice(0,10)
+         dinamics[i].fechaF = dinamics[i].fechaFin.slice(0,10)
+
        }
+       dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
       this.setState({dinamicasFilter:dinamics,dinamics})
     })
     .catch(e=>console.log(e))
@@ -91,7 +97,10 @@ class Reportes extends Component {
        for(let i= 0; i < dinamics.length;i++) 
         {
           dinamics[i].brand = brands[i]
+          dinamics[i].fechaI = dinamics[i].fechaInicio.slice(0,10)
+          dinamics[i].fechaF = dinamics[i].fechaFin.slice(0,10)
         }
+        dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
@@ -101,12 +110,37 @@ class Reportes extends Component {
     var updatedList = this.state.dinamics.map(dinamic=>dinamic);
     updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
       return item.nombreDinamica.toLowerCase().search(
-        e.target.value.toLowerCase()) !== -1;
+        e.target.value.toLowerCase()) !== -1 || item.modalidad.toLowerCase().search(
+            e.target.value.toLowerCase()) !== -1;
     });
     this.setState({dinamicasFilter: updatedList})
   }
- 
-
+  orderByFechai = () => {
+    let {alReves} = this.state;
+    if(alReves === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(b.fechaI) - new Date(a.fechaI))
+      this.setState({dinamicasFilter,alReves:true})
+    }
+    else if(alReves === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(a.fechaI) - new Date(b.fechaI))
+      this.setState({dinamicasFilter,alReves:false})
+    }
+  }
+orderByFechaF = () => {
+  let {alReves2} = this.state;
+  if(alReves2 === false){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => new Date(b.fechaF) - new Date(a.fechaF))
+    this.setState({dinamicasFilter,alReves2:true})
+  }
+  else if(alReves2 === true){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => new Date(a.fechaF) - new Date(b.fechaF))
+    this.setState({dinamicasFilter,alReves2:false})
+  }
+  }
   render() {
     
     return (
@@ -150,13 +184,13 @@ class Reportes extends Component {
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn>Modalidad</TableHeaderColumn>
-              <TableHeaderColumn>BRAND</TableHeaderColumn>
-              <TableHeaderColumn>Nombre</TableHeaderColumn>
-              <TableHeaderColumn>Status</TableHeaderColumn>
-              <TableHeaderColumn>Fecha de Inicio</TableHeaderColumn>
-              <TableHeaderColumn>Fecha de Término</TableHeaderColumn>
-              <TableHeaderColumn>Ver</TableHeaderColumn>
+              <TableHeaderColumn><h3>Modalidad</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Nombre</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFechai}>Fecha de Inicio</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFechaF}>Fecha de Término</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -165,15 +199,14 @@ class Reportes extends Component {
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
           >
-            {this.state.dinamicasFilter.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
-.map( (dinamic, index) => (
+            {this.state.dinamicasFilter.map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaI}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaF}</TableRowColumn>
                 <TableRowColumn><Link to={`/dinamica/${dinamic._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
 
               </TableRow>

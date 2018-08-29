@@ -74,6 +74,7 @@ class Zonas extends Component {
   for(let i= 0; i < zonas.length;i++) 
     {
       zonas[i].estado = zonass[i]
+      zonas[i].created = zonas[i].created_at.slice(0,10)
     }
      this.setState({zonasFilter:zonas,zonas})
    })
@@ -94,7 +95,9 @@ class Zonas extends Component {
   var updatedList = this.state.zonas.map(dinamic=>dinamic);
   updatedList = updatedList.map(zona=>zona).filter(function(item){
     return item.nombre.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1;
+      e.target.value.toLowerCase()) !== -1 || item.estado.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1  || item.created.toLowerCase().search(
+          e.target.value.toLowerCase()) !== -1 ;
   });
   this.setState({zonasFilter: updatedList})
 }
@@ -214,7 +217,7 @@ onChange2 = (e) => {
 .map( (zona, index) => (
               <TableRow key={zona._id} data={zona}>
                 <TableRowColumn>{zona.nombre}</TableRowColumn>
-                <TableRowColumn>{zona.created_at.slice(0,10)}</TableRowColumn>
+                <TableRowColumn>{zona.created}</TableRowColumn>
                 <TableRowColumn>{zona.estado}</TableRowColumn>
                 <TableRowColumn>Editar</TableRowColumn>
 

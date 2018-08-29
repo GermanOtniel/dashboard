@@ -39,7 +39,10 @@ class Usuarios extends Component {
     enableSelectAll: true,
     deselectOnClickaway: true,
     showCheckboxes: true,
-    height: '300px'
+    height: '300px',
+    alReves:false,
+    alReves2:false,
+    alReves3:false
   }
 
   componentWillMount(){
@@ -47,9 +50,9 @@ class Usuarios extends Component {
     .then(users=>{
       for(let i= 0; i < users.length;i++) 
         {
-          users[i].created_at = users[i].created_at.slice(0,10)
-          
+          users[i].created_at = users[i].created_at.slice(0,10) 
         }
+        users.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
       this.setState({usuariosFilter:users,users})
     })
     .catch(e=>console.log(e))
@@ -65,9 +68,50 @@ filterList = (e) =>{
   var updatedList = this.state.users.map(dinamic=>dinamic);
   updatedList = updatedList.map(usuario=>usuario).filter(function(item){
     return item.correo.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1;
+      e.target.value.toLowerCase()) !== -1 || item.puesto.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1 || item.created_at.toLowerCase().search(
+          e.target.value.toLowerCase()) !== -1 ;
   });
   this.setState({usuariosFilter: updatedList})
+}
+orderByDate = (e) => {
+  let {alReves} = this.state;
+  if(alReves === false){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+    this.setState({usuariosFilter,alReves:true})
+  }
+  else if(alReves === true){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+    this.setState({usuariosFilter,alReves:false})
+  }
+}
+orderByEmail = (e) => {
+  let {alReves2} = this.state;
+  if(alReves2 === false){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => b.correo !== a.correo ? b.correo < a.correo ? -1 : 1 : 0)
+    this.setState({usuariosFilter,alReves2:true})
+  }
+  else if(alReves2 === true){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
+    this.setState({usuariosFilter,alReves2:false})
+  }
+}
+orderByPuesto = (e) => {
+  let {alReves3} = this.state;
+  if(alReves3 === false){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => b.puesto !== a.puesto ? b.puesto < a.puesto ? -1 : 1 : 0)
+    this.setState({usuariosFilter,alReves3:true})
+  }
+  else if(alReves3 === true){
+    let {usuariosFilter} = this.state;
+    usuariosFilter.sort((a, b) => a.puesto !== b.puesto ? a.puesto < b.puesto ? -1 : 1 : 0)
+    this.setState({usuariosFilter,alReves3:false})
+  }
 }
   render() {
     
@@ -90,7 +134,7 @@ filterList = (e) =>{
        <div className="buscador">
          <span>Buscador: </span>
          <br/><br/>
-        <input placeholder="Usuario por Correo" type="text" onChange={this.filterList}/>
+        <input placeholder="Busca cualquier usuario" type="text" onChange={this.filterList}/>
       </div>
        <div>
        <Table
@@ -111,11 +155,11 @@ filterList = (e) =>{
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="Correo Electrónico">Correo Electrónico</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Puesto">Puesto</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Fecha de Alta">Fecha de Registro</TableHeaderColumn>
-              <TableHeaderColumn tooltip="Fecha de Alta">Nombre</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
+              <TableHeaderColumn ><h2 onClick={this.orderByEmail}>Correo Electrónico</h2></TableHeaderColumn>
+              <TableHeaderColumn > <h2 onClick={this.orderByPuesto}>Puesto</h2></TableHeaderColumn>
+              <TableHeaderColumn ><h2 onClick={this.orderByDate}>Fecha de Registro</h2></TableHeaderColumn>
+              <TableHeaderColumn > <h2>Nombre</h2></TableHeaderColumn>
+              <TableHeaderColumn ><h2>Editar</h2></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -124,8 +168,7 @@ filterList = (e) =>{
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
           >
-            {this.state.usuariosFilter.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
-.map( (user, index) => (
+            {this.state.usuariosFilter.map( (user, index) => (
               <TableRow key={user._id} data={user}>
                 <TableRowColumn>{user.correo}</TableRowColumn>
                 <TableRowColumn>{user.puesto}</TableRowColumn>

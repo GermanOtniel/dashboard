@@ -21,6 +21,15 @@ const style = {
 const style2 = {
   margin: 12,
 };
+const styles = {
+  chip: {
+    margin: 1,
+  },
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+};
 
 class EvidenciaDetail extends Component{
 
@@ -95,7 +104,11 @@ class EvidenciaDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
             <div className="padreDetail">
             <div>
-            <img className="imagenEvidenciaDetail" src={evidence.archivo ? evidence.archivo : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340"}/>
+            <img alt="Imagen de evidencia" className="imagenEvidenciaDetail" src={evidence.archivo ? evidence.archivo : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340"}/>
+            <div>
+            <br/> <br/>
+            <b className="b">{evidence.imagen ? "Esta Dinámica SI requeria imagen como evidencia" : "Esta Dinámica NO requeria imagen como evidencia" }</b>
+            </div>
             <div>
               <div className="padreDetail">
               <SelectField
@@ -131,10 +144,11 @@ class EvidenciaDetail extends Component{
            <u>Mensaje del Usuario: </u><h4>{evidence.mensaje ? evidence.mensaje : "El usuario decidio no enviar mensaje" }</h4>
             <u>Cantidad Vendida según Usuario: </u>
             <br/><br/>
-            <div className="padreDetail">
+            <div style={styles.wrapper} className="padreDetail">
             {marcas.map( (marca, index) => (
               <div  key={index}>
               <Chip
+              style={styles.chip}
               >
               <Avatar  src={marca._id.imagen} />
                 <span className="span">{marca._id.nombre+" "}</span>
@@ -144,7 +158,8 @@ class EvidenciaDetail extends Component{
               </div>
               ))}
             </div>
-            
+
+
                    
             <u>Status: </u><b className="b">{evidence.status}</b>
             <br/><br/>
@@ -156,12 +171,8 @@ class EvidenciaDetail extends Component{
             <br/><br/>        
             <u>Correo del Usuario: </u><b>{evidence.correo}</b> 
             <br/><hr/>
-            <u>Requerimientos de la dinámica: </u><h4>{evidence.descripcion}</h4>        
-            <u>Modalidad: </u><b>{evidence.modalidad}</b>
-            <br/> <br/>
-            <b className="b">{evidence.imagen ? "Esta Dinámica SI requeria imagen como evidencia" : "Esta Dinámica NO requeria imagen como evidencia" }</b>
-
-                                                           
+            <u>Requerimientos de la dinámica: </u><h5>{evidence.descripcion}</h5>        
+            <u>Modalidad: </u><b>{evidence.modalidad}</b>                                                 
             </div>
             </div>
           </Paper>

@@ -94,7 +94,7 @@ class UsuarioDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE USUARIO" fullWidth={true} />
           <div className="userPadreDetail">
             <div>
-            <img width="500px" height="500px" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Ffoto-no-disponible.jpg?alt=media&token=c8c0d7a0-d1f2-418a-89d1-9d7688d0e801"}/>
+            <img alt="Imagen Usuario" width="500px" height="500px" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Ffoto-no-disponible.jpg?alt=media&token=c8c0d7a0-d1f2-418a-89d1-9d7688d0e801"}/>
             </div>
             <div className="userSonDetail">
               <u>Correo del Usuario: </u><h4>{user.correo}</h4>
