@@ -19,11 +19,11 @@
   max-height: 400px
 }
 .buscadorEvidencias{
-  margin-left: 2%
+  margin-left: 2%;
 }
 
 .buscadorEvidencias > input {
-  width: 200px;
+  width: 220px;
   height: 25px;
   border-color: black;
   border-radius: 10px;

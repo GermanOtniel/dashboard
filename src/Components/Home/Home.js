@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import { outUserDash } from '../../Services/authDash';
 
@@ -21,7 +20,6 @@ class Home extends Component {
   render() {
     return (
      <div>
-       <Dash/>
        <div>
        <RaisedButton label="Salir" secondary={true} onClick={this.outUser} style={styleButtonOut}/>
        </div>

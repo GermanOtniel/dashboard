@@ -77,6 +77,7 @@ componentWillMount(){
     for(let i= 0; i < centros.length;i++) 
       {
         centros[i].zona = centross[i]
+        centros[i].created = centros[i].created_at.slice(0,10)
       }
      this.setState({centrosFilter:centros,centros})
    })
@@ -98,6 +99,7 @@ onChange = (e) => {
   const value = e.target.value;
   const {newCenter} = this.state;
   newCenter[field] = value;
+  console.log(newCenter)
   this.setState({newCenter}); 
 }
 
@@ -105,7 +107,10 @@ filterList = (e) =>{
   var updatedList = this.state.centros.map(dinamic=>dinamic);
   updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
     return item.nombre.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1;
+      e.target.value.toLowerCase()) !== -1 || item.zona.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1 || item.nombre.toLowerCase().search(
+          e.target.value.toLowerCase()) !== -1 || item.created.toLowerCase().search(
+            e.target.value.toLowerCase()) !== -1 ;
   });
   this.setState({centrosFilter: updatedList})
 }
@@ -118,6 +123,7 @@ sendCenter = (e) => {
   })
   .catch(e=>console.log(e))
 }
+
 
   render() {
     
@@ -141,7 +147,7 @@ sendCenter = (e) => {
        <div className="buscadorCentros">
          <span>Buscador: </span>
          <br/><br/>
-        <input placeholder="Centro de Consumo por nombre" type="text" onChange={this.filterList}/>
+        <input placeholder="Por nombre, fecha ó zona" type="text" onChange={this.filterList}/>
       </div>
        <div>
        <Table
@@ -162,10 +168,10 @@ sendCenter = (e) => {
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Centro</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Zona</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
+              <TableHeaderColumn >Centro</TableHeaderColumn>
+              <TableHeaderColumn >Fecha de Creación</TableHeaderColumn>
+              <TableHeaderColumn >Zona</TableHeaderColumn>
+              <TableHeaderColumn >Editar</TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -177,8 +183,8 @@ sendCenter = (e) => {
             {this.state.centrosFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (centro, index) => (
               <TableRow key={centro._id} data={centro}>
-                <TableRowColumn>{centro._id}</TableRowColumn>
                 <TableRowColumn>{centro.nombre}</TableRowColumn>
+                <TableRowColumn>{centro.created}</TableRowColumn>
                 <TableRowColumn>{centro.zona}</TableRowColumn>
                 <TableRowColumn>Editar</TableRowColumn>
               </TableRow>
@@ -227,6 +233,18 @@ sendCenter = (e) => {
             onChange={this.onChange}
             name="nombre"
             type="text"
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Este campo es obligatorio"
+            errorStyle={styles.errorStyle}
+          />                     
+          <Divider />
+          <TextField
+            hintText="Solo números"
+            floatingLabelText="Código Postal"
+            onChange={this.onChange}
+            name="codigoPostal"
+            type="number"
             floatingLabelStyle={styles.floatingLabelFocusStyle}
             floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
             errorText="Este campo es obligatorio"

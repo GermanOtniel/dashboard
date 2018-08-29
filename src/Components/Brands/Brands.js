@@ -3,7 +3,6 @@ import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
-import Paper from 'material-ui/Paper';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
@@ -128,16 +127,15 @@ sendBrand = (e) => {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
                 Brands Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Brand</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Condición</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Fecha Alta</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
+              <TableHeaderColumn >Brand</TableHeaderColumn>
+              <TableHeaderColumn >Condición</TableHeaderColumn>
+              <TableHeaderColumn >Fecha Alta</TableHeaderColumn>
+              <TableHeaderColumn >Editar</TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -149,7 +147,6 @@ sendBrand = (e) => {
             {this.state.brands.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
 .map( (brand, index) => (
               <TableRow key={brand._id} data={brand}>
-                <TableRowColumn>{brand._id}</TableRowColumn>
                 <TableRowColumn>{brand.nombre}</TableRowColumn>
                 <TableRowColumn>{brand.activo}</TableRowColumn>
                 <TableRowColumn>{brand.fechaAlta}</TableRowColumn>

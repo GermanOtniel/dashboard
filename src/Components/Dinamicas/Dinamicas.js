@@ -16,7 +16,9 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
-import { createDinamic, getDinamics } from '../../Services/dinamicas';
+import { outUserDash } from '../../Services/authDash';
+import { createDinamic, getDinamics,getDinamicsByBrand } from '../../Services/dinamicas';
+import { getMarcas } from '../../Services/marcas';
 import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
@@ -25,6 +27,10 @@ import {green700,blue500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
 import './dinamicas.css';
+
+const styleButtonOut = {
+  float: 'right'
+}
 
 const styles = {
   button: {
@@ -101,7 +107,12 @@ class Dinamicas extends Component {
     height: '300px',
     progresoImagen:0,
     detalleDinamica:{},
-    marcasDinamica:[]
+    marcasDinamica:[],
+    open4: false,
+    alReves:false,
+    alReves2:false,
+    alReves3:false,
+    alReves4:false
   }
   handleRequestDelete = (label) => {
     this.chipData = this.state.chipData;
@@ -116,28 +127,49 @@ class Dinamicas extends Component {
     this.setState({chipData2: this.chipData});
   };
   componentWillMount(){
+        //ID DEL BRAND
+    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
      //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-     getDinamics()
+     if(id === "5b71bd925c65d40353ffda4c") {
+       getDinamics()
      .then(dinamics=>{
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
        for(let i= 0; i < dinamics.length;i++) 
         {
           dinamics[i].brand = brands[i]
         }
-       //this.setState({dinamics})
+        dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
-    //ID DEL BRAND
-    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-    //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
-    getBrand(id)
-      .then(brand=>{
-        let {marcas} = this.state;
-        marcas = brand.marcas
-        this.setState({marcas})
+     //COMO ES SUPER ADMIN PUEDE CREAR DINAMICAS CON LA MARCA QUE SEA 
+     getMarcas()
+     .then(marcas=>{
+       this.setState({marcas})
+     })
+     .catch(e=>console.log(e))
+     }
+     else if (id !== "5b71bd925c65d40353ffda4c"){
+       getDinamicsByBrand(id)
+       .then(dinamics=>{
+        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
+        for(let i= 0; i < dinamics.length;i++) 
+         {
+           dinamics[i].brand = brands[i]
+         }
+         dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
+        this.setState({dinamicasFilter:dinamics,dinamics})
       })
       .catch(e=>console.log(e))
+       //TRAEMOS EL BRAND PARA POPULAR SUS MARCAS Y TENER LAS MARCAS PARA EL AUTOCOMPLETE DE MARCAS
+    getBrand(id)
+    .then(brand=>{
+      let {marcas} = this.state;
+      marcas = brand.marcas
+      this.setState({marcas})
+    })
+    .catch(e=>console.log(e))
+     }
     //TRAEMOS LAS ZONAS PARA TENER LAS ZONAS PARA EL AUTOCOMPLETE DE ZONAS
     getZonas()
      .then(zonas=>{
@@ -151,7 +183,7 @@ class Dinamicas extends Component {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[]});
+    this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[],progresoImagen:0});
   };
   handleOpen2 = () => {
     this.setState({open2: true});
@@ -186,6 +218,9 @@ onChangeMarca = (e) => {
   for(let i = 0; i<chipData.length;i++){
     if(field === chipData[i]._id){
       chipData[i].puntosVentas = value
+    }
+    if(field === 'info'+chipData[i]._id){
+      chipData[i].descripcion = value
     }
   }
   newDinamic.marcaPuntosVentas = chipData;
@@ -237,15 +272,18 @@ onChange = (e) => {
   this.setState({newDinamic}); 
 }
 
-getFile = e => {
+ getFile = e => {
   const file = e.target.files[0];
-  const brand = `${JSON.parse(localStorage.getItem('user'))._id}`;
+  const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
   const date = new Date();
-  const date2 = String(date).slice(15,24)
+  const date2 = String(date).slice(16,24)
+  const numberRandom = Math.random();
+  const number = String(numberRandom).slice(2,16)
+  const child = correo + date2 + number
   //aqui lo declaro
   const uploadTask = firebase.storage()
   .ref("dinamicas")
-  .child(brand + date2 + file.name)
+  .child(child)
   .put(file);
   //aqui agreggo el exito y el error
   uploadTask
@@ -277,6 +315,13 @@ handleOpen3 = () => {
 handleClose3 = () => {
   this.setState({open3: false});
 };
+handleOpen4 = () => {
+  this.setState({open4: true});
+};
+
+handleClose4 = () => {
+  this.setState({open4: false});
+};
 detalleDinamica = (dinamic) => {
   this.handleOpen3()
   let {detalleDinamica,marcasDinamica} = this.state;
@@ -291,13 +336,78 @@ filterList = (e) =>{
   var updatedList = this.state.dinamics.map(dinamic=>dinamic);
   updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
     return item.nombreDinamica.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1;
+      e.target.value.toLowerCase()) !== -1 || item.brand.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1 || item.modalidad.toLowerCase().search(
+          e.target.value.toLowerCase()) !== -1;
   });
   this.setState({dinamicasFilter: updatedList})
 }
+
+orderByName = (e) => {
+  console.log('Sarabita, Otniel te quiere!!!')
+  let {alReves} = this.state;
+  if(alReves === false){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => a.nombreDinamica !== b.nombreDinamica ? a.nombreDinamica < b.nombreDinamica ? -1 : 1 : 0)
+    this.setState({dinamicasFilter,alReves:true})
+  }
+  else if(alReves === true){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => b.nombreDinamica !== a.nombreDinamica ? b.nombreDinamica < a.nombreDinamica ? -1 : 1 : 0)
+    this.setState({dinamicasFilter,alReves:false})
+  }
+}
+orderByInitDate = (e) => {
+  let {alReves2} = this.state;
+    if(alReves2 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio))
+      this.setState({dinamicasFilter,alReves2:true})
+    }
+    else if(alReves2 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
+      this.setState({dinamicasFilter,alReves2:false})
+    }
+}
+orderByFinishDate = (e) => {
+  let {alReves3} = this.state;
+    if(alReves3 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
+      this.setState({dinamicasFilter,alReves3:true})
+    }
+    else if(alReves3 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(b.fechaFin) - new Date(a.fechaFin))
+      this.setState({dinamicasFilter,alReves3:false})
+    }
+}
+orderByModality = (e) => {
+  let {alReves4} = this.state;
+    if(alReves4 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
+      this.setState({dinamicasFilter,alReves4:true})
+    }
+    else if(alReves4 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => b.modalidad !== a.modalidad ? b.modalidad < a.modalidad ? -1 : 1 : 0)
+      this.setState({dinamicasFilter,alReves4:false})
+    }
+}
+outUser = (e) => {
+  outUserDash()
+  .then(logoutUser=>{
+    this.props.history.push("/");
+    window.localStorage.removeItem("user");
+  })
+  .catch(e=>alert(e))
+}
+
 renderChip(data) {
   return (
-   <div key={data.nombre}>
+   <div className="chipDinamica" key={data.nombre}>
     <Chip
       
       onRequestDelete={() => this.handleRequestDelete(data.nombre)}
@@ -311,7 +421,19 @@ renderChip(data) {
     type="number"
     hintText="Puntos o Ventas por Marca"
   />
+  <br/>
+  <TextField
+    onChange={this.onChangeMarca}
+    name={`info${data._id}`}
+    type="text"
+    multiLine={true}
+    rowsMax={4}
+    floatingLabelText="Agrega información de la marca:"
+    hintText="Máximo 150 caracteres"
+    maxLength={150}
+  />
     </div>
+
   );
 }
 renderChip2(data) {
@@ -326,6 +448,14 @@ renderChip2(data) {
   );
 }
   render() {
+    const actions3 = [
+      <FlatButton
+        label="Entendido"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose4}
+      />,
+    ];
     const actions2 = [
       <FlatButton
         label="Ok"
@@ -346,6 +476,11 @@ renderChip2(data) {
     return (
     <div>
        <Dash/>
+       <div>
+       <div>
+       <RaisedButton label="Salir" secondary={true} onClick={this.outUser} style={styleButtonOut}/>
+       </div>
+       </div>
        <div className="zona-container">
          <div>
           <RaisedButton
@@ -385,13 +520,13 @@ renderChip2(data) {
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn>Modalidad</TableHeaderColumn>
-              <TableHeaderColumn>BRAND</TableHeaderColumn>
-              <TableHeaderColumn>Nombre</TableHeaderColumn>
-              <TableHeaderColumn>Status</TableHeaderColumn>
-              <TableHeaderColumn>Fecha de Inicio</TableHeaderColumn>
-              <TableHeaderColumn>Fecha de Término</TableHeaderColumn>
-              <TableHeaderColumn>Ver</TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByModality}>Modalidad</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByName}>Nombre</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -400,8 +535,7 @@ renderChip2(data) {
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
           >
-            {this.state.dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
-.map( (dinamic, index) => (
+            {this.state.dinamicasFilter.map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
@@ -439,6 +573,18 @@ renderChip2(data) {
           <hr/>
           <h4>¿Requerira imagen como evidencia?</h4>
           <RadioButtonGroup onChange={this.onChange} name="imagen" >
+          <RadioButton 
+          value={true}
+          label="Si"
+          />
+          <RadioButton 
+          value={false}
+          label="No"
+          />
+          </RadioButtonGroup>
+          <hr/>
+          <h4>¿Deseas revisar las evidencias que produzca esta dinámica? <button onClick={this.handleOpen4} className="botonInfoDinamicas"> ? </button></h4> 
+          <RadioButtonGroup onChange={this.onChange} name="checkEvidences" >
           <RadioButton 
           value={true}
           label="Si"
@@ -583,6 +729,7 @@ renderChip2(data) {
           labelColor="#FAFAFA" 
           />
           </div>
+          {/* vidcar.gonzalez@cuamoc.com  */}
       </Dialog> 
     </div>
     <div>
@@ -605,7 +752,7 @@ renderChip2(data) {
           onRequestClose={this.handleClose3}
           autoScrollBodyContent={true}
         >
-        <img width="300px" height="250px" src={detalleDinamica.imagenPremio} />
+        <img alt="Imagen Premio" width="300px" height="250px" src={detalleDinamica.imagenPremio} />
         <hr/>
         <h5>Nombre de la Dinámica:</h5>
         <h2>{detalleDinamica.nombreDinamica}</h2>
@@ -637,6 +784,28 @@ renderChip2(data) {
               <br/><br/>
               </div>
               ))}
+        </Dialog>
+          </div>
+          <div>
+          <Dialog
+          title="Información:"
+          modal={false}
+          actions={actions3}
+          open={this.state.open4}
+          onRequestClose={this.handleClose4}
+          autoScrollBodyContent={true}
+        >
+        Esta opción te da la oportunidad de:
+        <br/> <br/>
+        1) Revisar las evidencias que produzca esta 
+        dinámica para a su vez aprobarlas o rechazarlas.
+        <br/> <br/>
+        2) Ó en su defecto no tener la necesidad de revisar las evidencias y que todas estas 
+        salgan como aprobadas automáticamente, para así evitarte estar aprobandolas ó rechazandolas.
+        <br/><br/>
+        Si deseas la opción número 1 elige "SI", si deseas la opción número 2 elige "NO".
+        <br/><br/>
+        <b>Esta decisión es trascendental en el desempeño de una dinámica, asegurate de elegir la opción correcta</b>
         </Dialog>
           </div>
     </div>

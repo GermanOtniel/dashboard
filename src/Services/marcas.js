@@ -1,4 +1,8 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
+
 //SE UTILIZA EN EL COMPONENTE DE {{{{{{{MARCAS}}}}}}}
 export function createMarca(formulario){
   return fetch(  baseURL + '/marca/new' ,{
@@ -28,18 +32,15 @@ export function getMarcas(){
   })
 }
 
-//CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}
-// export function getMarcasByBrand(){
-//   //console.log("peticion");
-//   //  localhost  
-//   // herokuapp  '/auth/profile/'
-//   return fetch( baseURL + '/marca/bybrand' )
-//   .then(res=>{
-//     if(!res.ok) return Promise.reject(res.statusText);
-//     return res.json()
-//   })
-//   .then(marcas=>{
-//     return marcas
-//   })
-// }
-//CREO QUE NO SIRVE PARA NADA REPITO PARA {{{{{{ NADA }}}}}}
+//SE UTILIZA EN EL COMPONENTE DE {{{{{MARCAS}}}}} para traer LAS MARCAS DE UN USUARIO PERO POR SU BRAND
+export function getMarcasByBrand(id){
+  return fetch( baseURL + '/marca/dash/' + id )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(marcas=>{
+    return marcas
+  })
+}
+

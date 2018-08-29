@@ -17,7 +17,11 @@ class Signup extends Component {
 
   state={
     user:{},
-    open:false
+    open:false,
+    boton:true,
+    open2:false,
+    mensajeContraseñas:"",
+    infoIncompleta:true
   }
 
   onChange = (e) => {
@@ -25,13 +29,39 @@ class Signup extends Component {
     const value = e.target.value;
     const {user} = this.state;
     user[field] = value;
+    if(user.correo.includes('@') && user.correo.includes('.') ){
+      this.setState({boton:false})
+    }
+    else if(!user.correo.includes('@') || !user.correo.includes('.') ){
+      this.setState({boton:true,infoIncompleta:true})
+    }
     this.setState({user});
   }
-  
+  onChangeContraseñas = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const {user} = this.state;
+    let {mensajeContraseñas} = this.state;
+    user[field] = value;
+      if(user.password !== user.password2 ){
+        mensajeContraseñas = "Tus contraseñas no coinciden..."
+        this.setState({mensajeContraseñas,boton:true})
+      }
+      else if(user.password === user.password2 && user.password !== "" && user.password2 !== "" && this.state.boton ){
+        mensajeContraseñas = "Bien, tus contraseñas SI coinciden"
+        this.setState({mensajeContraseñas,infoIncompleta:false,contraseñasCorrectas:true})
+      }
+    this.setState({user}); 
+  }
   sendUser = (e) => {
     signup(this.state.user)
-    .then(user=>{
-      this.handleOpen();
+    .then(r=>{
+      if(r.message){
+        this.handleOpen2()
+      }
+      else{
+        this.handleOpen();
+      }
     })
   }
   handleOpen = () => {
@@ -40,13 +70,27 @@ class Signup extends Component {
   handleClose = () => {
     this.setState({open: false});
   };
+  handleOpen2 = () => {
+    this.setState({open2: true});
+  };
+  handleClose2 = () => {
+    this.setState({open2: false});
+  };
 
   render() {
+    const {mensajeContraseñas} = this.state;
     const actions = [
       <FlatButton
         label="Entendido"
         primary={true}
         onClick={this.handleClose}
+      />,
+    ];
+    const actions2 = [
+      <FlatButton
+        label="Entendido"
+        primary={true}
+        onClick={this.handleClose2}
       />,
     ];
     return (
@@ -80,18 +124,21 @@ class Signup extends Component {
           floatingLabelText="Tu contraseña"
           name="password"
           type="Password"
-          onChange={this.onChange}
+          onChange={this.onChangeContraseñas}
         />
         <br/>
         <TextField
           hintText="Confirma tu contraseña"
           floatingLabelText="Confirma tu contraseña"
+          name="password2"
           type="Password"
-          onChange={this.onChange}
+          onChange={this.onChangeContraseñas}
         />
+        <br/>
+        <span style={mensajeContraseñas === "Bien, tus contraseñas SI coinciden" ? {color:'green'} : {color:'red'}}>{mensajeContraseñas}</span>
         <br/><br/>
         <div className="hijoPaper">
-        <RaisedButton onClick={this.sendUser} label="Registrarme" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
+        <RaisedButton onClick={this.sendUser} disabled={this.state.infoIncompleta} label="Registrarme" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
         <br/>
         <h5>Si ya estás registrado <Link to="/" className="linkReg">Inicia Sesión</Link></h5>
         <br/>
@@ -105,6 +152,16 @@ class Signup extends Component {
           onRequestClose={this.handleClose}
          >
           Ahora inicia sesión para corroborar que tienes los permisos necesarios para ingresar. 
+          </Dialog>
+        </div>
+        <div> 
+         <Dialog
+          actions={actions2}
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+         >
+          Ups! Algo anda mal, revisa los datos que se te solicitan y los que estas ingresando.
           </Dialog>
         </div>
        </div>

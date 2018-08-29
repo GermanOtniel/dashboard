@@ -4,11 +4,10 @@ import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
-import Divider from 'material-ui/Divider';
 import LinearProgress from 'material-ui/LinearProgress';
 import TextField from 'material-ui/TextField';
-import { getBrands } from '../../Services/brands';
-import { createMarca,getMarcas } from '../../Services/marcas';
+import { getBrands,getBrandsById } from '../../Services/brands';
+import { createMarca,getMarcas,getMarcasByBrand } from '../../Services/marcas';
 import {
   Table,
   TableBody,
@@ -50,12 +49,14 @@ class Marcas extends Component {
 
   state={
     open:false,
+    open2:false,
     newMarca:{},
     fecha:"",
     newObj:{},
     brands:[],
     marcas:[],
     marcasFilter:[],
+    detalleMarca:{},
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
     fixedHeader: true,
     fixedFooter: true,
@@ -67,36 +68,69 @@ class Marcas extends Component {
     deselectOnClickaway: true,
     showCheckboxes: true,
     height: '300px',
-    progresoImagen:0
+    progresoImagen:0,
+    botonMarca:true,
+    alReves:false
   }
   componentWillMount(){
-    getBrands()
-     .then(brands=>{
-    this.setState({brands})
-     })
-     .catch(e=>console.log(e))
-     getMarcas()
-     .then(marcas=>{
-      var marcass =  marcas.map(marca=> marca.brand.nombre);
-      for(let i= 0; i < marcas.length;i++) 
-        {
-          marcas[i].brand = marcass[i]
-        }
-       this.setState({marcasFilter:marcas,marcas})
-     })
-     .catch(e=>console.log(e))
+           //ID DEL BRAND
+           const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
+           //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+           if(id === "5b71bd925c65d40353ffda4c"){
+            getBrands()
+            .then(brands=>{
+           this.setState({brands})
+            })
+            .catch(e=>console.log(e))
+            getMarcas()
+            .then(marcas=>{
+             var marcass =  marcas.map(marca=> marca.brand.nombre);
+             for(let i= 0; i < marcas.length;i++) 
+               {
+                 marcas[i].brand = marcass[i]
+               }
+               marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
+              this.setState({marcasFilter:marcas,marcas})
+            })
+            .catch(e=>console.log(e))
+           }
+           else if (id !== "5b71bd925c65d40353ffda4c"){
+            getBrandsById(id)
+            .then(brands=>{
+           this.setState({brands})
+            })
+            .catch(e=>console.log(e))
+            getMarcasByBrand(id)
+            .then(marcas=>{
+             var marcass =  marcas.map(marca=> marca.brand.nombre);
+             for(let i= 0; i < marcas.length;i++) 
+               {
+                 marcas[i].brand = marcass[i]
+               }
+               marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
+               this.setState({marcasFilter:marcas,marcas})
+            })
+            .catch(e=>console.log(e))
+           }
    }
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false});
+    this.setState({open: false,newObj:{},botonMarca:true});
+  };
+  handleOpen2 = () => {
+    this.setState({open2: true});
+  };
+
+  handleClose2 = () => {
+    this.setState({open2: false});
   };
  
  onNewRequest = (chosenRequest) => {
   const {newMarca} = this.state;
   newMarca.brand =  chosenRequest;
-  this.setState({newMarca});
+  this.setState({newMarca,botonMarca:false});
 }
 onChange = (e) => {
   const field = e.target.name;
@@ -107,10 +141,15 @@ onChange = (e) => {
 }
 getFile = e => {
   const file = e.target.files[0];
+  const date = new Date();
+  const date2 = String(date).slice(16,24)
+  const numberRandom = Math.random();
+  const number = String(numberRandom).slice(2,16)
+  const child = 'marca' + date2 + number
   //aqui lo declaro
   const uploadTask = firebase.storage()
   .ref("marcas")
-  .child(file.name)
+  .child(child)
   .put(file);
   //aqui agreggo el exito y el error
   uploadTask
@@ -141,17 +180,46 @@ createMarca(this.state.newMarca)
 })
 .catch(e=>console.log(e))
 };
+marca = (marca) => {
+  this.handleOpen2()
+  marca.fecha = marca.created_at.slice(0,10) 
+  let {detalleMarca} = this.state;
+  detalleMarca = marca;
+  this.setState({detalleMarca})
+  };
 filterList = (e) =>{
   var updatedList = this.state.marcas.map(dinamic=>dinamic);
   updatedList = updatedList.map(marca=>marca).filter(function(item){
     return item.brand.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1;
+      e.target.value.toLowerCase()) !== -1 || item.nombre.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1;
   });
   this.setState({marcasFilter: updatedList})
 }
+orderByMarca = (e) => {
+  let {alReves} = this.state;
+    if(alReves === false){
+      let {marcasFilter} = this.state;
+      marcasFilter.sort((a, b) => b.nombre.toLowerCase() !== a.nombre.toLowerCase() ? b.nombre.toLowerCase() < a.nombre.toLowerCase() ? -1 : 1 : 0)
+      this.setState({marcasFilter,alReves:true})
+    }
+    else if(alReves === true){
+      let {marcasFilter} = this.state;
+      marcasFilter.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
+      this.setState({marcasFilter,alReves:false})
+    }
+}
 
   render() {
-    
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose2}
+      />,
+    ];
+    const {detalleMarca} = this.state;
     return (
     <div>
        <Dash/>
@@ -172,7 +240,7 @@ filterList = (e) =>{
        <div className="buscador">
          <span>Buscador: </span>
          <br/><br/>
-        <input placeholder="Marcas por Brand" type="text" onChange={this.filterList}/>
+        <input placeholder="Búsqueda por nombre" type="text" onChange={this.filterList}/>
       </div>
        <div>
        <Table
@@ -188,16 +256,15 @@ filterList = (e) =>{
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
                 Marcas Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn tooltip="The ID">ID</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Marca</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Brand</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Fecha Alta</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Name"><h2 onClick={this.orderByMarca}>Marca</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Name"><h2>Brand</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Status"><h2>Fecha Alta</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Status"><h2>Editar</h2></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -206,14 +273,12 @@ filterList = (e) =>{
             deselectOnClickaway={this.state.deselectOnClickaway}
             showRowHover={this.state.showRowHover}
           >
-            {this.state.marcasFilter.sort((a, b) => a.nombre !== b.nombre ? a.nombre < b.nombre ? -1 : 1 : 0)
-.map( (marca, index) => (
+            {this.state.marcasFilter.map( (marca, index) => (
               <TableRow key={marca._id} data={marca}>
-                <TableRowColumn>{marca._id}</TableRowColumn>
                 <TableRowColumn>{marca.nombre}</TableRowColumn>
                 <TableRowColumn>{marca.brand}</TableRowColumn>
                 <TableRowColumn>{marca.fechaAlta}</TableRowColumn>
-                <TableRowColumn>Editar</TableRowColumn>
+                <TableRowColumn><button onClick={() => this.marca(marca)} className="buttonDinamicasDetalle">Ver Marca</button></TableRowColumn>
 
               </TableRow>
               ))}
@@ -228,8 +293,14 @@ filterList = (e) =>{
             onRequestClose={this.handleClose}
           >
                     
-            <TextField onChange={this.onChange} name="nombre" hintText="Nombre de la Marca" type="text"  underlineShow={false} />          
-          <Divider />
+            <TextField 
+              onChange={this.onChange} 
+              name="nombre" 
+              hintText="Nombre de la Marca" 
+              type="text"  
+              underlineShow={true} 
+            />  
+            <br/>
           <AutoComplete
             floatingLabelText="Selecciona Brand"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -239,7 +310,7 @@ filterList = (e) =>{
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
             onNewRequest={this.onNewRequest}
           />  
-          <Divider />
+          <br/>
           <DatePicker
             hintText="Fecha de Alta"
             value={this.state.newObj.fecha}
@@ -257,7 +328,7 @@ filterList = (e) =>{
           </FlatButton>
           <br/><br/>
           <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : "Espera la imagen se esta cargando..."}</span>
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." : "La imagen tarda unos segundos en cargar")}</span>
           <br/><br/>
           
           
@@ -267,10 +338,28 @@ filterList = (e) =>{
           label="Crear Marca" 
           backgroundColor="#0D47A1"
           labelColor="#FAFAFA"  
+          disabled={this.state.botonMarca}
           />
           
         </Dialog> 
          </div>
+         <div>
+          <Dialog
+          title="Detalle de Marca"
+          actions={actions}
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+          autoScrollBodyContent={true}
+        >
+        <img alt="Foto Marca" width="300px" height="250px" src={detalleMarca.imagen} />
+        <br/><br/>
+        <span>Nombre de la Marca: </span>
+        <h3>{detalleMarca.nombre}</h3>  
+        <span>Fecha de Creación: </span>
+        <b>{detalleMarca.fecha}</b>  
+        </Dialog>
+          </div>
     </div>
     );
   }

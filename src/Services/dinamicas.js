@@ -1,4 +1,7 @@
-const baseURL = process.env.REACT_APP_BASE_URL;
+// production 
+// const baseURL = process.env.REACT_APP_BASE_URL;
+// development
+const baseURL = "http://localhost:3000"
 
 //CREO QUE NO SIRVE PARA NADA 
 export function zoneById(id) {
@@ -31,6 +34,18 @@ export function createDinamic(formulario){
 //SE UTILIZA EN EL COMPONENTE DE DINAMICAS
 export function getDinamics(){
   return fetch( baseURL + '/dinamica/' )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(dinamicas=>{
+    return dinamicas
+  })
+}
+
+//DINAMICAS POR BRAND 
+export function getDinamicsByBrand(id){
+  return fetch( baseURL + '/dinamica/dash/' + id )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()

@@ -50,24 +50,35 @@ class DinamicaDetail extends Component{
     centros:[],
     marcas:[],
     open: false,
-    open2:false,
+    open2: false,
+    open3: false,
+    open4: false,
+    open5: false,
     detalleCreador: {},
     marcasCreador: [],
-    posibleGanador:{}
+    posibleGanador:{},
+    marcaVentas:{},
+    newMarcas:[],
+    centroDetalle:{},
+    centro:{},
+    ganadores:[],
+    detalleGanador:{},
+    marcasGanador:[]
   }
 
   componentWillMount(){
      let id = this.props.match.params.id
     getSingleDinamic(id)
     .then(dinamica=>{
+        let {ganadores} = this.state;
         let marcas = dinamica.marcaPuntosVentas.map(marca=>marca._id);
         let { centros } = this.state;
       dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
       dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
       centros = dinamica.centroConsumo.map(centro=>centro);
-      this.setState({dinamica, centros,marcas})
       getEvidencesByDinamic(id)
-      .then(evidencias=>{
+      .then(evidencias=>{        
+       
         // El array "creadoresArray" trae a todos los usarios que ya han hecho ventas en esta dinamica. 
         //Esta lista traera usuarios repetidos.
         let creadoresArray = evidencias.map(evidencia=>evidencia.creador)
@@ -78,11 +89,11 @@ class DinamicaDetail extends Component{
 
         //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
 
-        for(var i in creadoresArray) {
-          lookupObject[creadoresArray[i]['_id']] = creadoresArray[i];
+        for(var iii in creadoresArray) {
+          lookupObject[creadoresArray[iii]['_id']] = creadoresArray[iii];
         }
-        for(i in lookupObject) {
-          newCreadores.push(lookupObject[i]);
+        for(iii in lookupObject) {
+          newCreadores.push(lookupObject[iii]);
        }
        // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
        
@@ -98,6 +109,8 @@ class DinamicaDetail extends Component{
           }
         }
       }
+      
+
 // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
 
 
@@ -108,15 +121,15 @@ class DinamicaDetail extends Component{
 // ESTOS CICLOS LO QUE HACEN ES DARLE LAS MARCAS QUE SE VENDIERON EN ESTA DINAMICA A CADA USUARIO:
       var lookupObject3  = {};
       for(let z = 0; z < newCreadores.length; z++){
-        for(var i in newCreadores[z].ventasDinamica) {
-          lookupObject3[newCreadores[z].ventasDinamica[i]['id']] = newCreadores[z].ventasDinamica[i];
+        for(var ii in newCreadores[z].ventasDinamica) {
+          lookupObject3[newCreadores[z].ventasDinamica[ii]['id']] = newCreadores[z].ventasDinamica[ii];
         }
-        for(i in lookupObject3) {
-          newCreadores[z].marcas.push(lookupObject3[i]);
+        for(ii in lookupObject3) {
+          newCreadores[z].marcas.push(lookupObject3[ii]);
        }
       }
 
-      // AQUI SE ADENTRA A CADA USUARIO Y SE EJECUTA EL BUSCAR:
+      // AQUI SE ADENTRA A CADA USUARIO Y SE BUSCA:
       // SI SON MARCAS IGUALES QUE SE SUMEN SUS VENTAS 
      for(let x = 0; x < newCreadores.length; x++){
        for (let v = 0; v < newCreadores[x].marcas.length; v++){
@@ -136,6 +149,7 @@ class DinamicaDetail extends Component{
        for( let g = 0; g < dinamica.ganadores.length; g++){
         if(dinamica.ganadores[g] === newCreadores[ab]._id){
           newCreadores[ab].ganador = true
+          ganadores.push(newCreadores[ab])
         }
        }
        // Y SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
@@ -143,7 +157,36 @@ class DinamicaDetail extends Component{
           newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
        }
      }
-      this.setState({newCreadores}) 
+     for(let ñ = 0; ñ < marcas.length; ñ++){
+       //console.log(marcas[ñ]._id)
+       for(let ññ = 0; ññ < newCreadores.length;ññ++){
+         //console.log(newCreadores[ññ].ventasDinamica)
+         for( let ñññ = 0; ñññ < newCreadores[ññ].ventasDinamica.length; ñññ++){
+          if(marcas[ñ]._id === newCreadores[ññ].ventasDinamica[ñññ].id){
+            marcas[ñ].total += newCreadores[ññ].ventasDinamica[ñññ].ventas
+          }
+         }
+       }
+     }
+     // VENTAS TOTALES POR CENTRO DE CONSUMO
+     for ( let s = 0; s < centros.length; s++){
+       //console.log('CENTROS ID: ',centros[s]._id)
+       for(let ss = 0; ss < newCreadores.length; ss++){
+         //console.log('USERS CC ID: ',newCreadores[ss].centroConsumo)
+         if(centros[s]._id === newCreadores[ss].centroConsumo){
+           //console.log(centros[s],'    ',newCreadores[ss].ventasDinamica )
+           for(let ig = 0; ig < newCreadores[ss].ventasDinamica.length; ig++){
+            centros[s].ventasUsuario.push(newCreadores[ss].ventasDinamica[ig])
+            //console.log(newCreadores[ss].ventasDinamica[ig])
+           }
+         }
+       }
+     }
+
+
+     // TERMINA VT POR CC
+     //console.log(ganadores)
+      this.setState({newCreadores,dinamica, centros,marcas,ganadores}) 
       })
       .catch(e=>console.log(e))
     })
@@ -165,6 +208,28 @@ class DinamicaDetail extends Component{
   handleClose2 = () => {
     this.setState({open2: false});
   };
+  handleOpen3 = () => {
+    this.setState({open3: true});
+  };
+
+  handleClose3 = () => {
+    this.setState({open3: false});
+  };
+  handleOpen4 = () => {
+    this.setState({open4: true});
+  };
+
+  handleClose4 = () => {
+    this.cerosTotal(this.state.newMarcas)
+    this.setState({open4: false,newMarcas:[]});
+  };
+  handleOpen5 = () => {
+    this.setState({open5: true});
+  };
+
+  handleClose5 = () => {
+    this.setState({open5: false});
+  };
   detalleVenta = (creador) => {
     this.handleOpen()
     let {detalleCreador,marcasCreador} = this.state;
@@ -172,6 +237,61 @@ class DinamicaDetail extends Component{
     marcasCreador = creador.marcas;
     this.setState({detalleCreador,marcasCreador})
   } 
+  detalleGanador = (ganador) => {
+    this.handleOpen5()
+    let {detalleGanador,marcasGanador} = this.state;
+    detalleGanador = ganador;
+    marcasGanador = ganador.marcas;
+    this.setState({detalleGanador,marcasGanador})
+  } 
+  marcas = (marca) =>{
+    this.handleOpen3()
+    let {marcaVentas} = this.state;
+    marcaVentas = marca
+    this.setState({marcaVentas})
+  }
+  centros = (centro) =>{
+    let {newMarcas} = this.state;
+    let {centroDetalle} = this.state;
+    let ventas = centro.ventasUsuario
+    centroDetalle = centro
+     // El array "marcas" trae a todas las marcas. 
+        //Esta lista traera marcas repetidas.
+        let marcas = centro.ventasUsuario.map(ventas=>ventas._id)
+        //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
+        //let newMarcas=[];
+        // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
+        var lookupObject  = {};
+
+        //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
+
+        for(var iii in marcas) {
+          lookupObject[marcas[iii]['_id']] = marcas[iii];
+        }
+        for(iii in lookupObject) {
+          newMarcas.push(lookupObject[iii]);
+       }
+       // HASTA AQUI YA TENEMOS A LaS marcas QUE NO SE REPITEN ES DECIR UNICaS ----> "newMarcas"
+       //console.log('MARCAS:   ',newMarcas)
+       //console.log('VENTAS:   ',ventas)
+       for ( let io = 0; io < newMarcas.length; io++){
+         for( let ioi = 0; ioi < ventas.length; ioi++){
+           if( newMarcas[io]._id === ventas[ioi].id ){
+            newMarcas[io].total += ventas[ioi].ventas
+           }
+         }
+       }
+       this.handleOpen4()
+       this.setState({newMarcas,centroDetalle,centro})
+  }
+// ESTA FUNCION ES IMPORTANTE PORQUE HACE QUE LAS MARCAS REGRESEN A CERO, SINO 
+//TUVIERAMOS ESTA FUNCION NUESTRAS MARCAS SUMARIAN LAS VENTAS UNA Y OTRA Y OTRA VEZ
+  cerosTotal = (newMarcas) => {
+    for ( let ceros = 0; ceros < newMarcas.length; ceros++){
+      newMarcas[ceros].total = 0
+    }
+    this.setState({newMarcas})
+  }
   enviarGanador = (ganador) => {
     let idDinamica = this.state.dinamica._id;
     //dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -204,7 +324,31 @@ class DinamicaDetail extends Component{
         onClick={() => this.enviarGanador(this.state.posibleGanador)}
       />,
     ];
-    const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador} = this.state;
+    const actions3 = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose3}
+      />,
+    ];
+    const actions4 = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose4}
+      />,
+    ];
+    const actions5 = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose5}
+      />,
+    ];
+    const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador,marcaVentas,newMarcas,centroDetalle,ganadores,detalleGanador,marcasGanador} = this.state;
       return (
         <div>
           <Dash/>
@@ -215,7 +359,7 @@ class DinamicaDetail extends Component{
           <div className="padreDetail">
         
             <div>
-            <img className="img" src={dinamica.imagenPremio}/>
+            <img alt="Imagen Premio" className="img" src={dinamica.imagenPremio}/>
             </div>
             
             <div>
@@ -234,17 +378,20 @@ class DinamicaDetail extends Component{
               <h4>Centros de Consumo:</h4>
               <div className="padreDetail" >
               {centros.map( (centro, index) => (
+                <div key={index} onClick={() => this.centros(centro)}>
               <Chip
               key={index}
               className="reportDinamicDetailHijo"
               >
                 {centro.nombre}
               </Chip> 
+              </div>
               ))}
               </div>
               <h4>Marcas:</h4>
               <div className="padreDetail" >
               {marcas.map( (marca, index) => (
+                <div key={index} onClick={() => this.marcas(marca)}>
               <Chip
               key={index}
               className="reportDinamicDetailHijo"
@@ -252,6 +399,7 @@ class DinamicaDetail extends Component{
               <Avatar src={marca.imagen} />
                 {marca.nombre}
               </Chip> 
+                </div>
               ))}
               </div>    
             </div>  
@@ -264,14 +412,35 @@ class DinamicaDetail extends Component{
     <GridList style={styles.gridList} cols={1}>
       {newCreadores.sort((a, b) => b.total - a.total ).map((creador,index) => (
         <GridTile
-          key={creador.fotoPerfil}
+          key={index}
           title={creador.total+' ventas'}
-          subtitle={index+1 + ') ' + creador.nombre+' '+creador.apellido}
+          subtitle={ creador.nombre && creador.apellido ? index+1 + ') ' + creador.nombre + " " + creador.apellido : index+1 + ') ' + creador.correo  }
           titleStyle={styles.titleStyle}
           actionIcon={<IconButton onClick={() => this.detalleVenta(creador)} ><FontIcon color="white" className="material-icons">equalizer</FontIcon></IconButton>}
           titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
         >
-          <img src={creador.fotoPerfil} />
+          <img width="180px" alt="Foto Usuario" src={creador.fotoPerfil ? creador.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Fuser.png?alt=media&token=f699f557-33b4-44d2-9de5-442e791b746a"} />
+        </GridTile>
+      ))}
+    </GridList>
+  </div>
+  <hr/>
+
+  <div className="padreDetail">
+              <h2> Ganadores: </h2>
+          </div>
+          <div style={styles.root}>
+    <GridList style={styles.gridList} cols={1}>
+      {ganadores.sort((a, b) => b.total - a.total ).map((ganador,index) => (
+        <GridTile
+          key={ganador.fotoPerfil}
+          title={ganador.total+' ventas'}
+          subtitle={ganador.nombre && ganador.apellido ? index+1 + ') ' + ganador.nombre+' '+ganador.apellido : ganador.correo}
+          titleStyle={styles.titleStyle}
+          actionIcon={<IconButton onClick={() => this.detalleGanador(ganador)} ><FontIcon color="white" className="material-icons">equalizer</FontIcon></IconButton>}
+          titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+        >
+          <img alt="Foto Usuario" src={ganador.fotoPerfil} />
         </GridTile>
       ))}
     </GridList>
@@ -287,8 +456,8 @@ class DinamicaDetail extends Component{
           onRequestClose={this.handleClose}
           autoScrollBodyContent={true}
         >
-        <img width="300px" height="250px" src={detalleCreador.fotoPerfil} />
-        <h2>{detalleCreador.nombre + " " + detalleCreador.apellido}</h2>
+        <img alt="Foto Usuario" width="300px" height="250px" src={detalleCreador.fotoPerfil ? detalleCreador.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Fuser.png?alt=media&token=f699f557-33b4-44d2-9de5-442e791b746a"} />
+        <h2>{detalleCreador.nombre && detalleCreador.apellido ? detalleCreador.nombre + " " + detalleCreador.apellido : ""}</h2>
         <h3>{detalleCreador.correo}</h3>
         <b className="bDetalleCreador">{detalleCreador.ganador === true  ? "Este usuario HA CUMPLIDO con las metas de esta dinámica" : (dinamica.modalidad === "Ventas" ? "Este usuario AÚN NO cumple con las metas de esta dinámica.": "Esta es una dinámica de modalidad Puntos")}</b>
         <br/><br/>
@@ -298,8 +467,8 @@ class DinamicaDetail extends Component{
               className="dinamicDetailHijo"
               >
               <Avatar src={marca._id.imagen} />
-                {marca._id.nombre}
-                 <b>{dinamica.modalidad === "Ventas" ? " " + marca.puntosUsuario + " ventas" + "   /  " + marca.puntosVentas + " meta" : " " + marca.puntosUsuario + " ventas" + "   /  " + marca.puntosVentas + " puntos por Venta" }</b> 
+                <span>{marca._id.nombre} </span> 
+                 <b>{dinamica.modalidad === "Ventas" ?  marca.puntosUsuario + " ventas /  " + marca.puntosVentas + " meta" :  marca.puntosUsuario + " ventas  /  " + marca.puntosVentas + " puntos por Venta" }</b> 
               </Chip> 
               <br/><br/>
               </div>
@@ -325,6 +494,74 @@ class DinamicaDetail extends Component{
               <b>¿Estás seguro de querer continuar con esta acción?</b>
             </Dialog>
       </div>
+      <div>
+            <Dialog
+              title="Detalle de Venta por Marca"
+              actions={actions3}
+              modal={false}
+              open={this.state.open3}
+              onRequestClose={this.handleClose3}
+            >
+              <img alt="Imagen Marca" width="200px" height="150px" src={marcaVentas.imagen} />
+              <h4>{'Marca: ' + marcaVentas.nombre}</h4>
+              <h4>{'Total de ventas en esta dinámica: '+marcaVentas.total}</h4>
+
+            </Dialog>
+      </div>
+      <div>
+            <Dialog
+              title={"Detalle de Venta de "+ centroDetalle.nombre}
+              actions={actions4}
+              modal={false}
+              open={this.state.open4}
+              onRequestClose={this.handleClose4}
+            >
+              <div>
+              {newMarcas.map( (marca, index) => (
+                <div className="chipCentroReporte" key={index} onClick={() => this.marcas(marca)}>
+              <Chip
+              key={index}
+              >
+              <Avatar src={marca.imagen} />
+                {marca.nombre+'   '}
+                <b>{marca.total+' unidades vendidas'}</b>
+              </Chip> 
+                </div>
+              ))}
+              </div> 
+
+            </Dialog>
+      </div>
+      <div>
+          <Dialog
+          title="Detalle de Ganador"
+          actions={actions5}
+          modal={false}
+          open={this.state.open5}
+          onRequestClose={this.handleClose5}
+          autoScrollBodyContent={true}
+        >
+        <img alt="Foto usuario" width="300px" height="250px" src={detalleCreador.fotoPerfil ? detalleCreador.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Fuser.png?alt=media&token=f699f557-33b4-44d2-9de5-442e791b746a"} />
+        <h2>{detalleCreador.nombre && detalleCreador.apellido ? detalleCreador.nombre + " " + detalleCreador.apellido : ""}</h2>
+        <h3>{detalleGanador.correo}</h3>
+        <br/><br/>
+        {marcasGanador.map( (marca, index) => (
+              <div key={index}>
+              <Chip
+              className="dinamicDetailHijo"
+              >
+              <Avatar src={marca._id.imagen} />
+                <span>{marca._id.nombre} </span>
+                 <b>{dinamica.modalidad === "Ventas" ? marca.puntosUsuario + " ventas  /  " + marca.puntosVentas + " meta" :  marca.puntosUsuario + " ventas  /  " + marca.puntosVentas + " puntos por Venta" }</b> 
+              </Chip> 
+              <br/><br/>
+              </div>
+              ))}
+              <b>Ventas totales: {detalleGanador.total}</b>
+              <br/>
+
+        </Dialog>
+          </div>
           </div>
         </div>
       );

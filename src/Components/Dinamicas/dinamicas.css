@@ -31,3 +31,10 @@
   width: 90px;
   border-radius: 30%
 }
+.chipDinamica{
+  margin-right: 10%
+}
+.botonInfoDinamicas{
+  color: white;
+  background-color: blue
+}

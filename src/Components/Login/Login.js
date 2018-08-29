@@ -125,7 +125,7 @@ class Login extends Component {
           open={this.state.open2}
           onRequestClose={this.handleClose2}
          >
-          Debes de registrarte para ingresar. 
+          Parece que aún no estás registrado ó tu contraseña es incorrecta.
           </Dialog>
         </div>
        <br/><br/><br/><br/><br/><br/><br/>
