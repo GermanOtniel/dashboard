@@ -48,7 +48,7 @@ class Dash extends Component {
           onRequestChange={(open) => this.setState({open})}
         >
         <div>
-          <MenuItem 
+          {/* <MenuItem 
           leftIcon={<FontIcon className="material-icons">home</FontIcon>} 
           style={styleMenu} 
           onClick={this.handleClose}>
@@ -56,7 +56,7 @@ class Dash extends Component {
             style={{ textDecoration: 'none',color:'black' }} 
             to={`/home`}>Inicio
            </Link>
-          </MenuItem>
+          </MenuItem> */}
           <MenuItem leftIcon={<FontIcon className="material-icons icon">assistant</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/marcas`}>Marcas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">queue_play_next</FontIcon>} style={styleMenu}   onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/dinamicas`}>Dinámicas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons">insert_photo</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/tickets`}>Evidencias</Link></MenuItem>
