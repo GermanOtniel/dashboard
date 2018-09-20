@@ -1,14 +1,17 @@
 import React, {Component} from 'react';
 import { getSingleDinamic } from '../../Services/dinamicas';
-import { getEvidencesByDinamic } from '../../Services/evidencias';
+import { getEvidencesByDinamic,getEvidencesByDinamicAndByDate } from '../../Services/evidencias';
+import { getCenter } from '../../Services/centro';
 import { makeWinner } from '../../Services/dinamicas';
 import Dash from '../Dash/Dashboard';
 import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
 import Avatar from 'material-ui/Avatar';
+import DatePicker from 'material-ui/DatePicker';
 import IconButton from 'material-ui/IconButton';
 import FontIcon from 'material-ui/FontIcon';
 import Paper from 'material-ui/Paper';
+import {green700} from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {GridList, GridTile} from 'material-ui/GridList';
@@ -37,6 +40,9 @@ const styles = {
   },
   radioButton: {
     marginTop: 16,
+  },
+  errorStyle: {
+    color: green700,
   }
 };
 
@@ -54,6 +60,7 @@ class DinamicaDetail extends Component{
     open3: false,
     open4: false,
     open5: false,
+    open6: false,
     detalleCreador: {},
     marcasCreador: [],
     posibleGanador:{},
@@ -63,11 +70,34 @@ class DinamicaDetail extends Component{
     centro:{},
     ganadores:[],
     detalleGanador:{},
-    marcasGanador:[]
+    marcasGanador:[],
+    porFecha:false,
+    reporteCompleto:false,
+    newObj:{},
+    newObj2:{},
+    botonFecha:true
   }
 
   componentWillMount(){
-     let id = this.props.match.params.id
+    this.handleOpen6()
+  }
+  quieroFecha = () =>{
+    let id = this.props.match.params.id
+    let {newObj,newObj2} = this.state;
+    let dia = newObj.fecha.getDate()
+    let mes = newObj.fecha.getMonth() 
+    let año = newObj.fecha.getFullYear()
+    let dia2 = newObj2.fecha.getDate()
+    let mes2 = newObj2.fecha.getMonth()
+    let año2 = newObj2.fecha.getFullYear()
+    let fechaInicio = new Date(año,mes,dia).getTime();
+    let fechaFin    = new Date(año2,mes2,dia2).getTime();
+    let diff = fechaFin - fechaInicio;
+    let diasNumero = diff/(1000*60*60*24) 
+    let fechasArray = []
+    for(let i = 0; i <= diasNumero; i++){
+      fechasArray.push(String(new Date(año,mes,dia + i)).slice(0,15))
+    }
     getSingleDinamic(id)
     .then(dinamica=>{
         let {ganadores} = this.state;
@@ -76,43 +106,12 @@ class DinamicaDetail extends Component{
       dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
       dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
       centros = dinamica.centroConsumo.map(centro=>centro);
-      getEvidencesByDinamic(id)
-      .then(evidencias=>{        
-       
-        // El array "creadoresArray" trae a todos los usarios que ya han hecho ventas en esta dinamica. 
-        //Esta lista traera usuarios repetidos.
-        let creadoresArray = evidencias.map(evidencia=>evidencia.creador)
-        //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
-        var {newCreadores} = this.state;
-        // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
-        var lookupObject  = {};
+      getEvidencesByDinamicAndByDate(id,fechasArray)
+      .then(evidencias=>{  
+        this.usuariosUnicos(evidencias)  
+        // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
 
-        //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
-
-        for(var iii in creadoresArray) {
-          lookupObject[creadoresArray[iii]['_id']] = creadoresArray[iii];
-        }
-        for(iii in lookupObject) {
-          newCreadores.push(lookupObject[iii]);
-       }
-       // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
-       
-       
-       // AQUI ACOMODAMOS LAS EVIDENCIAS CONFORME A QUE USUARIO PERTENECEN.
-       for(var i = 0; i<newCreadores.length;i++){
-        for(var j = 0; j<evidencias.length;j++){
-          if( newCreadores[i]._id === evidencias[j].creador._id ){
-            for ( let o = 0; o < evidencias[j].marcas.length; o++){
-              evidencias[j].marcas[o].id = evidencias[j].marcas[o]._id._id;
-              newCreadores[i].ventasDinamica.push(evidencias[j].marcas[o]);
-            }
-          }
-        }
-      }
-      
-
-// HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
-
+        let {newCreadores} = this.state;
 
 // AHORA QUEREMOS SUMAR SUS EVIDENCIAS RESPECTO A LA MARCA QUE VENDIERON, ES DECIR:
 // SI VENDIERON EN UNA EVIDENCIA 20 COCAS Y DESPUES EN OTRA 3 COCAS, 
@@ -152,9 +151,17 @@ class DinamicaDetail extends Component{
           ganadores.push(newCreadores[ab])
         }
        }
-       // Y SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
-       for (let cd = 0; cd < newCreadores[ab].marcas.length; cd++){
-          newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
+       if(dinamica.modalidad === "Ventas"){
+          // SI LA DINAMICA ES DE VENTAS; SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
+          for (let cd = 0; cd < newCreadores[ab].marcas.length; cd++){
+            newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
+          }
+       }
+       else if (dinamica.modalidad === "Puntos"){
+         // PERO SI LA DINAMICA ES POR PUNTOS SACAMOS EL TOTAL DE PUNTOS DE CADA USUARIO
+        for (let ef = 0; ef < newCreadores[ab].marcas.length; ef++){
+          newCreadores[ab].total += newCreadores[ab].marcas[ef].puntosUsuario * newCreadores[ab].marcas[ef].puntosVentas
+        }
        }
      }
      for(let ñ = 0; ñ < marcas.length; ñ++){
@@ -185,14 +192,153 @@ class DinamicaDetail extends Component{
 
 
      // TERMINA VT POR CC
-     //console.log(ganadores)
       this.setState({newCreadores,dinamica, centros,marcas,ganadores}) 
       })
       .catch(e=>console.log(e))
+      this.handleClose6()
     })
     .catch(e=>alert(e));
-    
   }
+
+  quieroReporteCompleto = () =>{
+    let id = this.props.match.params.id
+    getSingleDinamic(id)
+    .then(dinamica=>{
+        let {ganadores} = this.state;
+        let marcas = dinamica.marcaPuntosVentas.map(marca=>marca._id);
+        let { centros } = this.state;
+      dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
+      dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
+      centros = dinamica.centroConsumo.map(centro=>centro);
+      getEvidencesByDinamic(id)
+      .then(evidencias=>{  
+        this.usuariosUnicos(evidencias)  
+        // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
+
+        let {newCreadores} = this.state;
+
+// AHORA QUEREMOS SUMAR SUS EVIDENCIAS RESPECTO A LA MARCA QUE VENDIERON, ES DECIR:
+// SI VENDIERON EN UNA EVIDENCIA 20 COCAS Y DESPUES EN OTRA 3 COCAS, 
+//QUEREMOS QUE SE IDENTIFIQUEN QUE SON VENTAS DEL MISMO PRODUCTO Y QUE SE SUMEN ( 20 + 3 ) = 23
+
+// ESTOS CICLOS LO QUE HACEN ES DARLE LAS MARCAS QUE SE VENDIERON EN ESTA DINAMICA A CADA USUARIO:
+      var lookupObject3  = {};
+      for(let z = 0; z < newCreadores.length; z++){
+        for(var ii in newCreadores[z].ventasDinamica) {
+          lookupObject3[newCreadores[z].ventasDinamica[ii]['id']] = newCreadores[z].ventasDinamica[ii];
+        }
+        for(ii in lookupObject3) {
+          newCreadores[z].marcas.push(lookupObject3[ii]);
+       }
+      }
+
+      // AQUI SE ADENTRA A CADA USUARIO Y SE BUSCA:
+      // SI SON MARCAS IGUALES QUE SE SUMEN SUS VENTAS 
+     for(let x = 0; x < newCreadores.length; x++){
+       for (let v = 0; v < newCreadores[x].marcas.length; v++){
+          for ( let y = 0; y < newCreadores[x].ventasDinamica.length; y++){
+            if(newCreadores[x].marcas[v]._id._id === newCreadores[x].ventasDinamica[y]._id._id  ){
+              newCreadores[x].marcas[v].puntosUsuario += newCreadores[x].ventasDinamica[y].ventas
+              newCreadores[x].marcas[v].nombre = newCreadores[x].ventasDinamica[y]._id.nombre
+            }
+          }
+      }
+     }
+           // HASTA AQUI LOGRAMOS TENER YA A CADA USUARIO CON SUS VENTAS YA SUMADAS POR MARCA 
+
+
+           // AQUI REVISAMOS SI EL USUARIO YA ES UN GANADOR 
+     for (let ab = 0; ab < newCreadores.length; ab++){
+       for( let g = 0; g < dinamica.ganadores.length; g++){
+        if(dinamica.ganadores[g] === newCreadores[ab]._id){
+          newCreadores[ab].ganador = true
+          ganadores.push(newCreadores[ab])
+        }
+       }
+       if(dinamica.modalidad === "Ventas"){
+          // SI LA DINAMICA ES DE VENTAS; SUMAMOS SUS VENTAS PARA SACAR UN TOTAL DE VENTAS POR USUARIO
+          for (let cd = 0; cd < newCreadores[ab].marcas.length; cd++){
+            newCreadores[ab].total += newCreadores[ab].marcas[cd].puntosUsuario
+          }
+       }
+       else if (dinamica.modalidad === "Puntos"){
+         // PERO SI LA DINAMICA ES POR PUNTOS SACAMOS EL TOTAL DE PUNTOS DE CADA USUARIO
+        for (let ef = 0; ef < newCreadores[ab].marcas.length; ef++){
+          newCreadores[ab].total += newCreadores[ab].marcas[ef].puntosUsuario * newCreadores[ab].marcas[ef].puntosVentas
+        }
+       }
+     }
+     for(let ñ = 0; ñ < marcas.length; ñ++){
+       //console.log(marcas[ñ]._id)
+       for(let ññ = 0; ññ < newCreadores.length;ññ++){
+         //console.log(newCreadores[ññ].ventasDinamica)
+         for( let ñññ = 0; ñññ < newCreadores[ññ].ventasDinamica.length; ñññ++){
+          if(marcas[ñ]._id === newCreadores[ññ].ventasDinamica[ñññ].id){
+            marcas[ñ].total += newCreadores[ññ].ventasDinamica[ñññ].ventas
+          }
+         }
+       }
+     }
+     // VENTAS TOTALES POR CENTRO DE CONSUMO
+     for ( let s = 0; s < centros.length; s++){
+       //console.log('CENTROS ID: ',centros[s]._id)
+       for(let ss = 0; ss < newCreadores.length; ss++){
+         //console.log('USERS CC ID: ',newCreadores[ss].centroConsumo)
+         if(centros[s]._id === newCreadores[ss].centroConsumo){
+           //console.log(centros[s],'    ',newCreadores[ss].ventasDinamica )
+           for(let ig = 0; ig < newCreadores[ss].ventasDinamica.length; ig++){
+            centros[s].ventasUsuario.push(newCreadores[ss].ventasDinamica[ig])
+            //console.log(newCreadores[ss].ventasDinamica[ig])
+           }
+         }
+       }
+     }
+     //console.log(newCreadores)
+     // TERMINA VT POR CC
+      this.setState({newCreadores,dinamica, centros,marcas,ganadores}) 
+      })
+      .catch(e=>console.log(e))
+      this.handleClose6()
+    })
+    .catch(e=>alert(e));
+  }
+
+
+  usuariosUnicos = (evidencias) =>{
+        // El array "creadoresArray" trae a todos los usarios que ya han hecho ventas en esta dinamica. 
+        //Esta lista traera usuarios repetidos.
+    let creadoresArray = evidencias.map(evidencia=>evidencia.creador)
+    //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
+    var {newCreadores} = this.state;
+    // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
+    var lookupObject  = {};
+
+    //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
+
+    for(var iii in creadoresArray) {
+      lookupObject[creadoresArray[iii]['_id']] = creadoresArray[iii];
+    }
+    for(iii in lookupObject) {
+      newCreadores.push(lookupObject[iii]);
+   }
+   // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
+   this.evidenciasPorUsuario(newCreadores,evidencias)
+  }
+  evidenciasPorUsuario = (newCreadores,evidencias) =>{
+           // AQUI ACOMODAMOS LAS EVIDENCIAS CONFORME A QUE USUARIO PERTENECEN.
+           for(var i = 0; i<newCreadores.length;i++){
+            for(var j = 0; j<evidencias.length;j++){
+              if( newCreadores[i]._id === evidencias[j].creador._id ){
+                for ( let o = 0; o < evidencias[j].marcas.length; o++){
+                  evidencias[j].marcas[o].id = evidencias[j].marcas[o]._id._id;
+                  newCreadores[i].ventasDinamica.push(evidencias[j].marcas[o]);
+                }
+              }
+            }
+          }
+          
+  }
+
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -201,7 +347,6 @@ class DinamicaDetail extends Component{
     this.setState({open: false});
   };
   handleOpen2 = (detalleCreador) => {
-    //console.log(detalleCreador)
     this.setState({open2: true,posibleGanador:detalleCreador});
   };
 
@@ -228,14 +373,40 @@ class DinamicaDetail extends Component{
   };
 
   handleClose5 = () => {
-    this.setState({open5: false});
+    this.setState({open5: false,detalleCreador:{},marcasGanador:{}});
   };
+  handleOpen6 = () => {
+    this.setState({open6: true});
+  };
+
+  handleClose6 = () => {
+    this.setState({open6: false});
+  };
+
+
+  handleChange = (event, date) => {
+    const {newObj} = this.state;
+    newObj.fecha = date;
+    this.setState({newObj});
+  };
+  handleChange2 = (event, date) => {
+    const {newObj2} = this.state;
+    newObj2.fecha = date;
+    this.setState({newObj2,botonFecha:false});
+  };
+
   detalleVenta = (creador) => {
-    this.handleOpen()
+    let id = creador.centroConsumo
     let {detalleCreador,marcasCreador} = this.state;
-    detalleCreador = creador;
-    marcasCreador = creador.marcas;
-    this.setState({detalleCreador,marcasCreador})
+    getCenter(id)
+    .then(center=>{
+      this.handleOpen()
+      detalleCreador = creador;
+      marcasCreador = creador.marcas;
+      detalleCreador.centro = center.nombre
+      this.setState({detalleCreador,marcasCreador})
+    })
+    .catch(e=>console.log(e))
   } 
   detalleGanador = (ganador) => {
     this.handleOpen5()
@@ -301,6 +472,9 @@ class DinamicaDetail extends Component{
     .catch(e=>console.log(e))
     this.handleClose2()
   } 
+  refresh = () =>{
+    window.location.reload()
+  }
 
   render(){
     const actions = [
@@ -348,6 +522,21 @@ class DinamicaDetail extends Component{
         onClick={this.handleClose5}
       />,
     ];
+    const actions6 = [
+      <FlatButton
+        label="ENVIAR FECHA"
+        primary={true}
+        keyboardFocused={false}
+        onClick={this.quieroFecha}
+        disabled={this.state.botonFecha}
+      />,
+      <FlatButton
+        label="REPORTE COMPLETO"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.quieroReporteCompleto}
+      />
+    ];
     const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador,marcaVentas,newMarcas,centroDetalle,ganadores,detalleGanador,marcasGanador} = this.state;
       return (
         <div>
@@ -360,8 +549,18 @@ class DinamicaDetail extends Component{
         
             <div>
             <img alt="Imagen Premio" className="img" src={dinamica.imagenPremio}/>
+            <br/><br/><br/><br/>
+            <div>  
+            <RaisedButton
+              label="Cambiar Visualización del Reporte"
+              labelColor="#FAFAFA"
+              backgroundColor="#607D8B"
+              onClick={this.refresh}
+            />
             </div>
-            
+            </div>
+          
+
             <div>
             <b>Nombre de la Dinámica:</b>
             <h3>{dinamica.nombreDinamica}</h3>
@@ -378,10 +577,11 @@ class DinamicaDetail extends Component{
               <h4>Centros de Consumo:</h4>
               <div className="padreDetail" >
               {centros.map( (centro, index) => (
-                <div key={index} onClick={() => this.centros(centro)}>
+                <div key={index} >
               <Chip
               key={index}
               className="reportDinamicDetailHijo"
+              onClick={() => this.centros(centro)}
               >
                 {centro.nombre}
               </Chip> 
@@ -391,17 +591,18 @@ class DinamicaDetail extends Component{
               <h4>Marcas:</h4>
               <div className="padreDetail" >
               {marcas.map( (marca, index) => (
-                <div key={index} onClick={() => this.marcas(marca)}>
+                <div key={index}>
               <Chip
               key={index}
               className="reportDinamicDetailHijo"
+              onClick={() => this.marcas(marca)}
               >
               <Avatar src={marca.imagen} />
                 {marca.nombre}
               </Chip> 
                 </div>
               ))}
-              </div>    
+              </div>   
             </div>  
           </div>
           <hr/>
@@ -409,14 +610,14 @@ class DinamicaDetail extends Component{
               <h2> Ranking: </h2>
           </div>
           <div style={styles.root}>
-    <GridList style={styles.gridList} cols={1}>
+    <GridList style={styles.gridList} cols={1} padding={4}>
       {newCreadores.sort((a, b) => b.total - a.total ).map((creador,index) => (
         <GridTile
           key={index}
-          title={creador.total+' ventas'}
+          title={dinamica.modalidad === "Ventas" ? creador.total +' ventas' : creador.total + ' puntos'}
           subtitle={ creador.nombre && creador.apellido ? index+1 + ') ' + creador.nombre + " " + creador.apellido : index+1 + ') ' + creador.correo  }
           titleStyle={styles.titleStyle}
-          actionIcon={<IconButton onClick={() => this.detalleVenta(creador)} ><FontIcon color="white" className="material-icons">equalizer</FontIcon></IconButton>}
+          onClick={() => this.detalleVenta(creador)}
           titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
         >
           <img width="180px" alt="Foto Usuario" src={creador.fotoPerfil ? creador.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Fuser.png?alt=media&token=f699f557-33b4-44d2-9de5-442e791b746a"} />
@@ -457,6 +658,7 @@ class DinamicaDetail extends Component{
           autoScrollBodyContent={true}
         >
         <img alt="Foto Usuario" width="300px" height="250px" src={detalleCreador.fotoPerfil ? detalleCreador.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/users%2Fuser.png?alt=media&token=f699f557-33b4-44d2-9de5-442e791b746a"} />
+        <h2>{detalleCreador.centro}</h2>
         <h2>{detalleCreador.nombre && detalleCreador.apellido ? detalleCreador.nombre + " " + detalleCreador.apellido : ""}</h2>
         <h3>{detalleCreador.correo}</h3>
         <b className="bDetalleCreador">{detalleCreador.ganador === true  ? "Este usuario HA CUMPLIDO con las metas de esta dinámica" : (dinamica.modalidad === "Ventas" ? "Este usuario AÚN NO cumple con las metas de esta dinámica.": "Esta es una dinámica de modalidad Puntos")}</b>
@@ -473,7 +675,7 @@ class DinamicaDetail extends Component{
               <br/><br/>
               </div>
               ))}
-              <b>Ventas totales: {detalleCreador.total}</b>
+              <b>{dinamica.modalidad === "Ventas" ? "Ventas totales: " + detalleCreador.total : "Puntos Totales: " + detalleCreador.total}</b>
               <br/><br/>
               <FlatButton style={dinamica.modalidad === "Ventas" ? {display:"block"} : {display:"none"}} onClick={() => this.handleOpen2(detalleCreador)} backgroundColor="#BDBDBD" label="Convertir en Ganador" />
 
@@ -518,7 +720,7 @@ class DinamicaDetail extends Component{
             >
               <div>
               {newMarcas.map( (marca, index) => (
-                <div className="chipCentroReporte" key={index} onClick={() => this.marcas(marca)}>
+                <div className="chipCentroReporte" key={index} >
               <Chip
               key={index}
               >
@@ -560,6 +762,42 @@ class DinamicaDetail extends Component{
               <b>Ventas totales: {detalleGanador.total}</b>
               <br/>
 
+        </Dialog>
+          </div>
+          <div>
+          <Dialog
+          title="¿Cómo deseas visualizar el reporte?"
+          actions={actions6}
+          modal={false}
+          open={this.state.open6}
+          autoScrollBodyContent={true}
+        >
+        <b>Si deseas ver el reporte de ventas por DETERMINADA FECHA, por favor define la <span className="reporteFecha">Fecha Inicial</span> y la <span className="reporteFecha">Fecha Final</span> de búsqueda y presiona la opción ' ENVIAR FECHA '</b>
+        <br/><br/>
+        <div className="padre">
+            <div className="margin">
+            <DatePicker
+            hintText="Fecha Inicial"
+            value={this.state.newObj.fecha}
+            onChange={this.handleChange}
+            errorText="Define la fecha inicial de búsqueda"
+            errorStyle={styles.errorStyle}
+          /> 
+            </div>
+            <br/>
+            <div className="margin">
+          <DatePicker
+            hintText="Fecha Final"
+            value={this.state.newObj2.fecha}
+            onChange={this.handleChange2}
+            errorText="Define la fecha final de búsqueda"
+            errorStyle={styles.errorStyle}
+          />
+          </div>
+          </div> 
+          <br/><br/>
+        <b>De lo contrario presiona la opción ' REPORTE COMPLETO '</b>
+      
         </Dialog>
           </div>
           </div>

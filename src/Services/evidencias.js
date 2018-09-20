@@ -1,7 +1,7 @@
 // production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 //SE UTILIZA EN EL COMPONENTE DE {{{{{{{EVIDENCIAS}}}}}}}
 export function getEvidences(){
@@ -57,4 +57,20 @@ export function getEvidencesByDinamic(id) {
   .then(evidencias=>{
     return evidencias
   })
+}
+
+export function getEvidencesByDinamicAndByDate(id,fechasArray){
+  return fetch(baseURL + '/evidencia/dinamica/date/' + id + '?fechas=' + fechasArray, {
+    method:'GET',
+    headers:{
+        "Content-Type": "application/json"
+    }
+})
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(evidencias=>{
+      return evidencias;
+  });
 }

@@ -14,6 +14,7 @@ import Usuarios from './Components/Usuarios/Usuarios';
 import UsuarioDetail from './Components/Usuarios/UsuarioDetail';
 import Reportes from './Components/Reportes/Reportes';
 import DinamicaDetail from './Components/Reportes/DinamicaDetail';
+import Mensajes from './Components/Mensajes/Mensajes';
 
 
 export const Routes = () => {
@@ -33,6 +34,7 @@ export const Routes = () => {
       <Route  path="/usuario/:id" component={UsuarioDetail}/>
       <Route  path="/reportes" component={Reportes}/>
       <Route  path="/dinamica/:id" component={DinamicaDetail}/>
+      <Route  path="/mensajes" component={Mensajes}/>
     </Switch>
   );
 }

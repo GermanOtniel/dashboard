@@ -8,7 +8,7 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import FontIcon from 'material-ui/FontIcon';
 import { Link } from 'react-router-dom';
 import Dialog from 'material-ui/Dialog';
-import { login } from '../../Services/authDash';
+import { login,getNewPasswordDash } from '../../Services/authDash';
 import './login.css';
 
 
@@ -18,8 +18,30 @@ class Login extends Component {
   state={
     user:{},
     open: false,
-    open2: false
+    open2: false,
+    open3: false,
+    open4:false,
+    userLogged:{},
+    correo:{}
   }
+
+  componentWillMount(){
+    let usuarioGuardado;
+    let hayUsuario = `${JSON.parse(localStorage.getItem('userLoggedDash'))}`;
+    if ( hayUsuario === "null" ){
+      usuarioGuardado = false
+    }
+    else{
+      usuarioGuardado = true
+    }
+    if(usuarioGuardado){
+      let {userLogged} = this.state;
+      userLogged.correo = `${JSON.parse(localStorage.getItem('userLoggedDash')).correo}`;
+      userLogged.password = `${JSON.parse(localStorage.getItem('userLoggedDash')).password}`;
+      this.setState({userLogged,user:userLogged})
+    }
+ }
+
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -32,6 +54,18 @@ class Login extends Component {
   handleClose2 = () => {
     this.setState({open2: false});
   };
+  handleOpen3 = () => {
+    this.setState({open3: true});
+  };
+  handleClose3 = () => {
+    this.setState({open3: false});
+  };
+  handleOpen4 = () => {
+    this.setState({open4: true});
+  };
+  handleClose4 = () => {
+    this.setState({open4: false});
+  };
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -39,8 +73,16 @@ class Login extends Component {
     user[field] = value;
     this.setState({user});
   }
+  onChange2 = (e) => {
+    const field = e.target.name;
+    const value = e.target.value;
+    const {correo} = this.state;
+    correo[field] = value;
+    this.setState({correo}); 
+  }
   
   sendUser = (e) => {
+    localStorage.setItem('userLoggedDash', JSON.stringify(this.state.user))
     login(this.state.user)
     .then(user=>{
       if(user.puesto === "SUPERADMIN" || user.puesto === "GERENTE" || user.puesto === "SUPERVISOR" )this.props.history.push("/dinamicas");
@@ -51,6 +93,31 @@ class Login extends Component {
     .catch(e=>this.handleOpen2())
   }
 
+  onCheck = (e) =>{
+    let {userLogged} = this.state;
+    let {user} = this.state;
+    if(e.target.name === "correo"){
+        userLogged.correo = false;
+        user.correo = ""
+        this.setState({userLogged,user})
+    }
+    else if(e.target.name === "password")
+      userLogged.password = false;
+      user.password = ""
+      this.setState({userLogged,user})
+  }
+  nada = (e) =>{
+    //jajaja no hace nada pero a la vez si...esto es la programacion beibe!!!
+  }
+  getNewPassword = () =>{
+    let {correo} = this.state;
+    getNewPasswordDash(correo)
+    .then(r=>{
+          this.handleClose3()
+          this.handleOpen4()
+    })
+    .catch(e=>console.log(e))
+  }
   render() {
     const actions = [
       <FlatButton
@@ -66,6 +133,7 @@ class Login extends Component {
         onClick={this.handleClose2}
       />,
     ];
+    const {userLogged,user} = this.state;
     return (
      <div className="padreLogin">
        <div>
@@ -90,6 +158,8 @@ class Login extends Component {
           floatingLabelText="Correo electrónico"
           name="correo"
           onChange={this.onChange}
+          onClick={userLogged.correo ? this.onCheck : this.nada}
+          value={userLogged.correo ? userLogged.correo : user.correo}
         />
         <br/>
         <TextField
@@ -98,11 +168,15 @@ class Login extends Component {
           type="Password"
           name="password"
           onChange={this.onChange}
+          onClick={userLogged.correo ? this.onCheck : this.nada}
+          value={userLogged.correo ? userLogged.password : user.password }
         />
         <br/><br/>
         <div className="hijoPaper">
         <RaisedButton onClick={this.sendUser} label="Ingresar" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
         <br/>
+        <br/>
+        <b className="contraseñaOlvidada" onClick={this.handleOpen3}>Olvidé mi contraseña</b>
         <h5>Si aún no estás registrado <Link to="/signup" className="linkReg">Regístrate</Link></h5>
         <br/>
         </div>
@@ -128,6 +202,47 @@ class Login extends Component {
           Parece que aún no estás registrado ó tu contraseña es incorrecta.
           </Dialog>
         </div>
+        <div>
+        <Dialog
+          title="Restablecer contraseña"
+          modal={false}
+          open={this.state.open3}
+          onRequestClose={this.handleClose3}
+          autoScrollBodyContent={true}      
+        > 
+        Parece que has olvidado tu contraseña, por favor Ingresa el correo electrónico con el cual te regístraste, ya que a esa dirección te mandaremos 
+        la contraseña temporal con la cual podrás volver a Ingresar a tu cuenta.
+        <br/>
+        <TextField
+              onChange={this.onChange2} 
+              name="correito" 
+              floatingLabelText="Correo electrónico"
+              type="email"  
+              underlineShow={true}
+            />
+            <br/>
+            <RaisedButton 
+              onClick={this.getNewPassword}  
+              label="Enviar" 
+              backgroundColor="#B71C1C"
+              labelColor="#FAFAFA"
+            />
+        </Dialog>  
+
+        </div> 
+        <div>
+        <Dialog
+          modal={false}
+          open={this.state.open4}
+          onRequestClose={this.handleClose4}
+          autoScrollBodyContent={true}      
+        > 
+         Revisa tu correo electrónico, tu contraseña temporal ha sido enviada.
+         <br/>
+         Una vez que hayas Ingresado actualiza tu contraseña nuevamente.
+        </Dialog>  
+
+        </div>  
        <br/><br/><br/><br/><br/><br/><br/>
      </div>
     );

@@ -1,7 +1,7 @@
 // production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 //SE USA EN EL COMPONENTE DE {{{{{{{{{SIGNUP}}}}}}}}}
 export function signup(userData){
@@ -79,3 +79,40 @@ export function login(userData){
       return 'Saliste'
     })
   }
+
+  // RECUPERAR CONTRASEÑA
+  export function getNewPasswordDash(correo){
+    return fetch(  baseURL + '/dash/password/',{
+      method:'post',
+      headers:{
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(correo),
+    })
+    .then(res=>{
+      if(!res.ok) return Promise.reject(res.statusText);
+      return res.json()
+    })
+    .then(user=>{
+      return user
+    })
+  }
+
+  // CAMBIAR CONTRASEÑA
+export function changePasswordDash(body){
+  return fetch(  baseURL + '/dash/password/dash',{
+    method:'post',
+    headers:{
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(body),
+    credentials:"include"
+})
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(user=>{
+    return user
+  })
+}

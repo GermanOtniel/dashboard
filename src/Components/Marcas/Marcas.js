@@ -117,7 +117,7 @@ class Marcas extends Component {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({open: false,newObj:{},botonMarca:true});
+    this.setState({open: false,newObj:{},botonMarca:true,progresoImagen:0});
   };
   handleOpen2 = () => {
     this.setState({open2: true});

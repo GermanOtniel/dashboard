@@ -239,6 +239,7 @@ onNewRequest2 = (chosenRequest) => {
   newDinamic.activa = chosenRequest.value;
 }
 onNewRequestZona = (chosenRequest) => {
+  console.log(chosenRequest)
   let {centros} = this.state;
   centros = chosenRequest.centros
   this.setState({centros});
@@ -405,6 +406,10 @@ outUser = (e) => {
   .catch(e=>alert(e))
 }
 
+editarDinamica = (dinamica) =>{
+  console.log('Ya soy una dinamica ',dinamica)
+}
+
 renderChip(data) {
   return (
    <div className="chipDinamica" key={data.nombre}>
@@ -515,7 +520,7 @@ renderChip2(data) {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="7" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="8" style={{textAlign: 'center'}}>
                 Marcas Existentes
               </TableHeaderColumn>
             </TableRow>
@@ -527,6 +532,7 @@ renderChip2(data) {
               <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Editar</h3></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -544,6 +550,7 @@ renderChip2(data) {
                 <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><button className="buttonDinamicasDetalle" onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
+                <TableRowColumn><button className="botonDinamicaEditar" onClick={() => this.editarDinamica(dinamic)}>Editar</button></TableRowColumn>
 
               </TableRow>
               ))}

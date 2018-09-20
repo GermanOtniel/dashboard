@@ -6,6 +6,7 @@ import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import Divider from 'material-ui/Divider';
 import TextField from 'material-ui/TextField';
+import FlatButton from 'material-ui/FlatButton';
 import {
   Table,
   TableBody,
@@ -16,7 +17,9 @@ import {
 } from 'material-ui/Table';
 import {green700,blue500} from 'material-ui/styles/colors';
 import { getZonas, createCenter, getCenters } from '../../Services/pez';
+import { getUsersByCenter } from '../../Services/centro';
 import './centros.css';
+
 
 const styles = {
   button: {
@@ -57,12 +60,22 @@ class Centros extends Component {
     deselectOnClickaway: true,
     showCheckboxes: true,
     height: '300px',
+    userss:[],
+    cantidad:0,
+    centro:{}
   }
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
     this.setState({open: false});
+  };
+ 
+  handleOpen2 = () => {
+    this.setState({open2: true});
+  };
+  handleClose2 = () => {
+    this.setState({open2: false});
   };
  
 componentWillMount(){
@@ -99,7 +112,6 @@ onChange = (e) => {
   const value = e.target.value;
   const {newCenter} = this.state;
   newCenter[field] = value;
-  console.log(newCenter)
   this.setState({newCenter}); 
 }
 
@@ -124,9 +136,25 @@ sendCenter = (e) => {
   .catch(e=>console.log(e))
 }
 
+centro = (centro) =>{
+  getUsersByCenter(centro._id)
+  .then(users=>{
+    this.handleOpen2()
+    this.setState({userss:users,cantidad:users.length,centro:centro})
+  })
+  .catch(e=>console.log(e))
+}
 
   render() {
-    
+    const {userss,cantidad,centro} = this.state;
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose2}
+      />,
+    ];
     return (
     <div>
        <Dash/>
@@ -171,7 +199,7 @@ sendCenter = (e) => {
               <TableHeaderColumn >Centro</TableHeaderColumn>
               <TableHeaderColumn >Fecha de Creación</TableHeaderColumn>
               <TableHeaderColumn >Zona</TableHeaderColumn>
-              <TableHeaderColumn >Editar</TableHeaderColumn>
+              <TableHeaderColumn >Ver</TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -186,7 +214,7 @@ sendCenter = (e) => {
                 <TableRowColumn>{centro.nombre}</TableRowColumn>
                 <TableRowColumn>{centro.created}</TableRowColumn>
                 <TableRowColumn>{centro.zona}</TableRowColumn>
-                <TableRowColumn>Editar</TableRowColumn>
+                <TableRowColumn><button onClick={() => this.centro(centro)} className="buttonDinamicasDetalle">Ver Centro</button></TableRowColumn>
               </TableRow>
               ))}
           </TableBody>
@@ -261,7 +289,57 @@ sendCenter = (e) => {
           
         </Dialog> 
          </div>
-         
+         <div>
+          <Dialog
+          title={"Usuarios de " + centro.nombre}
+          actions={actions}
+          modal={false}
+          open={this.state.open2}
+          onRequestClose={this.handleClose2}
+          autoScrollBodyContent={true}
+        >
+        <b>{cantidad + " usuarios en Total"}</b>
+        <div>
+       <Table
+          height={this.state.height}
+          fixedHeader={this.state.fixedHeader}
+          fixedFooter={this.state.fixedFooter}
+          selectable={this.state.selectable}
+          multiSelectable={this.state.multiSelectable}
+        >
+          <TableHeader
+            displaySelectAll={this.state.showCheckboxes}
+            adjustForCheckbox={this.state.showCheckboxes}
+            enableSelectAll={this.state.enableSelectAll}
+          >
+            <TableRow>
+              <TableHeaderColumn colSpan="2" tooltip="Super Header" style={{textAlign: 'center'}}>
+                Usuarios por Centro de Consumo
+              </TableHeaderColumn>
+            </TableRow>
+            <TableRow>
+              <TableHeaderColumn >Nombre</TableHeaderColumn>
+              <TableHeaderColumn >Correo</TableHeaderColumn>
+
+            </TableRow>
+          </TableHeader>
+          <TableBody
+            displayRowCheckbox={this.state.showCheckboxes}
+            deselectOnClickaway={this.state.deselectOnClickaway}
+            showRowHover={this.state.showRowHover}
+          >
+            {userss.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
+.map( (user, index) => (
+              <TableRow key={user._id} data={user}>
+                <TableRowColumn>{user.nombre + " " + user.apellido}</TableRowColumn>
+                <TableRowColumn>{user.correo}</TableRowColumn>
+              </TableRow>
+              ))}
+          </TableBody>
+        </Table>
+       </div>
+        </Dialog>
+          </div>
     </div>
     );
   }

@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
+import {green700,blue500} from 'material-ui/styles/colors';
 import {Link} from 'react-router-dom';
 import {
   Table,
@@ -19,8 +20,20 @@ const styles = {
     margin: 12,
     width: 400,
     height:70
+  },
+  button2: {
+    width:300,
+    height:40,
+    float: 'right'
+  },
+  errorStyle: {
+    color: green700,
+  },
+  floatingLabelFocusStyle: {
+    color: blue500,
   }
 };
+
 
 class Evidencias extends Component {
 
@@ -91,6 +104,7 @@ class Evidencias extends Component {
     
    }
 
+
    filterList = (e) =>{
     var updatedList = this.state.evidencias.map(evidencia=>evidencia);
     updatedList = updatedList.map(evidencia=>evidencia).filter(function(item){
@@ -127,6 +141,9 @@ class Evidencias extends Component {
       this.setState({evidenciasFilter,alReves2:false})
     }
   }
+
+
+
   
 
 
@@ -153,7 +170,7 @@ class Evidencias extends Component {
          <br/><br/>
         <input placeholder="Dinámica ó Modalidad ó Estado" type="text" onChange={this.filterList}/>
       </div>
-    
+    <br/>
        <div>
        <Table
           height={this.state.height}
@@ -203,7 +220,6 @@ class Evidencias extends Component {
           </TableBody>
         </Table>
        </div>
-
     </div>
     );
   }

@@ -38,7 +38,8 @@ class EvidenciaDetail extends Component{
     evidencia:{},
     marcas:[],
     value:null,
-    textFieldDisabled:true
+    textFieldDisabled:true,
+    boton: false
   }
 
   componentWillMount(){
@@ -49,8 +50,16 @@ class EvidenciaDetail extends Component{
       let { evidencia } = this.state;
       evidencia = evidence;
       evidence.dueño = evidence.creador.nombre +' '+ evidence.creador.apellido;
-      evidence.fecha = evidence.created_at.slice(0,10);
+      evidence.fecha2 = evidence.created_at.slice(0,10);
       evidence.hora = evidence.created_at.slice(11,19);
+      let año = evidence.created_at.slice(0,4);
+      let mes = evidence.created_at.slice(5,7)
+      let dia = evidence.created_at.slice(8,10)
+      let hora = evidence.created_at.slice(11,13)
+      let min = evidence.created_at.slice(14,16)
+      let seg = evidence.created_at.slice(17,19)
+      let fechaChida = new Date(año,mes - 1,dia,hora - 5 ,min,seg)
+      evidence.fechaChida = String(fechaChida).slice(16,24)       
       evidence.correo = evidence.creador.correo;
       evidence.descripcion = evidence.dinamica.descripcion
       evidence.imagen = evidence.dinamica.imagen
@@ -81,12 +90,14 @@ class EvidenciaDetail extends Component{
   }
   sendEvidence = (e) => {
     let { evidencia } = this.state;
+    let {boton} = this.state;
     let id = this.props.match.params.id
     evidencia.dueño = null;
-    evidencia.fecha = null;
     evidencia.hora = null;
     evidencia.correo = null;
     evidencia.descripcion = null;
+    boton = true
+    this.setState({boton})
     sendEvidencia(evidencia,id)
     .then(evidencia=>{
       this.props.history.push('/tickets');
@@ -163,9 +174,9 @@ class EvidenciaDetail extends Component{
                    
             <u>Status: </u><b className="b">{evidence.status}</b>
             <br/><br/>
-            <u>Fecha: </u><b>{evidence.fecha}</b>
+            <u>Fecha: </u><b>{evidence.fecha2}</b>
             <br/><br/>        
-            <u>Hora: </u><b>{evidence.hora}</b>
+            <u>Hora: </u><b>{evidence.fechaChida}</b>
             <br/><br/>        
             <u>Usuario: </u><b>{evidence.dueño}</b> 
             <br/><br/>        

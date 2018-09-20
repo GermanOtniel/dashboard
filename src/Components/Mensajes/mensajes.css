@@ -1,0 +1,8 @@
+.buttonBorrarMensaje{
+  background-color: rgb(211, 0, 0);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%
+}
