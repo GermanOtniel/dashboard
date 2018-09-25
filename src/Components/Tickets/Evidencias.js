@@ -2,6 +2,8 @@ import React, { Component } from 'react';
 import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
+import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 import {green700,blue500} from 'material-ui/styles/colors';
 import {Link} from 'react-router-dom';
 import {
@@ -13,7 +15,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import './evidencias.css';
-import { getEvidences,getEvidencesByBrand } from '../../Services/evidencias';
+import { getEvidences,getEvidencesByBrand,deleteEvidence } from '../../Services/evidencias';
 
 const styles = {
   button: {
@@ -56,7 +58,9 @@ class Evidencias extends Component {
     showCheckboxes: true,
     height: '300px',
     alReves:false,
-    alReves2:false
+    alReves2:false,
+    evidenciaBorrar:{},
+    open:false
   }
   componentWillMount(){
     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
@@ -141,14 +145,42 @@ class Evidencias extends Component {
       this.setState({evidenciasFilter,alReves2:false})
     }
   }
+  handleOpen = () => {
+    this.setState({open: true});
+  };
+  handleClose = () => {
+    this.setState({open: false,evidenciaBorrar:{}});
+  };
+  deleteEvidence=(evidencia)=>{
+    this.setState({evidenciaBorrar:evidencia})
+    this.handleOpen()
+  }
+  sendEvidenceForDelete = ()=>{
+    let {evidenciaBorrar} = this.state;
+    deleteEvidence(evidenciaBorrar._id)
+    .then(r=>{
+      this.handleClose();
+      window.location.reload()
+    })
+    .catch(e=>console.log(e))
 
-
-
-  
-
+  }
 
   render() {
-    
+    const actions = [
+      <FlatButton
+        label="Si, Borrar"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.sendEvidenceForDelete}
+      />,
+      <FlatButton
+        label="Cancelar"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose}
+      />
+    ];
     return (
     <div>
        <Dash/>
@@ -185,7 +217,7 @@ class Evidencias extends Component {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="6"  style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="7"  style={{textAlign: 'center'}}>
                 Marcas Existentes
               </TableHeaderColumn>
             </TableRow>
@@ -196,6 +228,8 @@ class Evidencias extends Component {
               <TableHeaderColumn><h2>Usuario</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Modalidad</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Revisar</h2></TableHeaderColumn>
+              <TableHeaderColumn><h2>Borrar</h2></TableHeaderColumn>
+
 
             </TableRow>
           </TableHeader>
@@ -214,12 +248,29 @@ class Evidencias extends Component {
                 <TableRowColumn>{evidencia.creador}</TableRowColumn>
                 <TableRowColumn>{evidencia.modalidad}</TableRowColumn>
                 <TableRowColumn><Link to={`/evidencia/${evidencia._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
+                <TableRowColumn><button onClick={()=>this.deleteEvidence(evidencia)} className="botonDinamicaBorrar">Borrar</button></TableRowColumn>
 
               </TableRow>
               ))}
           </TableBody>
         </Table>
        </div>
+       <div>
+          <Dialog
+          title="¿Estás seguro?"
+          modal={false}
+          actions={actions}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
+        >
+          Esta decisión es irreversible, si borras esta evidencia sera de manera permanente y no podras visualizar mas tarde ningún detalle relacionado a esta.
+          <br/><br/>
+          Las evidencias se usan a lo largo de la vida de una dinámica para seguir visualizando las ventas generadas por la dinámica a la que corresponde.
+          <h3>Te recomendamos no borrar ninguna evidencia de alguna dinámica que aún este en uso.</h3>
+
+        </Dialog>
+          </div>
     </div>
     );
   }

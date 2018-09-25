@@ -43,8 +43,18 @@ const styles = {
   },
   errorStyle: {
     color: green700,
+  },
+  chip: {
+    margin: 1
+  },
+  wrapper: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent:'center'
   }
 };
+
+
 
 
 class DinamicaDetail extends Component{
@@ -589,12 +599,12 @@ class DinamicaDetail extends Component{
               ))}
               </div>
               <h4>Marcas:</h4>
-              <div className="padreDetail" >
+              <div style={styles.wrapper}>
               {marcas.map( (marca, index) => (
                 <div key={index}>
               <Chip
+              style={styles.chip}
               key={index}
-              className="reportDinamicDetailHijo"
               onClick={() => this.marcas(marca)}
               >
               <Avatar src={marca.imagen} />

@@ -2,7 +2,6 @@ import React, { Component } from 'react';
 import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
 import FontIcon from 'material-ui/FontIcon';
-import Dialog from 'material-ui/Dialog';
 import AutoComplete from 'material-ui/AutoComplete';
 import TextField from 'material-ui/TextField';
 import {RadioButton, RadioButtonGroup} from 'material-ui/RadioButton';
@@ -17,11 +16,12 @@ import {
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
 import { outUserDash } from '../../Services/authDash';
-import { createDinamic, getDinamics,getDinamicsByBrand } from '../../Services/dinamicas';
+import { createDinamic, getDinamics,getDinamicsByBrand,sendChangesDinamic,deleteDinamic } from '../../Services/dinamicas';
 import { getMarcas } from '../../Services/marcas';
 import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
+import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
 import {green700,blue500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
@@ -81,6 +81,9 @@ class Dinamicas extends Component {
     open:false,
     open2:false,
     open3:false,
+    open4: false,
+    open5:false,
+    open6:false,
     centros:[],
     zonas:[],
     marcas:[],
@@ -108,11 +111,14 @@ class Dinamicas extends Component {
     progresoImagen:0,
     detalleDinamica:{},
     marcasDinamica:[],
-    open4: false,
     alReves:false,
     alReves2:false,
     alReves3:false,
-    alReves4:false
+    alReves4:false,
+    dinamicaEditar:{},
+    objEdit:{},
+    objEdit2:{},
+    progresoImagen2:0
   }
   handleRequestDelete = (label) => {
     this.chipData = this.state.chipData;
@@ -239,7 +245,6 @@ onNewRequest2 = (chosenRequest) => {
   newDinamic.activa = chosenRequest.value;
 }
 onNewRequestZona = (chosenRequest) => {
-  console.log(chosenRequest)
   let {centros} = this.state;
   centros = chosenRequest.centros
   this.setState({centros});
@@ -323,6 +328,23 @@ handleOpen4 = () => {
 handleClose4 = () => {
   this.setState({open4: false});
 };
+
+handleOpen5 = () => {
+  this.setState({open5: true});
+};
+
+handleClose5 = () => {
+  this.setState({open5: false,dinamicaEditar:{},objEdit:{},objEdit2:{},progresoImagen2:0});
+};
+handleOpen6 = () => {
+  this.setState({open6: true});
+};
+
+handleClose6 = () => {
+  this.setState({open6: false,dinamicaBorrar:{}});
+};
+
+
 detalleDinamica = (dinamic) => {
   this.handleOpen3()
   let {detalleDinamica,marcasDinamica} = this.state;
@@ -407,9 +429,86 @@ outUser = (e) => {
 }
 
 editarDinamica = (dinamica) =>{
-  console.log('Ya soy una dinamica ',dinamica)
+  let {detalleDinamica} = this.state;
+  detalleDinamica = dinamica;
+  detalleDinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
+  detalleDinamica.fechaFin = dinamica.fechaFin.slice(0,10)
+  this.setState({detalleDinamica})
+  this.handleOpen5();
+}
+handleChangeEdit = (event, date) => {
+  let {dinamicaEditar,objEdit} = this.state;
+  objEdit.fecha = date;
+  dinamicaEditar.fechaInicio = date;
+  this.setState({dinamicaEditar,objEdit});
+};
+handleChangeEdit2 = (event, date) => {
+  let {dinamicaEditar,objEdit2} = this.state;
+  objEdit2.fecha = date;
+  dinamicaEditar.fechaFin = date;
+  this.setState({dinamicaEditar,objEdit2});
+};
+onChangeEdit = (e) =>{
+  const field = e.target.name;
+  const value = e.target.value;
+  const {dinamicaEditar} = this.state;
+  dinamicaEditar[field] = value;
+  this.setState({dinamicaEditar}); 
+}
+sendChangesDinamic = () =>{
+  let {dinamicaEditar,detalleDinamica} = this.state;
+  let id = detalleDinamica._id;
+  sendChangesDinamic(id,dinamicaEditar)
+  .then(dinamic=>{
+    this.handleClose5();
+    window.location.reload()
+  })
+  .catch(e=>console.log(e))
+
+}
+getFileEdit = e => {
+  const file = e.target.files[0];
+  const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
+  const date = new Date();
+  const date2 = String(date).slice(16,24)
+  const numberRandom = Math.random();
+  const number = String(numberRandom).slice(2,16)
+  const child = correo + date2 + number
+  //aqui lo declaro
+  const uploadTask = firebase.storage()
+  .ref("dinamicas")
+  .child(child)
+  .put(file);
+  //aqui agreggo el exito y el error
+  uploadTask
+  .then(r=>{
+    const {dinamicaEditar} = this.state;
+    dinamicaEditar.imagenPremio =  r.downloadURL;
+    this.setState({dinamicaEditar})
+  })
+  .catch(e=>console.log(e)) //task
+  //aqui reviso el progreso
+  uploadTask.on('state_changed', (snap)=>{
+    const progresoImagen2 = (snap.bytesTransferred / snap.totalBytes) * 100;
+    this.setState({progresoImagen2});
+  })
+};
+
+borrarDinamica = (dinamica) =>{
+  this.setState({dinamicaBorrar:dinamica})
+  this.handleOpen6();
 }
 
+deleteDinamic = () => {
+  let {dinamicaBorrar} = this.state;
+  deleteDinamic(dinamicaBorrar._id)
+  .then(r=>{
+    this.handleClose6();
+    window.location.reload()
+  })
+  .catch(e=>console.log(e))
+
+}
 renderChip(data) {
   return (
    <div className="chipDinamica" key={data.nombre}>
@@ -453,6 +552,34 @@ renderChip2(data) {
   );
 }
   render() {
+    const actions5 = [
+      <FlatButton
+        label="Si estoy seguro"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.deleteDinamic}
+      />,
+      <FlatButton
+        label="Cancelar"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose6}
+      />
+    ];
+    const actions4 = [
+      <FlatButton
+        label="Enviar Cambios"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.sendChangesDinamic}
+      />,
+      <FlatButton
+        label="Cerrar"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose5}
+      />
+    ];
     const actions3 = [
       <FlatButton
         label="Entendido"
@@ -528,11 +655,11 @@ renderChip2(data) {
               <TableHeaderColumn><h3 onClick={this.orderByModality}>Modalidad</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByName}>Nombre</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Editar</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Borrar</h3></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -546,11 +673,11 @@ renderChip2(data) {
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
-                <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><button className="buttonDinamicasDetalle" onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
                 <TableRowColumn><button className="botonDinamicaEditar" onClick={() => this.editarDinamica(dinamic)}>Editar</button></TableRowColumn>
+                <TableRowColumn><button className="botonDinamicaBorrar" onClick={() => this.borrarDinamica(dinamic)}>Borrar</button></TableRowColumn>
 
               </TableRow>
               ))}
@@ -739,16 +866,16 @@ renderChip2(data) {
           {/* vidcar.gonzalez@cuamoc.com  */}
       </Dialog> 
     </div>
-    <div>
-    <Dialog
+        <div>
+          <Dialog
           title="Te hace falta algo..."
           actions={actions}
           modal={false}
           open={this.state.open2}
           onRequestClose={this.handleClose2}
-        >
+          >
           Debes de elegir primero una modalidad de la Dinámica.
-        </Dialog>
+          </Dialog>
         </div>
         <div>
           <Dialog
@@ -815,9 +942,102 @@ renderChip2(data) {
         <b>Esta decisión es trascendental en el desempeño de una dinámica, asegurate de elegir la opción correcta</b>
         </Dialog>
           </div>
+          <div>
+          <Dialog
+          title={<h2>Editar Dinámica</h2>}
+          actions={actions4}
+          modal={false}
+          open={this.state.open5}
+          onRequestClose={this.handleClose5}
+          autoScrollBodyContent={true}
+          >
+            <img alt="Imagen Premio" width="300px" height="250px" src={detalleDinamica.imagenPremio} />
+            <br/>
+            <FlatButton
+            label="Cambiar  imagen"
+            labelPosition="before"
+            style={styles.uploadButton}
+            containerElement="label"
+            backgroundColor="#00897B"
+          > 
+            <input onChange={this.getFileEdit} name="imagenPremio" type="file" style={styles.uploadInput} />
+          </FlatButton>
+            <br/><br/>
+            <LinearProgress mode="determinate" value={this.state.progresoImagen2} />
+            <span>{this.state.progresoImagen2 >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen2 > 0 && this.state.progresoImagen2 < 98 ? "Espera la imagen se esta cargando..." : "La imagen tarda unos segundos en cargar...")}</span>
+            <br/><br/>  
+            <hr/>
+            <h5>Nombre de la Dinámica:</h5>
+            <h2>{detalleDinamica.nombreDinamica}</h2>
+            <TextField
+            hintText="Sea específico en pocas palabras"
+            floatingLabelText="Edita el Nombre de la Dinámica"
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Llena solo los campos a editar"
+            errorStyle={styles.errorStyle}
+            type="text" 
+            onChange={this.onChangeEdit}
+            name="nombreDinamica"
+          />
+            <hr/>
+            <h5>Descripción de la Dinámica:</h5>
+            <b>{detalleDinamica.descripcion}</b>
+            <br/>
+            <TextField
+            floatingLabelText="Edita la Descripción de la Dinámica"
+            floatingLabelStyle={styles.floatingLabelFocusStyle}
+            floatingLabelFocusStyle={styles.floatingLabelFocusStyle}
+            errorText="Llena solo los campos a editar"
+            errorStyle={styles.errorStyle}
+            type="text" 
+            multiLine={true}
+            rowsMax={4}
+            fullWidth={true}
+            onChange={this.onChangeEdit}
+            name="descripcion"
+          />
+            <hr/>
+            <h5>Duración de la Dinámica:</h5>
+            <span>{detalleDinamica.fechaInicio}<b> hasta </b>{detalleDinamica.fechaFin}</span>
+            <br/>
+            <div className="padre">
+            <div className="margin">
+            <DatePicker
+            hintText="Editar Fecha Inicial"
+            value={this.state.objEdit.fecha}
+            onChange={this.handleChangeEdit}
+            errorText="Llena solo los campos a editar"
+            errorStyle={styles.errorStyle}
+          /> 
+            </div>
+            <b>        </b>
+            <div className="margin">
+          <DatePicker
+            hintText="Editar Fecha Final"
+            value={this.state.objEdit2.fecha}
+            onChange={this.handleChangeEdit2}
+            errorText="Llena solo los campos a editar"
+            errorStyle={styles.errorStyle}
+          />
+          </div>
+          </div> 
+          </Dialog>
+        </div>
+        <div>
+          <Dialog
+          title="¿Estás seguro?"
+          modal={false}
+          actions={actions5}
+          open={this.state.open6}
+          onRequestClose={this.handleClose6}
+          autoScrollBodyContent={true}
+        >
+          Esta decisión es irreversible, si borras esta dinámica sera de manera permanente y no podras visualizar mas tarde ningún detalle relacionada a esta. 
+        </Dialog>
+          </div>
     </div>
     );
   }
 }
-
 export default Dinamicas;

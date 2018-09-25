@@ -99,7 +99,7 @@ class EvidenciaDetail extends Component{
     boton = true
     this.setState({boton})
     sendEvidencia(evidencia,id)
-    .then(evidencia=>{
+    .then(r=>{
       this.props.history.push('/tickets');
     })
     .catch(e=>console.log(e))

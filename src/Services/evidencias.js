@@ -74,3 +74,21 @@ export function getEvidencesByDinamicAndByDate(id,fechasArray){
       return evidencias;
   });
 }
+
+//SEUTILIA EN EL COMPONENTE DE EVIDENCIAS PARA BORRAR UNA EVIDENCIA
+
+export function deleteEvidence(id){
+  return fetch(baseURL + '/evidencia/delete/' + id , {
+      method:'delete',
+      headers:{
+          "Content-Type": "application/json"
+      }
+  })
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(r=>{
+      return r;
+  });
+}

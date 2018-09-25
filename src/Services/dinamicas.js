@@ -31,6 +31,25 @@ export function createDinamic(formulario){
   })
 }
 
+//SE UTILIZA EN EL COMPONENTE DE DINAMICAS PARA EDITAR UNA DINAMICA
+
+export function sendChangesDinamic(id,newDinamic){
+  return fetch(  baseURL + '/dinamica/edit/'+ id ,{
+    method:'post',
+    headers:{
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newDinamic)
+})
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(dinamica=>{
+    return dinamica
+  })
+}
+
 //SE UTILIZA EN EL COMPONENTE DE DINAMICAS
 export function getDinamics(){
   return fetch( baseURL + '/dinamica/' )
@@ -71,6 +90,24 @@ export function makeWinner(user,id){
           "Content-Type": "application/json"
       },
       body: JSON.stringify(user)
+  })
+  .then(res=>{
+      if(!res.ok) return Promise.reject(res);
+      return res.json();
+  })
+  .then(dinamica=>{
+      return dinamica;
+  });
+}
+
+//SEUTILIA EN EL COMPONENTE DE DINAMICAS PARA BORRAR UNA DINAMICA
+
+export function deleteDinamic(id){
+  return fetch(baseURL + '/dinamica/delete/' + id , {
+      method:'delete',
+      headers:{
+          "Content-Type": "application/json"
+      }
   })
   .then(res=>{
       if(!res.ok) return Promise.reject(res);
