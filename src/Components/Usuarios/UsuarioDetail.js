@@ -44,6 +44,8 @@ class UsuarioDetail extends Component{
     brands:[]
   }
 
+  // ESTA VISTA SOLO ESTA DISPONIBLE PARA LOS SUPERADMINS O LOS QUE SON DEL BRAND DE 1PUNTOCINCO QUE ES LO MISMO
+  // TRAEMOS AL USUARIO ELEGIDO Y TRAEMOS TODOS LOS BRANDS PORQUE VAMOS A ASIGNARLE UN BRAND
   componentWillMount(){
      let id = this.props.match.params.id
     getUser(id)
@@ -57,22 +59,31 @@ class UsuarioDetail extends Component{
      })
      .catch(e=>console.log(e))
   }
+
+// ABRIR Y CERRAR DIALOGO PARA EDITAR UN USUARIO
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
     this.setState({open: false});
   };
+
+
+// ELEGIR QUE PUESTO VA A TENER DENTRO DE SU ORGANIZACIÓN UN USUARIO
   onNewRequest = (chosenRequest) => {
     let { user } = this.state;
     user.puesto = chosenRequest;
     this.setState({user})
   }
+
+// ASIGNARLE UN BRAND A UN USUARIO
   onNewRequestBrand = (chosenRequest) => {
     const {user} = this.state;
     user.brand =  chosenRequest;
     this.setState({user});
   }
+
+// ENVIAR LOS CAMBIOS  ANUESTRO BACKEND MEDIANTE EL SERVICIO editUser 
   sendEdit = (e) => {
     const id = this.props.match.params.id;
     const {user} = this.state;
@@ -107,9 +118,7 @@ class UsuarioDetail extends Component{
                 onClick={this.handleOpen} 
               />
             </div>
-
           </div>
-            
           </Paper>
           </div>
           <div>
@@ -146,22 +155,17 @@ class UsuarioDetail extends Component{
              errorText="Este campo es obligatorio"
              errorStyle={styles.errorStyle}
             /> 
-    
           <RaisedButton 
           onClick={this.sendEdit}  
           label="Enviar Cambios" 
           backgroundColor="#0D47A1"
           labelColor="#FAFAFA" 
           />
-          
         </Dialog> 
          </div>
         </div>
       );
     }
-    
   }
-
-  
 
 export default UsuarioDetail;

@@ -55,18 +55,9 @@ class Zonas extends Component {
     showCheckboxes: true,
     height: '300px',
   }
-  handleOpen = () => {
-    this.setState({open: true});
-  };
-  handleClose = () => {
-    this.setState({open: false});
-  };
-  handleOpen2 = () => {
-    this.setState({open2: true});
-  };
-  handleClose2 = () => {
-    this.setState({open2: false});
-  };
+
+// ESTE COMPONENTE SOLO LO VISUALIZAN LOS SUPERADMINS O LOS DEL BRAND DE 1PUNTOCINCO
+// ASI QUE USAMOS EL SERVCIO QUE TRAIGA TODA SLAS ZONAS EXISTENTES, TODOS LOS ESTADOS EXISTENTES Y EL PAIS EXISTENTE
   componentWillMount(){
   getZonas()
    .then(zonas=>{
@@ -91,6 +82,21 @@ class Zonas extends Component {
    .catch(e=>alert(e))
  }
 
+// SE USAN PARA ABRIR LOS DIALOGOS PARA CREAR ESTADOS O ZONAS
+ handleOpen = () => {
+  this.setState({open: true});
+ };
+ handleClose = () => {
+  this.setState({open: false});
+ };
+ handleOpen2 = () => {
+  this.setState({open2: true});
+ };
+ handleClose2 = () => {
+  this.setState({open2: false});
+ };
+
+// SE USA PARA HACER BUSQUEDA DE ZONAS POR NOMBRE, ESTADO Y FECHA DE CREACION
  filterList = (e) =>{
   var updatedList = this.state.zonas.map(dinamic=>dinamic);
   updatedList = updatedList.map(zona=>zona).filter(function(item){
@@ -100,32 +106,41 @@ class Zonas extends Component {
           e.target.value.toLowerCase()) !== -1 ;
   });
   this.setState({zonasFilter: updatedList})
-}
+ }
 
+ // SE USA PARA INSERTAR EL PAIS AL NUEVO ESTADO QUE ESTAMOS CREANDO
  onNewRequest = (chosenRequest) => {
   const {newState} = this.state;
   newState.pais =  chosenRequest;
   this.setState({newState});
-}
-onNewRequest2 = (chosenRequest) => {
+ }
+
+ // SE USA PARA INSERTAR EL ESTADO AL QUE PERTENECERA LA ZONA QUE ESTAMOS CREANDO
+ onNewRequest2 = (chosenRequest) => {
   const {newZone} = this.state;
   newZone.estado =  chosenRequest;
   this.setState({newZone});
-}
-onChange = (e) => {
+ }
+
+ // SE USA PARA GUARDAR LA INFO CON LA QUE SE CREARA EL NUEVO ESTADO
+ onChange = (e) => {
   const field = e.target.name;
   const value = e.target.value;
   const {newState} = this.state;
   newState[field] = value;
   this.setState({newState}); 
-}
-onChange2 = (e) => {
+ }
+
+ // SE USA PARA GUARDAR LA INFO DE LA NUEVA ZONA QUE SE CREARA
+ onChange2 = (e) => {
   const field = e.target.name;
   const value = e.target.value;
   const {newZone} = this.state;
   newZone[field] = value;
   this.setState({newZone}); 
-}
+ }
+
+ // SE ENVIA EL ESTADO A NUESTRO BACKEND PARA SU CREACION SE USA EL SERVICIO createState
   sendEdit = (e) => {
     const estado = this.state.newState;
     createState(estado)
@@ -136,6 +151,8 @@ onChange2 = (e) => {
     })
     .catch(e=>console.log(e))
   }
+
+   // SE ENVIA LA ZONA A NUESTRO BACKEND PARA SU CREACION SE USA EL SERVICIO createZone
   sendZona = (e) => {
     const zona = this.state.newZone;
     createZone(zona)
@@ -146,8 +163,8 @@ onChange2 = (e) => {
     })
     .catch(e=>console.log(e))
   }
+
   render() {
-    
     return (
     <div>
        <Dash/>

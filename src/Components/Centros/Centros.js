@@ -64,20 +64,9 @@ class Centros extends Component {
     cantidad:0,
     centro:{}
   }
-  handleOpen = () => {
-    this.setState({open: true});
-  };
-  handleClose = () => {
-    this.setState({open: false});
-  };
- 
-  handleOpen2 = () => {
-    this.setState({open2: true});
-  };
-  handleClose2 = () => {
-    this.setState({open2: false});
-  };
- 
+ //ESTE COMPONENTE SOLO LO VISUALIZAN LOS SUPERADMINS
+ //TRAE TODAS LAS ZONAS
+ //TRAE TODOS LOS CENTROS DE CONSUMO
 componentWillMount(){
   getZonas()
    .then(zonas=>{
@@ -96,17 +85,36 @@ componentWillMount(){
    })
    .catch(e=>console.log(e))
  }
- onNewRequest = (chosenRequest) => {
+
+ // ABRIR Y CERRAR DIALOGOS
+handleOpen = () => {
+  this.setState({open: true});
+};
+handleClose = () => {
+  this.setState({open: false});
+};
+handleOpen2 = () => {
+  this.setState({open2: true});
+};
+handleClose2 = () => {
+  this.setState({open2: false});
+};
+
+// AGREGA LA ZONA ELEGIDA AL CENTRO DE CONSUMO QUE SE VA A CREAR
+onNewRequest = (chosenRequest) => {
   const {newCenter} = this.state;
   newCenter.zona =  chosenRequest;
   this.setState({newCenter});
 }
+
+// AGREGA EL STATUS ("ACTIVO" O "INACTIVO") AL CENTRO DE CONSUMO QUE SE ESTA CREANDO
 onNewRequest2 = (chosenRequest) => {
   const {newCenter} = this.state;
   newCenter.activo =  chosenRequest.value;
   this.setState({newCenter});
 }
 
+// GUARDA LA INFO QUE SE ESTA AGREGANDO AL CENTRO DE CONSUMO QUE ESTAMOS CREANDO
 onChange = (e) => {
   const field = e.target.name;
   const value = e.target.value;
@@ -115,32 +123,35 @@ onChange = (e) => {
   this.setState({newCenter}); 
 }
 
+// FUNCION QUE AYUDA A FILTRAR CENTROS DE CONSUMO POR NOMBRE, ZONA Y FECHA DE CREACIÓN
 filterList = (e) =>{
   var updatedList = this.state.centros.map(dinamic=>dinamic);
   updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
     return item.nombre.toLowerCase().search(
       e.target.value.toLowerCase()) !== -1 || item.zona.toLowerCase().search(
-        e.target.value.toLowerCase()) !== -1 || item.nombre.toLowerCase().search(
-          e.target.value.toLowerCase()) !== -1 || item.created.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1 || item.created.toLowerCase().search(
             e.target.value.toLowerCase()) !== -1 ;
   });
   this.setState({centrosFilter: updatedList})
 }
 
-sendCenter = (e) => {
-  createCenter(this.state.newCenter)
-  .then(centro=>{
-    this.handleClose();
-    this.componentWillMount();
-  })
-  .catch(e=>console.log(e))
-}
-
+// SE MUESTRAN LOS USUARIOS CON LOS QUE CUENTA UN CENTRO DE CONSUMO  
 centro = (centro) =>{
   getUsersByCenter(centro._id)
   .then(users=>{
     this.handleOpen2()
     this.setState({userss:users,cantidad:users.length,centro:centro})
+  })
+  .catch(e=>console.log(e))
+}
+
+// AQUI SE ENVIA EL CENTRO DE CONSUMO QUE SE ESTA CREANDO, USAMOS EL SERVICIO 
+// createCenter QUE CONECTA CON EL BACKEND PARA PROCESAR Y CREAR EL CENTRO DE CONSUMO ESPECIFICADO
+sendCenter = (e) => {
+  createCenter(this.state.newCenter)
+  .then(centro=>{
+    this.handleClose();
+    this.componentWillMount();
   })
   .catch(e=>console.log(e))
 }

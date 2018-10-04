@@ -14,8 +14,22 @@ export function getEvidences(){
     return evidencias
   })
 }
-export function getEvidencesByBrand(id){
-  return fetch( baseURL + '/evidencia/dash/' + id )
+
+// esta se usa para traer las evidencias de una dinamica, para aprobarlas o desaprobarlas.
+export function getAllEvidencesByDinamica(id){
+  return fetch( baseURL + '/evidencia/all/dash/' + id)
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(evidencias=>{
+    return evidencias
+  })
+}
+
+// esta se usa para traer las evidencias de una dinamica, para aprobarlas o desaprobarlas.
+export function getEvidencesByDinamica(id,status){
+  return fetch( baseURL + '/evidencia/dash/' + id + '?status=' + status)
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
     return res.json()

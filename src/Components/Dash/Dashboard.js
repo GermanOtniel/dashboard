@@ -31,6 +31,11 @@ class Dash extends Component {
     correoo:"",
     msjConf:""
   }
+
+  // ESTO SE USA SOLO PARA GUARDAR AL USUARIO QUE INGRESO AL DASHBOARD PARA VER QUE
+  // PERMISOS TIENE Y VER A QUE RUTAS TIENE PERMISO DE INGRESAR Y A CUALES NO Y 
+  // TAMBIEN REVISAMOS SI HAY ALGUN USUARIO GUARDADO EN EL LOCALSTORAGE PARA GUARDAR SU CORREO 
+  // POR SI QUIERE CAMBIAR SU CONTRASEÑA PUES MANDAR SU NUEVA CONTRASEÑA A SU CORREO
   componentWillMount(){
     let id = `${JSON.parse(localStorage.getItem('user'))._id}`;
     const userLogged = `${JSON.parse(localStorage.getItem('userLoggedDash'))}`;
@@ -46,8 +51,12 @@ class Dash extends Component {
     }
   }
 
+  // ABRIR  Y CERRAR MENU DESPLEGABLE
+  handleToggle = () => this.setState({open: !this.state.open});
+
+    // ABRIR Y CERRAR DIALOGOS
   handleOpen = () => {
-    this.setState({open2: true});
+    this.setState({open2: true,cambios:{}});
   };
   handleClose = () => {
     this.setState({open2: false});
@@ -58,6 +67,10 @@ class Dash extends Component {
   handleClose2 = () => {
     this.setState({open3: false});
   };
+
+
+  // GUARDA LA CONTRASEÑA NUEVA QUE EL USUARIO INGRESA Y REVISA QUE LA CONTRASEÑA ACTUAL QUE ESTA INGRESANDO 
+  // SEA LA CORRECTA, SINO ES LA CORRECTA NO LO DEJA CAMBIAR SU CONTRASEÑA
   onChange = (e) => {
     let {passwordd} = this.state;
     const field = e.target.name;
@@ -83,6 +96,7 @@ class Dash extends Component {
     this.setState({cambios}); 
   }
 
+  // FUNCION PARA ENVIAR LA NUEVA CONTRASEÑA Y QUE NUESTRO BACKEND LA PROCESE Y CAMBIE
   sendNewPassword = () => {
     let {correoo,cambios} = this.state;
     let body = {
@@ -98,7 +112,7 @@ class Dash extends Component {
     .catch(e=>console.log(e))
   }
 
-  handleToggle = () => this.setState({open: !this.state.open});
+  
   render() {
     const actions = [
       <FlatButton
@@ -127,23 +141,15 @@ class Dash extends Component {
       <div>
       <Drawer
           docked={false}
-          width={400}
+          width={300}
           open={this.state.open}
           onRequestChange={(open) => this.setState({open})}
         >
         <div>
-          {/* <MenuItem 
-          leftIcon={<FontIcon className="material-icons">home</FontIcon>} 
-          style={styleMenu} 
-          onClick={this.handleClose}>
-           <Link 
-            style={{ textDecoration: 'none',color:'black' }} 
-            to={`/home`}>Inicio
-           </Link>
-          </MenuItem> */}
+          {/* <MenuItem leftIcon={<FontIcon className="material-icons">home</FontIcon>} style={styleMenu} onClick={this.handleClose}><Link style={{ textDecoration: 'none',color:'black' }} to={`/home`}>Inicio</Link></MenuItem> */}
           <MenuItem leftIcon={<FontIcon className="material-icons icon">assistant</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/marcas`}>Marcas</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">queue_play_next</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/dinamicas`}>Dinámicas</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons">insert_photo</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/tickets`}>Evidencias</Link></MenuItem>
+          {/* <MenuItem leftIcon={<FontIcon className="material-icons">insert_photo</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/tickets`}>Evidencias</Link></MenuItem> */}
           <MenuItem leftIcon={<FontIcon className="material-icons icon">signal_cellular_alt</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/reportes`}>Reportes</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">work</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/brands`}>Brands</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>

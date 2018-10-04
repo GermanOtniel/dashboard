@@ -57,6 +57,9 @@ class Mensajes extends Component {
     alReves:false
   }
  
+  // DE NUEVA CUENTA SE HACE DISTINCION ENTRE LOS MESNAJES QUE PUED EVER UN USUARIO Y LOS QUE NO, 
+  // AQUI RVISAMOS A QUE BRAND PERTENECE EL USUARIO, SI ES BRAND 1PUNTOCINCO S EMUESTRA TODO SINO 
+  // LO ES SOLO SE MUESTRAN LOS MENSAJES QUE LE CORRESPONDEN
   componentWillMount(){
     let brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
     let {mensajesFilter} = this.state;
@@ -101,6 +104,7 @@ class Mensajes extends Component {
     }
  }
 
+ // AQUI SE GUARDA LA INFO QUE SE INGRESA CUANDO SE CREA UN NUEVO MENSAJE
  onChange = (e) => {
   const field = e.target.name;
   const value = e.target.value;
@@ -109,22 +113,22 @@ class Mensajes extends Component {
   this.setState({newMessage}); 
 }
 
+// SE ABREN O CIERRAN DIALOGOS
  handleOpen = (e) =>{
   this.setState({open:true})
 }
-
 handleClose = (e) =>{
   this.setState({open:false})
 }
-
 handleOpen2 = (e) =>{
   this.setState({open2:true})
 }
-
 handleClose2 = (e) =>{
   this.setState({open2:false})
 }
 
+// MEDIANTE ESTA FUNCION SE PUEDEN ENVIAR LOS DATOS RECOGIDOS PARA LA CREACION DE UN NUEVO MENSAJE
+// SE HACE LA CONEXION CON NUESTRO BACKEND MEDIANTE EL SERVICIO sendNote
 sendMessage = () => {
   let brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
   let {newMessage} = this.state;
@@ -138,12 +142,18 @@ sendMessage = () => {
   .catch(e=>console.log(e))
 }
 
+// SE VE EL DETALLE DE UN MENSAJE
 mensaje = (mensaje) => {
   let {detalleMensaje} = this.state;
   detalleMensaje = mensaje
   this.setState({detalleMensaje})
   this.handleOpen2()
 }
+
+// SE BORRA UN MENSAJE, SE BORRA EN TODOS LADOS, UN MENSAJE GLOBAL ES UN MENSAJE QUE SE MANDA A TODOS, 
+// UN MENSAJE QUE SE ENVIA A UN USUARIO EN ESPECIFICO OBVIO NO ES UN MNESAJE GLOBAL, LOS MENSAJES QUE SE 
+// MANDAN A UN USUARIO EN ESPECIFICO SE CREAN CUANDO SE DESAPRUEBA UNA EVIDENCIA Y SE LE DICE UNA EXPLIACION 
+// AL USUARIO,  A VECES SOLO SE DESAPRUEBA Y NO SE LE MANDA NADA ESOS SON LOS MSJS VACIOS.
 borrarMensaje = (mensaje) =>{
   deleteNote(mensaje._id)
   .then(r=>{
@@ -151,6 +161,8 @@ borrarMensaje = (mensaje) =>{
   .catch(e=>console.log(e))
   window.location.reload()
 }
+
+// FUNCION PARA ACOMODAR LOS MENSAJES POR FECHA
 orderByDate = (e) =>{
   let {alReves} = this.state;
   if(alReves === false){

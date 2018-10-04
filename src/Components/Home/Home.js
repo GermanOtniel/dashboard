@@ -2,6 +2,9 @@ import React, { Component } from 'react';
 import RaisedButton from 'material-ui/RaisedButton';
 import { outUserDash } from '../../Services/authDash';
 
+//HASTA AHORA ESTE COMPONENTE NO SE ESTA USANDO//
+
+
 const styleButtonOut = {
   marginLeft: 700,
   marginTop: 300

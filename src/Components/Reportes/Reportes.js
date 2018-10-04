@@ -58,18 +58,12 @@ class Reportes extends Component {
     alReves:false,
     alReves2:false
   }
-  handleRequestDelete = (label) => {
-    this.chipData = this.state.chipData;
-    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
-    this.chipData.splice(chipToDelete, 1);
-    this.setState({chipData: this.chipData});
-  };
-  handleRequestDelete2 = (label) => {
-    this.chipData = this.state.chipData2;
-    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
-    this.chipData.splice(chipToDelete, 1);
-    this.setState({chipData2: this.chipData});
-  };
+
+// SE MONTA EL COMPONENTE PERO SE HACE LA DISTINCION 
+// SI EL USUARIO QUE ESTA GUARDADO EN EL LOCALSTORAGRE ES DEL BRAND DE 1PUNTOCINCO PUES VAS A TRAER INFORMACION GENERAL ES DECIR
+//TRARERAS TODAS LAS DINAMICAS
+
+// SI ERES UN USUARIO QUE NO ES DEL BRAND 1PUNTOCINCO PUES VAMOS A TRAERTE SOLO LAS DINAMICAS QUE CORRESPONDEN A TU BRAND
   componentWillMount(){
      //ID DEL BRAND
      const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
@@ -106,6 +100,7 @@ class Reportes extends Component {
      .catch(e=>console.log(e))
     } 
   }
+// ES LA FUNCION PARA FILTRAR LAS DINAMICAS EN EL BUSCADOR, LAS BUSCA POR SU NOMBRE Y POR US MODALIDAD
    filterList = (e) =>{
     var updatedList = this.state.dinamics.map(dinamic=>dinamic);
     updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
@@ -115,6 +110,8 @@ class Reportes extends Component {
     });
     this.setState({dinamicasFilter: updatedList})
   }
+
+  // ES LA FUNCION PARA ORDENAR LAS DINAMICAS POR FECHA INICIAL
   orderByFechai = () => {
     let {alReves} = this.state;
     if(alReves === false){
@@ -128,6 +125,7 @@ class Reportes extends Component {
       this.setState({dinamicasFilter,alReves:false})
     }
   }
+    // ES LA FUNCION PARA ORDENAR LAS DINAMICAS POR FECHA FINAL
 orderByFechaF = () => {
   let {alReves2} = this.state;
   if(alReves2 === false){

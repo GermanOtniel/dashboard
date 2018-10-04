@@ -21,6 +21,8 @@ import { getMarcas } from '../../Services/marcas';
 import DatePicker from 'material-ui/DatePicker';
 import { getBrand } from '../../Services/brands';
 import FlatButton from 'material-ui/FlatButton';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
 import {green700,blue500} from 'material-ui/styles/colors';
@@ -84,6 +86,7 @@ class Dinamicas extends Component {
     open4: false,
     open5:false,
     open6:false,
+    open7:false,
     centros:[],
     zonas:[],
     marcas:[],
@@ -108,6 +111,7 @@ class Dinamicas extends Component {
     deselectOnClickaway: true,
     showCheckboxes: true,
     height: '300px',
+    terminaStateTabla:"TERMINASTATE DE LA TABLA",
     progresoImagen:0,
     detalleDinamica:{},
     marcasDinamica:[],
@@ -118,25 +122,21 @@ class Dinamicas extends Component {
     dinamicaEditar:{},
     objEdit:{},
     objEdit2:{},
-    progresoImagen2:0
+    progresoImagen2:0,
+    value:null,
+    puesto:null,
+    hayEvidencias:false
   }
-  handleRequestDelete = (label) => {
-    this.chipData = this.state.chipData;
-    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
-    this.chipData.splice(chipToDelete, 1);
-    this.setState({chipData: this.chipData});
-  };
-  handleRequestDelete2 = (label) => {
-    this.chipData = this.state.chipData2;
-    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
-    this.chipData.splice(chipToDelete, 1);
-    this.setState({chipData2: this.chipData});
-  };
+  // REVISA EL BRAND AL QUE PERTENECE EL USUARIO QUE SE LOGUEO
+  //SI ES DEL BRAND 1PUNTOCINCO "5b71bd925c65d40353ffda4c" TRAE TODAS LAS DINAMICAS EXISTENTES, TODAS LAS MARCAS EXISTENTES, VAYA UTILIZA SERVICIOS 
+  //PARA TRAER DATOS GENERALES PORQUE ES UN SUPERADMIN.
   componentWillMount(){
+    const puestoUser = `${JSON.parse(localStorage.getItem('user')).puesto}`
         //ID DEL BRAND
     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-     //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+    //SI ES SUPERADMIN USA ESTOS SERVICIOS
      if(id === "5b71bd925c65d40353ffda4c") {
+       //SERVICIO PARA TRAER TODAS LAS DINAMICAS
        getDinamics()
      .then(dinamics=>{
        let brands = dinamics.map(dinamic => dinamic.brand.nombre);
@@ -148,13 +148,14 @@ class Dinamicas extends Component {
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
-     //COMO ES SUPER ADMIN PUEDE CREAR DINAMICAS CON LA MARCA QUE SEA 
+     //SERVICIO PARA TRAER TODAS LAS MARCAS 
      getMarcas()
      .then(marcas=>{
        this.setState({marcas})
      })
      .catch(e=>console.log(e))
      }
+     //SI NO ES SUPERADMIN TRAE LA INFO DE SU BRAND AL QUE PERTENECE
      else if (id !== "5b71bd925c65d40353ffda4c"){
        getDinamicsByBrand(id)
        .then(dinamics=>{
@@ -177,14 +178,16 @@ class Dinamicas extends Component {
     .catch(e=>console.log(e))
      }
     //TRAEMOS LAS ZONAS PARA TENER LAS ZONAS PARA EL AUTOCOMPLETE DE ZONAS
+    //LAS TRAEMOS TODAS PORQUE LOS CENTROS DE CONSUMO SON DE USO GENERAL
     getZonas()
      .then(zonas=>{
-      this.setState({zonas})
+      this.setState({zonas,puesto:puestoUser})
      })
      .catch(e=>console.log(e))
    }
 
-
+// ABRIR Y CERRAR DIALOGOS, TAMBIEN ALGUNOS BORRAN INFORMACION INGRESADA EN LOS FORMULARIOS
+//SOBRE TODO LOS HANDLECLOSE SON LOS QUE BORRAN INFO PARA QUE NO SE QUED EGUARDADA 
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -194,11 +197,55 @@ class Dinamicas extends Component {
   handleOpen2 = () => {
     this.setState({open2: true});
   };
-
   handleClose2 = () => {
     this.setState({open2: false});
   };
- 
+  handleOpen3 = () => {
+    this.setState({open3: true});
+  };
+  handleClose3 = () => {
+    this.setState({open3: false});
+  };
+  handleOpen4 = () => {
+    this.setState({open4: true});
+  };
+  handleClose4 = () => {
+    this.setState({open4: false});
+  };
+  handleOpen5 = () => {
+    this.setState({open5: true});
+  };
+  handleClose5 = () => {
+    this.setState({open5: false,dinamicaEditar:{},objEdit:{},objEdit2:{},progresoImagen2:0,value:null});
+  };
+  handleOpen6 = () => {
+    this.setState({open6: true});
+  };
+  handleClose6 = () => {
+    this.setState({open6: false,dinamicaBorrar:{}});
+  };
+  handleOpen7 = () =>{
+    this.setState({open7: true});
+  }
+  handleClose7 = () =>{
+    this.setState({open7: false});
+  }
+
+  // NO COMPRENDI BIEN SU FUNCIONAMIENTO PERO LO QUE HACEN ES BORRAR LOS CHIPS DE LAS MARCAS SELECCIONADAS
+  //Y LOS CENTROS DE CONSUMO SELECCIONADOS EN EL FORMULARIO DE CREAR DINAMICA 
+  handleRequestDelete = (label) => {
+    this.chipData = this.state.chipData;
+    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
+    this.chipData.splice(chipToDelete, 1);
+    this.setState({chipData: this.chipData});
+  };
+  handleRequestDelete2 = (label) => {
+    this.chipData = this.state.chipData2;
+    const chipToDelete = this.chipData.map((chip) => chip.key).indexOf(label);
+    this.chipData.splice(chipToDelete, 1);
+    this.setState({chipData2: this.chipData});
+  };
+  // SE ELIGEN LAS MARCAS PARTICIPANTES EN LA DINAMICA QUE SE ESTA CREANDO
   onNewRequestMarca = (chosenRequest) => {
     let { chipData } = this.state;
     let { newDinamic } = this.state;
@@ -215,7 +262,31 @@ class Dinamicas extends Component {
     else{
       this.handleOpen2();
     }
+ }
+// SE ELIGE EL STATUS ACTIVA/INACTIVA
+onNewRequest2 = (chosenRequest) => {
+  let {newDinamic} = this.state;
+  newDinamic.activa = chosenRequest.value;
 }
+// SE ELIGE LA ZONA Y LA ZONA ELEGIDA NOS TRAE LOS CENTROS
+onNewRequestZona = (chosenRequest) => {
+  let {centros} = this.state;
+  centros = chosenRequest.centros
+  this.setState({centros});
+}
+ // SE ELIGEN LOS CENTROS DE CONSUMO PARTICIPANTES EN LA DINAMICA QUE SE ESTA CREANDO
+ onNewRequestCentro = (chosenRequest) => {
+  let { chipData2 } = this.state;
+  let { newDinamic } = this.state;
+  chipData2.push(chosenRequest)
+  newDinamic.centroConsumo = chipData2;
+  this.setState({chipData2,newDinamic})
+}
+//ESTA SUPER FUMADA ESTA FUNCION, PARECE QUE DETECTA EL EVENTO O LO QUE EL USUARIO ESCRIBE
+//REVISA SI EL ID CONCUERDA CON EL E.TARGET.NAME DEL TEXT FIEL Y SI SI SIGNIFICA QUE LA CANTIDAD CORRESPODNE A ESA MARCA
+//SUCEDE LO MISMO CON LA DESCRIPCION DE ESA MARCA....HAY QUE PRESTAR ATENCION EN DOND ESE USA ESTE ONCHANGE Y EL NAME DE LOS TEXT FIELD 
+// EN POCAS PALABRAS ES PARA INGRESAR INFORMACION(CANTIDAD A VENDER O PUNTOS POR VENDER E INFORMACION ADICIONAL) A LAS MARCAS 
+//SELECCIONADAS EN EL CHIPDATA DE LAS MARCAS.
 onChangeMarca = (e) => {
   const field = e.target.name;
   const value = e.target.value;
@@ -232,24 +303,23 @@ onChangeMarca = (e) => {
   newDinamic.marcaPuntosVentas = chipData;
   this.setState({newDinamic,chipData})
 }
-
-onNewRequestCentro = (chosenRequest) => {
-  let { chipData2 } = this.state;
-  let { newDinamic } = this.state;
-  chipData2.push(chosenRequest)
-  newDinamic.centroConsumo = chipData2;
-  this.setState({chipData2,newDinamic})
+// EL ONCHANGE QUE AGREGA INFORMACION A LA NUEVA DINAMICA QUE SE ESTA CREANDO
+onChange = (e) => {
+  const field = e.target.name;
+  const value = e.target.value;
+  const {newDinamic} = this.state;
+  newDinamic[field] = value;
+  this.setState({newDinamic}); 
 }
-onNewRequest2 = (chosenRequest) => {
-  let {newDinamic} = this.state;
-  newDinamic.activa = chosenRequest.value;
+// EL ONCHANGE PARA EDITAR UNA DINAMICA
+onChangeEdit = (e) =>{
+  const field = e.target.name;
+  const value = e.target.value;
+  const {dinamicaEditar} = this.state;
+  dinamicaEditar[field] = value;
+  this.setState({dinamicaEditar}); 
 }
-onNewRequestZona = (chosenRequest) => {
-  let {centros} = this.state;
-  centros = chosenRequest.centros
-  this.setState({centros});
-}
-
+// PARA INGRESAR LA FECHA DE INICIO A LA NUEVA DINAMICA QUE SE ESTE CREANDO
 handleChange = (event, date) => {
   let {newDinamic} = this.state;
   //let fecha = String(date);
@@ -260,6 +330,7 @@ handleChange = (event, date) => {
   newObj.fecha = date;
   this.setState({newObj});
 };
+// PARA INGRESAR LA FECHA DE FIN A LA NUEVA DINAMICA QUE SE ESTE CREANDO
 handleChange2 = (event, date) => {
   let {newDinamic} = this.state;
   //let fecha = String(date);
@@ -270,14 +341,37 @@ handleChange2 = (event, date) => {
   newObj2.fecha = date;
   this.setState({newObj2});
 };
-onChange = (e) => {
-  const field = e.target.name;
-  const value = e.target.value;
-  const {newDinamic} = this.state;
-  newDinamic[field] = value;
-  this.setState({newDinamic}); 
-}
-
+// PARA INGRESAR LA FECHA DE INICIO CUANDO SE EDITA UNA DINAMICA
+handleChangeEdit = (event, date) => {
+  let {dinamicaEditar,objEdit} = this.state;
+  objEdit.fecha = date;
+  dinamicaEditar.fechaInicio = date;
+  this.setState({dinamicaEditar,objEdit});
+};
+// PARA INGRESAR LA FECHA DE FIN CUANDO SE EDITA UNA DINAMICA
+handleChangeEdit2 = (event, date) => {
+  let {dinamicaEditar,objEdit2} = this.state;
+  objEdit2.fecha = date;
+  dinamicaEditar.fechaFin = date;
+  this.setState({dinamicaEditar,objEdit2});
+};
+// APROBAR O DESAPROBAR DINAMICAS, ESTA CUANDO SE TRATA DE EDITAR UNA DINAMICA
+handleChangeDinamic = (event, index, value) => {
+  if( value === "Desaprobada")
+    {
+      let {dinamicaEditar} = this.state;
+      dinamicaEditar.status = value
+      this.setState({dinamicaEditar,value})
+    }
+    else if ( value === "Aprobada")
+    {
+      let {dinamicaEditar} = this.state;
+      dinamicaEditar.status = value
+      this.setState({dinamicaEditar,value})
+    }
+};
+// ENVIA LA IMAGEN A FIREBASE STORAGE Y NOS REGRESA UNA URL LA CUAL INSERTAMOS EN LA NUEVA DINAMICA QUE SE ESTA CREANDO
+// TAMBIEN SE LE MUESTRA AL USUARIO EL AVANCE DE CARGA DE LA IMAGEN
  getFile = e => {
   const file = e.target.files[0];
   const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
@@ -305,167 +399,8 @@ onChange = (e) => {
     this.setState({progresoImagen});
   })
 };
-sendDinamic = (e) => {
-  const { newDinamic } = this.state;
-  newDinamic.brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
-  createDinamic(newDinamic)
-  .then(dinamic=>{
-    this.handleClose();
-  })
-  .catch(e=>console.log(e))
-}
-handleOpen3 = () => {
-  this.setState({open3: true});
-};
-
-handleClose3 = () => {
-  this.setState({open3: false});
-};
-handleOpen4 = () => {
-  this.setState({open4: true});
-};
-
-handleClose4 = () => {
-  this.setState({open4: false});
-};
-
-handleOpen5 = () => {
-  this.setState({open5: true});
-};
-
-handleClose5 = () => {
-  this.setState({open5: false,dinamicaEditar:{},objEdit:{},objEdit2:{},progresoImagen2:0});
-};
-handleOpen6 = () => {
-  this.setState({open6: true});
-};
-
-handleClose6 = () => {
-  this.setState({open6: false,dinamicaBorrar:{}});
-};
-
-
-detalleDinamica = (dinamic) => {
-  this.handleOpen3()
-  let {detalleDinamica,marcasDinamica} = this.state;
-  detalleDinamica = dinamic;
-  detalleDinamica.fechaInicio = dinamic.fechaInicio.slice(0,10)
-  detalleDinamica.fechaFin = dinamic.fechaFin.slice(0,10)
-  marcasDinamica = dinamic.marcaPuntosVentas;
-  this.setState({detalleDinamica,marcasDinamica})
-}
-
-filterList = (e) =>{
-  var updatedList = this.state.dinamics.map(dinamic=>dinamic);
-  updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
-    return item.nombreDinamica.toLowerCase().search(
-      e.target.value.toLowerCase()) !== -1 || item.brand.toLowerCase().search(
-        e.target.value.toLowerCase()) !== -1 || item.modalidad.toLowerCase().search(
-          e.target.value.toLowerCase()) !== -1;
-  });
-  this.setState({dinamicasFilter: updatedList})
-}
-
-orderByName = (e) => {
-  console.log('Sarabita, Otniel te quiere!!!')
-  let {alReves} = this.state;
-  if(alReves === false){
-    let {dinamicasFilter} = this.state;
-    dinamicasFilter.sort((a, b) => a.nombreDinamica !== b.nombreDinamica ? a.nombreDinamica < b.nombreDinamica ? -1 : 1 : 0)
-    this.setState({dinamicasFilter,alReves:true})
-  }
-  else if(alReves === true){
-    let {dinamicasFilter} = this.state;
-    dinamicasFilter.sort((a, b) => b.nombreDinamica !== a.nombreDinamica ? b.nombreDinamica < a.nombreDinamica ? -1 : 1 : 0)
-    this.setState({dinamicasFilter,alReves:false})
-  }
-}
-orderByInitDate = (e) => {
-  let {alReves2} = this.state;
-    if(alReves2 === false){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio))
-      this.setState({dinamicasFilter,alReves2:true})
-    }
-    else if(alReves2 === true){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
-      this.setState({dinamicasFilter,alReves2:false})
-    }
-}
-orderByFinishDate = (e) => {
-  let {alReves3} = this.state;
-    if(alReves3 === false){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
-      this.setState({dinamicasFilter,alReves3:true})
-    }
-    else if(alReves3 === true){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => new Date(b.fechaFin) - new Date(a.fechaFin))
-      this.setState({dinamicasFilter,alReves3:false})
-    }
-}
-orderByModality = (e) => {
-  let {alReves4} = this.state;
-    if(alReves4 === false){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
-      this.setState({dinamicasFilter,alReves4:true})
-    }
-    else if(alReves4 === true){
-      let {dinamicasFilter} = this.state;
-      dinamicasFilter.sort((a, b) => b.modalidad !== a.modalidad ? b.modalidad < a.modalidad ? -1 : 1 : 0)
-      this.setState({dinamicasFilter,alReves4:false})
-    }
-}
-outUser = (e) => {
-  outUserDash()
-  .then(logoutUser=>{
-    this.props.history.push("/");
-    window.localStorage.removeItem("user");
-  })
-  .catch(e=>alert(e))
-}
-
-editarDinamica = (dinamica) =>{
-  let {detalleDinamica} = this.state;
-  detalleDinamica = dinamica;
-  detalleDinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
-  detalleDinamica.fechaFin = dinamica.fechaFin.slice(0,10)
-  this.setState({detalleDinamica})
-  this.handleOpen5();
-}
-handleChangeEdit = (event, date) => {
-  let {dinamicaEditar,objEdit} = this.state;
-  objEdit.fecha = date;
-  dinamicaEditar.fechaInicio = date;
-  this.setState({dinamicaEditar,objEdit});
-};
-handleChangeEdit2 = (event, date) => {
-  let {dinamicaEditar,objEdit2} = this.state;
-  objEdit2.fecha = date;
-  dinamicaEditar.fechaFin = date;
-  this.setState({dinamicaEditar,objEdit2});
-};
-onChangeEdit = (e) =>{
-  const field = e.target.name;
-  const value = e.target.value;
-  const {dinamicaEditar} = this.state;
-  dinamicaEditar[field] = value;
-  this.setState({dinamicaEditar}); 
-}
-sendChangesDinamic = () =>{
-  let {dinamicaEditar,detalleDinamica} = this.state;
-  let id = detalleDinamica._id;
-  sendChangesDinamic(id,dinamicaEditar)
-  .then(dinamic=>{
-    this.handleClose5();
-    window.location.reload()
-  })
-  .catch(e=>console.log(e))
-
-}
+// ENVIA A FIREBASE STORAGE LA IMAGEN DE LA DINAMICA QUE SE ESTA EDITANDO...REPITO EEEEDIIIITAAAANDOOOOO
+// Y SE LE MUESTRA EL PROGRESO DE LA IMAGEN AL USUARIO
 getFileEdit = e => {
   const file = e.target.files[0];
   const correo = `${JSON.parse(localStorage.getItem('user')).correo}`;
@@ -493,12 +428,144 @@ getFileEdit = e => {
     this.setState({progresoImagen2});
   })
 };
+// SE UTILIZA PARA EL BUSCADOR DE LAS DINAMICAS, BUSCA POR NOMBRE DE DINAMICA, 
+//BRAND, MODALIDAD, SOLO PUEDE BUSCAR POR 3 ITEMS MAXIMO
+filterList = (e) =>{
+  var updatedList = this.state.dinamics.map(dinamic=>dinamic);
+  updatedList = updatedList.map(dinamic=>dinamic).filter(function(item){
+    return item.nombreDinamica.toLowerCase().search(
+      e.target.value.toLowerCase()) !== -1 || item.brand.toLowerCase().search(
+        e.target.value.toLowerCase()) !== -1 || item.modalidad.toLowerCase().search(
+          e.target.value.toLowerCase()) !== -1;
+  });
+  this.setState({dinamicasFilter: updatedList})
+}
+// FUNCIONES PARA ORDENAR LAS DINAMICAS DE DISTINTA MANERA 
 
+// ORDENAR POR NOMBRE 
+orderByName = (e) => {
+  console.log('Sarabita, Otniel te quiere!!!')
+  let {alReves} = this.state;
+  if(alReves === false){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => a.nombreDinamica !== b.nombreDinamica ? a.nombreDinamica < b.nombreDinamica ? -1 : 1 : 0)
+    this.setState({dinamicasFilter,alReves:true})
+  }
+  else if(alReves === true){
+    let {dinamicasFilter} = this.state;
+    dinamicasFilter.sort((a, b) => b.nombreDinamica !== a.nombreDinamica ? b.nombreDinamica < a.nombreDinamica ? -1 : 1 : 0)
+    this.setState({dinamicasFilter,alReves:false})
+  }
+}
+// ORDENAR POR FECHA INICIAL
+orderByInitDate = (e) => {
+  let {alReves2} = this.state;
+    if(alReves2 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(a.fechaInicio) - new Date(b.fechaInicio))
+      this.setState({dinamicasFilter,alReves2:true})
+    }
+    else if(alReves2 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
+      this.setState({dinamicasFilter,alReves2:false})
+    }
+}
+// ORDENAR POR FECHA DE FIN
+orderByFinishDate = (e) => {
+  let {alReves3} = this.state;
+    if(alReves3 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
+      this.setState({dinamicasFilter,alReves3:true})
+    }
+    else if(alReves3 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => new Date(b.fechaFin) - new Date(a.fechaFin))
+      this.setState({dinamicasFilter,alReves3:false})
+    }
+}
+//ORDENAR POR MODALIDAD
+orderByModality = (e) => {
+  let {alReves4} = this.state;
+    if(alReves4 === false){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => a.modalidad !== b.modalidad ? a.modalidad < b.modalidad ? -1 : 1 : 0)
+      this.setState({dinamicasFilter,alReves4:true})
+    }
+    else if(alReves4 === true){
+      let {dinamicasFilter} = this.state;
+      dinamicasFilter.sort((a, b) => b.modalidad !== a.modalidad ? b.modalidad < a.modalidad ? -1 : 1 : 0)
+      this.setState({dinamicasFilter,alReves4:false})
+    }
+}
+// SE USA PARA VER EL DETALLE DE CIERTA DINAMICA
+detalleDinamica = (dinamic) => {
+  this.handleOpen3()
+  let {detalleDinamica,marcasDinamica} = this.state;
+  detalleDinamica = dinamic;
+  detalleDinamica.fechaInicio = dinamic.fechaInicio.slice(0,10)
+  detalleDinamica.fechaFin = dinamic.fechaFin.slice(0,10)
+  marcasDinamica = dinamic.marcaPuntosVentas;
+  this.setState({detalleDinamica,marcasDinamica})
+}
+// PARA SACAR PAFUERA A UN USUARIO
+outUser = (e) => {
+  outUserDash()
+  .then(logoutUser=>{
+    this.props.history.push("/");
+    window.localStorage.removeItem("user");
+  })
+  .catch(e=>alert(e))
+}
+// PARA ABRIR EL DIALOGO DE EDITAR DINAMICA, PASA INFORMACION DEL OBJETO DE LA DINAMICA ACTUAL AL OBJETO DETALLEDINAMICA
+// Y ABRE EL DIALOGO PARA EDITAR UNA DINAMICA
+editarDinamica = (dinamica) =>{
+  let {detalleDinamica,hayEvidencias} = this.state;
+  detalleDinamica = dinamica;
+  detalleDinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
+  detalleDinamica.fechaFin = dinamica.fechaFin.slice(0,10)
+  if(detalleDinamica.evidencias[0]){
+    hayEvidencias = true
+  }
+  else if(!detalleDinamica.evidencias[0]){
+    hayEvidencias = false
+  }
+  this.setState({detalleDinamica,hayEvidencias})
+  this.handleOpen5();
+}
+// ENVIA LA DINAMICA QUE SE ESTA CREAND...REPITOLA DINAMICA QUE SE ESTA CREEEAAAANDOOOOO.
+// USA UN SERVICIO QUE NOS UNE CON NUESTRO BACKEND
+sendDinamic = (e) => {
+  const { newDinamic } = this.state;
+  newDinamic.brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
+  createDinamic(newDinamic)
+  .then(dinamic=>{
+    this.handleClose();
+    window.location.reload()
+  })
+  .catch(e=>console.log(e))
+}
+// ENVIA LOS CAMBIOS DE LA DINAMICA QUE SE ESTA EDITAAAAANDOOOOOO REPITO EEEEEDIIIITAAAAAANDOOOOOOO
+// USA UN SERVICIO QUE NOS UNE CON NUESTRO BACKEND
+sendChangesDinamic = () =>{
+  let {dinamicaEditar,detalleDinamica} = this.state;
+  let id = detalleDinamica._id;
+  sendChangesDinamic(id,dinamicaEditar)
+  .then(dinamic=>{
+    this.handleClose5();
+    window.location.reload()
+  })
+  .catch(e=>console.log(e))
+}
+//ENVIA LA LA DINAICA QUE SE QUIERE BORRAR Y ABRE EL DIALOGO PARA PREGUNTARLE SI ESTA SEGURO
+//EL BOTON DE BORRAR DINAMICA SOLO ESTARA HABILITADO SI UNA DINAMICA NO HA RECOGIDO INFORMACION O EVIDENCIAS, SI YA LO HIZO 
+// EL BOTON ESTARA DESHABILITADO
 borrarDinamica = (dinamica) =>{
   this.setState({dinamicaBorrar:dinamica})
   this.handleOpen6();
 }
-
+// ESTA ES LA FUNCION QUE BORRA UNA DINAMICA Y OBVIO USA UN SERVICIO QUE NOS CONECTA CON EL BACKEND
 deleteDinamic = () => {
   let {dinamicaBorrar} = this.state;
   deleteDinamic(dinamicaBorrar._id)
@@ -507,8 +574,17 @@ deleteDinamic = () => {
     window.location.reload()
   })
   .catch(e=>console.log(e))
-
 }
+
+// UNA FUNCION QUE NOS LLEVE MEDIANTE EL PUSH HISTORY A LA RUTA DE EVIDENCIAS POR DINAMICA
+evidenciasPorDinamica =(dinamica)=>{
+  this.props.history.push(`/tickets/${dinamica._id}`);
+}
+
+
+// LOS CHIPS DE LAS MARCAS AQUI DEBES DE PRESTAR ATENCION A ONCHANGE DE LOS TEXTFIELD 
+//Y AL NAME DE LOS TEXTFIELD PORQUE USAMOS ESOS PARA AGREGAR LA INFO EN LOS ONCHANGES CORRESPONDIENTES
+// ES EL ONCHANGE LOCO DEL QUE HABLE ARRIBA SE LLAMA ONCHANGEMARCA
 renderChip(data) {
   return (
    <div className="chipDinamica" key={data.nombre}>
@@ -540,6 +616,8 @@ renderChip(data) {
 
   );
 }
+// LOS CHIPS QUE USAMOS PARA AGREGAR CENTROS DE CONSUMO A LA DINAMICA 
+// QUE SE ESTA CREANDO
 renderChip2(data) {
   return (
     <Chip
@@ -604,7 +682,7 @@ renderChip2(data) {
         onClick={this.handleClose2}
       />,
     ];
-    const {detalleDinamica,marcasDinamica} = this.state;
+    const {detalleDinamica,marcasDinamica,puesto,hayEvidencias} = this.state;
     return (
     <div>
        <Dash/>
@@ -647,13 +725,14 @@ renderChip2(data) {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="8" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="9" style={{textAlign: 'center'}}>
                 Marcas Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
               <TableHeaderColumn><h3 onClick={this.orderByModality}>Modalidad</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Estatus</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByName}>Nombre</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn>
@@ -672,17 +751,21 @@ renderChip2(data) {
               <TableRow key={dinamic._id} data={dinamic}>
                 <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
+                <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><button className="buttonDinamicasDetalle" onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
                 <TableRowColumn><button className="botonDinamicaEditar" onClick={() => this.editarDinamica(dinamic)}>Editar</button></TableRowColumn>
-                <TableRowColumn><button className="botonDinamicaBorrar" onClick={() => this.borrarDinamica(dinamic)}>Borrar</button></TableRowColumn>
+                <TableRowColumn><button className="botonDinamicaBorrar" onClick={() => this.evidenciasPorDinamica(dinamic)}>Evidencias</button></TableRowColumn>
 
               </TableRow>
               ))}
           </TableBody>
         </Table>
+       </div>
+       <div>
+       <h5 onClick={this.handleOpen7}>* ¿Porqué el botón de borrar parece no funcionar?</h5>
        </div>
        </div>
        <div >
@@ -778,7 +861,6 @@ renderChip2(data) {
           <br/>
             <AutoComplete
             floatingLabelText="Selecciona Marca(s)"
-
             filter={AutoComplete.caseInsensitiveFilter}
             dataSource={this.state.marcas.map(marca => marca)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
@@ -951,6 +1033,23 @@ renderChip2(data) {
           onRequestClose={this.handleClose5}
           autoScrollBodyContent={true}
           >
+              <div style={puesto === "SUPERADMIN" || puesto === "GERENTE" ? {display:"block"} : {display:"none"}}>
+              <br/>
+              <span className="spanAprobarDinamicas">Aprueba o Rechaza esta Dinámica</span>
+              <br/>
+              <SelectField
+                floatingLabelStyle={{fontSize:22}}
+                floatingLabelText="Elige una opción"
+                value={this.state.value}
+                onChange={this.handleChangeDinamic}
+              >
+                <MenuItem value="Aprobada" primaryText="Aprobada" />
+                <MenuItem value="Desaprobada" primaryText="Desaprobada" />
+              </SelectField>
+
+              <hr/>
+              </div>
+              
             <img alt="Imagen Premio" width="300px" height="250px" src={detalleDinamica.imagenPremio} />
             <br/>
             <FlatButton
@@ -1022,6 +1121,8 @@ renderChip2(data) {
           />
           </div>
           </div> 
+          <br/><hr/>
+          <button disabled={hayEvidencias ? true : false} className="botonDinamicaBorrar" onClick={() => this.borrarDinamica(detalleDinamica)}>Borrar</button>
           </Dialog>
         </div>
         <div>
@@ -1034,6 +1135,19 @@ renderChip2(data) {
           autoScrollBodyContent={true}
         >
           Esta decisión es irreversible, si borras esta dinámica sera de manera permanente y no podras visualizar mas tarde ningún detalle relacionada a esta. 
+        </Dialog>
+          </div>
+          <div>
+          <Dialog
+          modal={false}
+          open={this.state.open7}
+          onRequestClose={this.handleClose7}
+          autoScrollBodyContent={true}
+        >
+          El botón esta inhabilitado para las dinámicas que ya han recogido datos.
+          <br/><br/>
+          Si deseas borrar una dinámica en donde el boton de borrar esta inhabilitado 
+          por favor contacta a soporte al correo <b>german@1puntocinco.com</b>, ¡Gracias!
         </Dialog>
           </div>
     </div>

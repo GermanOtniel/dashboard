@@ -72,47 +72,53 @@ class Marcas extends Component {
     botonMarca:true,
     alReves:false
   }
+
+  // ESTE COMPONENTE LO PUEDEN VER TODOS PERO SE HACE UNA DISTINCION ENTRE BRANDS, SI EL USUARIO 
+  // QUE ENTRO ES DEL BRAND DE 1PUNTOCINCO PUEDE VER TODAS LAS MARCAS QUE EXISTEN PERO SI NO ES DE 
+  // ESE BRAND SOLO VERA LAS MARCAS QUE PERTENECEN A ESE BRAND
   componentWillMount(){
-           //ID DEL BRAND
-           const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-           //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
-           if(id === "5b71bd925c65d40353ffda4c"){
-            getBrands()
-            .then(brands=>{
-           this.setState({brands})
-            })
-            .catch(e=>console.log(e))
-            getMarcas()
-            .then(marcas=>{
-             var marcass =  marcas.map(marca=> marca.brand.nombre);
-             for(let i= 0; i < marcas.length;i++) 
-               {
-                 marcas[i].brand = marcass[i]
-               }
-               marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
-              this.setState({marcasFilter:marcas,marcas})
-            })
-            .catch(e=>console.log(e))
-           }
-           else if (id !== "5b71bd925c65d40353ffda4c"){
-            getBrandsById(id)
-            .then(brands=>{
-           this.setState({brands})
-            })
-            .catch(e=>console.log(e))
-            getMarcasByBrand(id)
-            .then(marcas=>{
-             var marcass =  marcas.map(marca=> marca.brand.nombre);
-             for(let i= 0; i < marcas.length;i++) 
-               {
-                 marcas[i].brand = marcass[i]
-               }
-               marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
-               this.setState({marcasFilter:marcas,marcas})
-            })
-            .catch(e=>console.log(e))
-           }
+    //ID DEL BRAND
+    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
+    //ESTE ES EL SERVICIO PARA TRAER LAS DINAMICAS QUE EXISTEN Y REPRESENTARLAS EN LA TABLA
+    if(id === "5b71bd925c65d40353ffda4c"){
+     getBrands()
+      .then(brands=>{
+      this.setState({brands})
+      })
+      .catch(e=>console.log(e))
+     getMarcas()
+      .then(marcas=>{
+       var marcass =  marcas.map(marca=> marca.brand.nombre);
+       for(let i= 0; i < marcas.length;i++) 
+        {
+          marcas[i].brand = marcass[i]
+        }
+        marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
+        this.setState({marcasFilter:marcas,marcas})
+      })
+      .catch(e=>console.log(e))
+    }
+    else if (id !== "5b71bd925c65d40353ffda4c"){
+     getBrandsById(id)
+      .then(brands=>{
+      this.setState({brands})
+      })
+      .catch(e=>console.log(e))
+     getMarcasByBrand(id)
+     .then(marcas=>{
+      var marcass =  marcas.map(marca=> marca.brand.nombre);
+      for(let i= 0; i < marcas.length;i++) 
+        {
+          marcas[i].brand = marcass[i]
+        }
+        marcas.sort((a, b) => a.nombre.toLowerCase() !== b.nombre.toLowerCase() ? a.nombre.toLowerCase() < b.nombre.toLowerCase() ? -1 : 1 : 0)
+        this.setState({marcasFilter:marcas,marcas})
+     })
+     .catch(e=>console.log(e))
+    }
    }
+
+   // ABRIR Y CERRAR DIALOGOS
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -122,16 +128,18 @@ class Marcas extends Component {
   handleOpen2 = () => {
     this.setState({open2: true});
   };
-
   handleClose2 = () => {
     this.setState({open2: false});
   };
  
+  // AGREGA EL BRAND CORRESPONDIENTE A LA NUEVA MARCA QUE SE ESTA CREANDO 
  onNewRequest = (chosenRequest) => {
   const {newMarca} = this.state;
   newMarca.brand =  chosenRequest;
   this.setState({newMarca,botonMarca:false});
 }
+
+// GUARDA LA INFO QUE SE AGREGA PARA CREAR UNA NUEVA MARCA
 onChange = (e) => {
   const field = e.target.name;
   const value = e.target.value;
@@ -139,6 +147,20 @@ onChange = (e) => {
   newMarca[field] = value;
   this.setState({newMarca}); 
 }
+
+// LE AGREGA A LA NUEVA MARCA SU FECHA DE ALTA
+handleChange = (event, date) => {
+  const {newMarca} = this.state;
+  let fecha = String(date);
+  newMarca.fechaAlta = fecha.slice(0,24);
+  this.setState({newMarca});
+  const {newObj} = this.state;
+  newObj.fecha = date;
+  this.setState({newObj});
+};
+
+// ENVIA LA IMAGEN DE LA MARCA QUE SE ESTA CREANDO A FIRBEASE STORAGE Y NOS REGRESA
+// UNA URL LA CUAL LE INSERTAMOS A LA NUEVA MARCA QUE ESTAMOS CREANDO 
 getFile = e => {
   const file = e.target.files[0];
   const date = new Date();
@@ -164,15 +186,9 @@ getFile = e => {
     this.setState({progresoImagen});
   })
 };
-handleChange = (event, date) => {
-  const {newMarca} = this.state;
-  let fecha = String(date);
-  newMarca.fechaAlta = fecha.slice(0,24);
-  this.setState({newMarca});
-  const {newObj} = this.state;
-  newObj.fecha = date;
-  this.setState({newObj});
-};
+
+// ENVIA LOS DATOS RECOGIDOS DE LA MARCA QUE ESTAMOS CREANDO A NUESTRO BACKEND 
+// PARA SU PROCESAMIENTO Y CREACION, USA EL SERVICIO createMarca 
 sendMarca = (e) => {
 createMarca(this.state.newMarca)
 .then(marca=>{
@@ -180,6 +196,8 @@ createMarca(this.state.newMarca)
 })
 .catch(e=>console.log(e))
 };
+
+// MUESTRA EL DETALLE DE UNA MARCA EN ESPECIAL
 marca = (marca) => {
   this.handleOpen2()
   marca.fecha = marca.created_at.slice(0,10) 
@@ -187,6 +205,8 @@ marca = (marca) => {
   detalleMarca = marca;
   this.setState({detalleMarca})
   };
+
+// LA FUNCION QUE HACE BUSQUEDAS DE MARCA, EN ESTE SE PUEDE BUSCAR MARCAS POR BRAND Y NOMBRE
 filterList = (e) =>{
   var updatedList = this.state.marcas.map(dinamic=>dinamic);
   updatedList = updatedList.map(marca=>marca).filter(function(item){
@@ -196,6 +216,8 @@ filterList = (e) =>{
   });
   this.setState({marcasFilter: updatedList})
 }
+
+//FUNCION PARA ORDENAR LA LISTA O TABLA DE MARCAS POR NOMBRE Y ALFABETICAMENTE
 orderByMarca = (e) => {
   let {alReves} = this.state;
     if(alReves === false){

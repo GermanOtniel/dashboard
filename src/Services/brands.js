@@ -68,3 +68,14 @@ export function getBrand(id){
     return brand
   })
 }
+
+export function getUsersByBrand(id){
+  return fetch( baseURL + '/brand/users/' + id )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(users=>{
+    return users
+  })
+}

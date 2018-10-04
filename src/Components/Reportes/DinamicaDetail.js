@@ -88,9 +88,15 @@ class DinamicaDetail extends Component{
     botonFecha:true
   }
 
+  // ESTE SE COMPONENTE LE D APRIMERO LA OPCION AL USUARIO DE ELEGIR SI QUIERE VER EL REPORTE POR FECHA DETERMINADA 
+  // O DE MANERA COMPLETA, EL HANDLEOPEN6 ABRE UN DIALOGO INFORMATIVO QUE LE DA LA OPCION DE ELEGIR O REPORTE COMPLETO
+  // O POR FECHA 
   componentWillMount(){
     this.handleOpen6()
   }
+
+  // SI EL USUARIO ELIGE LA OPCION DE FECHA, DEBE D EINGRESAR FECHA INCIAL Y FECHA FINAL
+  //Y POSTERIORMENTE SE EJECUTA ESTA FUNCION
   quieroFecha = () =>{
     let id = this.props.match.params.id
     let {newObj,newObj2} = this.state;
@@ -108,6 +114,8 @@ class DinamicaDetail extends Component{
     for(let i = 0; i <= diasNumero; i++){
       fechasArray.push(String(new Date(año,mes,dia + i)).slice(0,15))
     }
+    // HASTA AQUI SE TIENE DENTRO DE UN ARRAY TODAS LAS FECHAS DE LAS EVIDENCIAS QUE DEBE DE BUSCAR NUESTRO SERVCIO 
+    // LLAMADO getEvidencesByDinamicAndByDate
     getSingleDinamic(id)
     .then(dinamica=>{
         let {ganadores} = this.state;
@@ -118,7 +126,11 @@ class DinamicaDetail extends Component{
       centros = dinamica.centroConsumo.map(centro=>centro);
       getEvidencesByDinamicAndByDate(id,fechasArray)
       .then(evidencias=>{  
+        // CUANDO YA TENEMOS LAS EVIDENCIAS POR FECHA DETERMINADA HACEMOS USO DE LA FUNCION this.usuariosUnicos QUE ESTA MAS ABAJO
+        // ESTA VA A TRABAJAR A PARTIR DE LAS EVIDENCIAS QUE LE MANDEMOS, LO QUE VA A HACER ES DEJARNOS UNA LISTA DE USUARIOS UNICOS
+
         this.usuariosUnicos(evidencias)  
+
         // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
 
         let {newCreadores} = this.state;
@@ -210,6 +222,9 @@ class DinamicaDetail extends Component{
     .catch(e=>alert(e));
   }
 
+  //ESTA ES LA FUNCION QUE NOS TRAE EL REPORTE COMPLETO, NO LE MANDAMOS FECHA, 
+  //SOLO TRAEMOS TOOOODAS LAS EVIENCIAS APROBADAS QUE HA RECOLECTADO ESTA DINAMICA Y 
+  //TRABAJAMOS A PARTIR DE ELLAS
   quieroReporteCompleto = () =>{
     let id = this.props.match.params.id
     getSingleDinamic(id)
@@ -222,6 +237,7 @@ class DinamicaDetail extends Component{
       centros = dinamica.centroConsumo.map(centro=>centro);
       getEvidencesByDinamic(id)
       .then(evidencias=>{  
+        //HACEMOS USO TAMBIEN AQUI DE ESTA FUNCION QUE LO QUE HACE ES SACARNOS LA LISTA DE USUARIOS UNICOS 
         this.usuariosUnicos(evidencias)  
         // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
 
@@ -312,8 +328,7 @@ class DinamicaDetail extends Component{
     })
     .catch(e=>alert(e));
   }
-
-
+    // DEJA UNA LISTA DE USUARIOS QUE HAN PARTICIPADO EN ESTA DINAMICA
   usuariosUnicos = (evidencias) =>{
         // El array "creadoresArray" trae a todos los usarios que ya han hecho ventas en esta dinamica. 
         //Esta lista traera usuarios repetidos.
@@ -332,8 +347,13 @@ class DinamicaDetail extends Component{
       newCreadores.push(lookupObject[iii]);
    }
    // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
+
+   // LE MANDA A LA FUNCION EVIDENCIAS POR USUARIO, LOS USUARIOS Y LAS EVIDENCIAS PARA QUE ESTA TRABAJE CON ELLOS
    this.evidenciasPorUsuario(newCreadores,evidencias)
   }
+
+  // ESTA FUNCION ACOMODA LAS EVIDENCIAS POR USUARIO, 
+  // ES DECIR SI LE PERTENECE UNA EVIDENCIA A TAL USUARIO PUE SPUM SE LA INSERTA A ESTE
   evidenciasPorUsuario = (newCreadores,evidencias) =>{
            // AQUI ACOMODAMOS LAS EVIDENCIAS CONFORME A QUE USUARIO PERTENECEN.
            for(var i = 0; i<newCreadores.length;i++){
@@ -345,35 +365,31 @@ class DinamicaDetail extends Component{
                 }
               }
             }
-          }
-          
+          }    
   }
 
+  // ABRIR Y CERRAR DIALOGOS INFORMATIVOS O DETALLES DE VENTA DE USUARIO O DE CENTRO DE CONSUMO O DE MARCA
   handleOpen = () => {
     this.setState({open: true});
   };
-
   handleClose = () => {
     this.setState({open: false});
   };
   handleOpen2 = (detalleCreador) => {
     this.setState({open2: true,posibleGanador:detalleCreador});
   };
-
   handleClose2 = () => {
     this.setState({open2: false});
   };
   handleOpen3 = () => {
     this.setState({open3: true});
   };
-
   handleClose3 = () => {
     this.setState({open3: false});
   };
   handleOpen4 = () => {
     this.setState({open4: true});
   };
-
   handleClose4 = () => {
     this.cerosTotal(this.state.newMarcas)
     this.setState({open4: false,newMarcas:[]});
@@ -381,30 +397,32 @@ class DinamicaDetail extends Component{
   handleOpen5 = () => {
     this.setState({open5: true});
   };
-
   handleClose5 = () => {
     this.setState({open5: false,detalleCreador:{},marcasGanador:{}});
   };
   handleOpen6 = () => {
     this.setState({open6: true});
   };
-
   handleClose6 = () => {
     this.setState({open6: false});
   };
 
-
+  // SE USA PARA DETERMINAR LA FECHA DE INICIO DEL REPORTE SI ES QUE SE QUIERE UN REPORTE POR FECHA
   handleChange = (event, date) => {
     const {newObj} = this.state;
     newObj.fecha = date;
     this.setState({newObj});
   };
+
+  // SE USA PARA DETERMINAR LA FECHA DE FIN DEL REPORTE SI ES QUE SE QUIERE UN REPORTE POR FECHA
   handleChange2 = (event, date) => {
     const {newObj2} = this.state;
     newObj2.fecha = date;
     this.setState({newObj2,botonFecha:false});
   };
 
+  // SE USA PARA MOSTRAR EL DETALLE DE VENTA DE CADA PARTICIPANTE DE ESTA DINAMICA
+  // SE USA UN SERVICIO PARA SABER A QUE CENTRO DE CONSUMO PERTENECE 
   detalleVenta = (creador) => {
     let id = creador.centroConsumo
     let {detalleCreador,marcasCreador} = this.state;
@@ -418,6 +436,8 @@ class DinamicaDetail extends Component{
     })
     .catch(e=>console.log(e))
   } 
+
+  // SE USA PARA MOSTRAR EL DETALLE DE UN GANADOR, ESTO SOLO SE USA EN REPORTES DONDE LA DINAMICA SEA DE MODALIDAD VENTAS
   detalleGanador = (ganador) => {
     this.handleOpen5()
     let {detalleGanador,marcasGanador} = this.state;
@@ -425,26 +445,32 @@ class DinamicaDetail extends Component{
     marcasGanador = ganador.marcas;
     this.setState({detalleGanador,marcasGanador})
   } 
+
+  // SE USA PARA VER LAS VENTAS TOTALES DE DETERMINADA MARCA 
+  // ABRE UN DIALOGO EN DONDE SE REPRESENTA LA INFO
   marcas = (marca) =>{
     this.handleOpen3()
     let {marcaVentas} = this.state;
     marcaVentas = marca
     this.setState({marcaVentas})
   }
+
+  // SE USA PARA VER LAS VENTAS TOTALES POR DETERMINADO CENTRO DE CONSUMO, 
+  //ESTO FUE MAS DIFICIL QUE LO DE LAS MARCAS PORQUE SE TUVIERON QUE EMPLEAR VARIOS LOOPS
+  // Y AGRUPAR DISTINTOS ELEMENTOS POR CENTRO DE CONSUMO
   centros = (centro) =>{
     let {newMarcas} = this.state;
     let {centroDetalle} = this.state;
     let ventas = centro.ventasUsuario
     centroDetalle = centro
-     // El array "marcas" trae a todas las marcas. 
+        //El array "marcas" trae a todas las marcas. 
         //Esta lista traera marcas repetidas.
         let marcas = centro.ventasUsuario.map(ventas=>ventas._id)
-        //Aqui guardaremos los usuarios unicos es decir ya no repetidos.
-        //let newMarcas=[];
-        // No sabemos para que es pero es util, parece q aqui se guardan los que si estan repetidos...
+
+        // No sabemos para que es pero es util, parece q aqui se guardan las marcas que si estan repetidos...
         var lookupObject  = {};
 
-        //Aqui comienzan los ciclos para dejar un array con usuarios unicos:
+        //Aqui comienzan los ciclos para dejar un array con marcas unicas:
 
         for(var iii in marcas) {
           lookupObject[marcas[iii]['_id']] = marcas[iii];
@@ -465,14 +491,17 @@ class DinamicaDetail extends Component{
        this.handleOpen4()
        this.setState({newMarcas,centroDetalle,centro})
   }
-// ESTA FUNCION ES IMPORTANTE PORQUE HACE QUE LAS MARCAS REGRESEN A CERO, SINO 
-//TUVIERAMOS ESTA FUNCION NUESTRAS MARCAS SUMARIAN LAS VENTAS UNA Y OTRA Y OTRA VEZ
+
+  // ESTA FUNCION ES IMPORTANTE PORQUE HACE QUE LAS MARCAS REGRESEN A CERO, SINO 
+  //TUVIERAMOS ESTA FUNCION NUESTRAS MARCAS SUMARIAN LAS VENTAS UNA Y OTRA Y OTRA VEZ
   cerosTotal = (newMarcas) => {
     for ( let ceros = 0; ceros < newMarcas.length; ceros++){
       newMarcas[ceros].total = 0
     }
     this.setState({newMarcas})
   }
+  // EN ESTA FUNCION HAY QUE SEGUIR TRABAJANDO PERO SOLO ESTA DISPONIBLE CUANDO LA DINAMICA ES DE VENTAS
+  // LO QUE HACE ES QUE SI UN USUARIO HA TENIDO UN BUEN RENDIMIENTO LO PUEDES CONVERTIR EN GANADOR
   enviarGanador = (ganador) => {
     let idDinamica = this.state.dinamica._id;
     //dinamic.winner = `${JSON.parse(localStorage.getItem('user'))._id}`;
@@ -482,6 +511,10 @@ class DinamicaDetail extends Component{
     .catch(e=>console.log(e))
     this.handleClose2()
   } 
+
+  // REFRESCAMOS LA PAGINA PARA VOLVER  A CARGAR EL COMPONENTE Y 
+  // LE DE LA OPCION A NUESTRO USUARIO DASHBOARD DE CAMBIAR LA 
+  //VISUALIZACIÓN DEL REPORTE YA SEA POR FECHA O POR REPORTE COMPLETO
   refresh = () =>{
     window.location.reload()
   }

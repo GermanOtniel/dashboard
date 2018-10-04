@@ -26,7 +26,6 @@ const styles = {
 class Usuarios extends Component {
 
   state={
-    open:false,
     users:[],
     usuariosFilter:[],
     iniciaStateDeTabla: "_REPITO INICIA STATE DE TABLA_",
@@ -44,7 +43,8 @@ class Usuarios extends Component {
     alReves2:false,
     alReves3:false
   }
-
+// ESTE COMPONENTE SOLO LO VISUALIZAN LOS SUPERADMINS ASI QUE USAMOS UN SERVICIO PARA TRAER TODOS LOS 
+// USUARIOS QUE EXISTEN EN NUESTRA BASE DE DATOS
   componentWillMount(){
     getUsers()
     .then(users=>{
@@ -57,13 +57,8 @@ class Usuarios extends Component {
     })
     .catch(e=>console.log(e))
  }
- handleOpen = () => {
-  this.setState({open: true});
-};
-handleClose = () => {
-  this.setState({open: false});
-};
 
+ // SE USA PARA BUSCAR USUARIOS POR CORREO POR PUESTO O POR FECHA DE REGISTRO
 filterList = (e) =>{
   var updatedList = this.state.users.map(dinamic=>dinamic);
   updatedList = updatedList.map(usuario=>usuario).filter(function(item){
@@ -74,6 +69,8 @@ filterList = (e) =>{
   });
   this.setState({usuariosFilter: updatedList})
 }
+
+// SE USA PARA ORDENAR LOS USUARIOS POR FECHA DE REGISTRO 
 orderByDate = (e) => {
   let {alReves} = this.state;
   if(alReves === false){
@@ -87,6 +84,8 @@ orderByDate = (e) => {
     this.setState({usuariosFilter,alReves:false})
   }
 }
+
+// SE USA PARA ORDENAR LOS USARIOS POR SU EMAIL
 orderByEmail = (e) => {
   let {alReves2} = this.state;
   if(alReves2 === false){
@@ -100,6 +99,8 @@ orderByEmail = (e) => {
     this.setState({usuariosFilter,alReves2:false})
   }
 }
+
+// SE USA PARA ORDENAR USUARIOS POR SU PUESTO
 orderByPuesto = (e) => {
   let {alReves3} = this.state;
   if(alReves3 === false){
@@ -113,6 +114,7 @@ orderByPuesto = (e) => {
     this.setState({usuariosFilter,alReves3:false})
   }
 }
+
   render() {
     
     return (

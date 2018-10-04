@@ -5,6 +5,8 @@ import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
 import Dialog from 'material-ui/Dialog';
 import {green700,blue500} from 'material-ui/styles/colors';
+import SelectField from 'material-ui/SelectField';
+import MenuItem from 'material-ui/MenuItem';
 import {Link} from 'react-router-dom';
 import {
   Table,
@@ -15,13 +17,13 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import './evidencias.css';
-import { getEvidences,getEvidencesByBrand,deleteEvidence } from '../../Services/evidencias';
+import {getAllEvidencesByDinamica,getEvidencesByDinamica,deleteEvidence} from '../../Services/evidencias';
 
 const styles = {
   button: {
     margin: 12,
-    width: 400,
-    height:70
+    width: 300,
+    height:50
   },
   button2: {
     width:300,
@@ -60,55 +62,64 @@ class Evidencias extends Component {
     alReves:false,
     alReves2:false,
     evidenciaBorrar:{},
-    open:false
+    open:false,
+    statusEvidencia:"",
+    value:null
   }
+
+  // NUEVAMENTE SE HACE UNA DISTINCION ENTRE BRANDS, SI ES DEL BRAND DE 1PUNTOCINCO PUEDE VER TODO
+  // SINO ES DE ESE BRAND SOLO PODRA VER LAS EVIDENCIAS DE SU BRAND
   componentWillMount(){
-    const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
-
-    // SI EL USUARIO ES DEL BRAND 1PUNTCINCO ES DECIR ES SUPERADMIN
-    // VAS A USAR EL SERVICIO QUE TRAE TOOOOODAS LAS EVIDENCIAS
-
-    if(id === "5b71bd925c65d40353ffda4c") {
-    getEvidences()
-     .then(evidencias=>{
-      let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
-      let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
-      for(let i= 0; i < evidencias.length;i++) 
-        {
-          evidencias[i].creador = nombre[i]
-          evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
-          evidencias[i].dinamica = dinamicas[i].nombreDinamica
-          
-        }
-        evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-    this.setState({evidencias,evidenciasFilter:evidencias})
-     })
-     .catch(e=>console.log(e))
+    const id = this.props.match.params.id;
+    let statusGuardada;
+    let hayStatus = `${JSON.parse(localStorage.getItem('statusEvidencia'))}`;
+    console.log(hayStatus)
+    if ( hayStatus === "null" ){
+      statusGuardada = false
+      getAllEvidencesByDinamica(id)
+      .then(evidencias=>{
+       let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
+       let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
+       for(let i= 0; i < evidencias.length;i++) 
+         {
+           evidencias[i].creador = nombre[i]
+           evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
+           evidencias[i].dinamica = dinamicas[i].nombreDinamica
+           
+         }
+         evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+     this.setState({evidencias,evidenciasFilter:evidencias})
+      })
+      .catch(e=>console.log(e))
+    }
+    else{
+      statusGuardada = true
+    }
+    if(statusGuardada){
+      let {statusEvidencia} = this.state;
+      statusEvidencia = `${JSON.parse(localStorage.getItem('statusEvidencia'))}`;
+      getEvidencesByDinamica(id,statusEvidencia)
+      .then(evidencias=>{
+       let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
+       let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
+       for(let i= 0; i < evidencias.length;i++) 
+         {
+           evidencias[i].creador = nombre[i]
+           evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
+           evidencias[i].dinamica = dinamicas[i].nombreDinamica
+           
+         }
+         evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+     this.setState({evidencias,evidenciasFilter:evidencias})
+      })
+      .catch(e=>console.log(e))
+      this.setState({statusEvidencia})
     }
 
-    // SI EL USUARIO NO ES UN SUPERADMIN, ES DECIR, ES DE CUALQUIER OTRO BRAND, 
-    // VAS A TRAER LAS EVIDENCIAS QUE SOLO PERTENECEN A ESE BRAND
-    else if (id !== "5b71bd925c65d40353ffda4c"){
-   getEvidencesByBrand(id)
-   .then(evidencias=>{
-    let dinamicas = evidencias.map(evidencia=> evidencia.dinamica);
-    let nombre = evidencias.map(evidencia=> evidencia.creador.nombre);
-    for(let i= 0; i < evidencias.length;i++) 
-      {
-        evidencias[i].creador = nombre[i]
-        evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
-        evidencias[i].dinamica = dinamicas[i].nombreDinamica
-        
-      }
-      evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-  this.setState({evidencias,evidenciasFilter:evidencias})
-   })
-   .catch(e=>console.log(e))
     }  
-    
-   }
 
 
+// FUNCION PARA FILTRAR EVIDENCIAS POR DINAMICA, STATUS O MODALIDAD
    filterList = (e) =>{
     var updatedList = this.state.evidencias.map(evidencia=>evidencia);
     updatedList = updatedList.map(evidencia=>evidencia).filter(function(item){
@@ -119,6 +130,8 @@ class Evidencias extends Component {
     });
     this.setState({evidenciasFilter: updatedList})
   }
+
+  // FUNCION PARA ORDENAR POR FECHA LAS EVIDENCIAS
   orderByDate = (e) => {
     let {alReves} = this.state;
     if(alReves === false){
@@ -132,6 +145,8 @@ class Evidencias extends Component {
       this.setState({evidenciasFilter,alReves:false})
     }
   }
+
+  // FUNCION PARA ORDENAR POR STATUS LAS EVIDENCIAS
   orderByState = (e) => {
     let {alReves2} = this.state;
     if(alReves2 === false){
@@ -145,16 +160,27 @@ class Evidencias extends Component {
       this.setState({evidenciasFilter,alReves2:false})
     }
   }
+
+  //ABRIR Y CERRAR DIALOGO INFORMATIVO CUANDO QUIERAN BORRAR UNA EVIDENCIA
   handleOpen = () => {
     this.setState({open: true});
   };
   handleClose = () => {
     this.setState({open: false,evidenciaBorrar:{}});
   };
+
+  // SE ENVIA LA EVIDENCIA CORRESPONDIENTE AL OBJETO EVIDENCIABORRAR Y SE LE
+  // PREGUNTA PARA CONFIRMAR SI DE VERDAD QUIERE BORRAR ESA EVIDENCIA
   deleteEvidence=(evidencia)=>{
     this.setState({evidenciaBorrar:evidencia})
     this.handleOpen()
   }
+
+  // SE ENVIA EL ID DE LA EVIDENCIA A BORRAR Y SE BORRA
+  // EN EL BACKEND SE HACE OTRA COSA MAS QUE BORRAR LA EVIDENCIA,
+  // SE BUSCA LA DINAMICA CORRESPONDIENTE Y SE BUSCA SU ARRAY DE EVIDENCIAS Y SE LE QUITA UN ELEMENTO
+  // ESTO CON EL OBJETIVO DE QUE UNA VEZ QUE UA DINAMICA NO TIENE EVIDENCIAS PUEDA SER BORRADA, ASI ESTA LA CONFIGURACION
+  // EN EL COMPONENTE DE DINAMICAS
   sendEvidenceForDelete = ()=>{
     let {evidenciaBorrar} = this.state;
     deleteEvidence(evidenciaBorrar._id)
@@ -164,6 +190,16 @@ class Evidencias extends Component {
     })
     .catch(e=>console.log(e))
 
+  }
+
+  // CAMBIAMOS STATUS DE LAS EVIDENCIAS QUE QUEREMOS QUE SE TRAIGAN Y LA GUARDAMOS EN EL LOCAL STORAGE PARA QUE SE GUARDE ESA DECISION
+  cambiarStatus =(e,i,v)=>{
+    this.setState({value:v})
+  }
+
+  changeStatus=()=>{
+    localStorage.setItem('statusEvidencia', JSON.stringify(this.state.value))
+    window.location.reload()
   }
 
   render() {
@@ -198,11 +234,26 @@ class Evidencias extends Component {
          </div>
        </div>
        <div className="buscadorEvidencias">
+       <div>
          <span>Buscador: </span>
-         <br/><br/>
-        <input placeholder="Dinámica ó Modalidad ó Estado" type="text" onChange={this.filterList}/>
+         <input className="inputEvidencias" placeholder="Dinámica ó Modalidad ó Estado" type="text" onChange={this.filterList}/>
+       </div>
+       <div>
+          <SelectField
+            floatingLabelStyle={{fontSize:15}}
+            floatingLabelText="Cambia el Status"
+            value={this.state.value}
+            onChange={this.cambiarStatus}
+          >
+            <MenuItem value="Aprobada" primaryText="Aprobada" />
+            <MenuItem value="Desaprobada" primaryText="Desaprobada" />
+            <MenuItem value="Pendiente" primaryText="Pendiente" />
+            <MenuItem value="null" primaryText="Todas" />
+          </SelectField>
+          <br/>
+          <button className="buttonDinamicasDetalle" onClick={this.changeStatus}>Cambiar</button>
+       </div>
       </div>
-    <br/>
        <div>
        <Table
           height={this.state.height}
@@ -224,7 +275,7 @@ class Evidencias extends Component {
             <TableRow>
               <TableHeaderColumn><h2 onClick={this.orderByDate}>Fecha de Creación</h2></TableHeaderColumn>
               <TableHeaderColumn><h3>Dinamica Perteneciente</h3></TableHeaderColumn>
-              <TableHeaderColumn><h2 onClick={this.orderByState}>Estado</h2></TableHeaderColumn>
+              <TableHeaderColumn><h2 onClick={this.orderByState}>Status</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Usuario</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Modalidad</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Revisar</h2></TableHeaderColumn>

@@ -39,15 +39,18 @@ class EvidenciaDetail extends Component{
     marcas:[],
     value:null,
     textFieldDisabled:true,
-    boton: false
+    boton: false,
+    botonGavel:true,
+    dinamica:{}
   }
 
+  // BUSCAMOS EL DETALLE DE CIERTA EVIDENCIA A TRAVES DEL SERVICIO getSingleEvidence
   componentWillMount(){
      let id = this.props.match.params.id
     getSingleEvidence(id)
     .then(evidence=>{
       let marcas = evidence.marcas.map(marca=>marca);
-      let { evidencia } = this.state;
+      let { evidencia,dinamica } = this.state;
       evidencia = evidence;
       evidence.dueño = evidence.creador.nombre +' '+ evidence.creador.apellido;
       evidence.fecha2 = evidence.created_at.slice(0,10);
@@ -63,33 +66,45 @@ class EvidenciaDetail extends Component{
       evidence.correo = evidence.creador.correo;
       evidence.descripcion = evidence.dinamica.descripcion
       evidence.imagen = evidence.dinamica.imagen
-      this.setState({evidence,evidencia,marcas})
+      dinamica = evidence.dinamica
+      this.setState({evidence,evidencia,marcas,dinamica})
     })
     .catch(e=>alert(e));
   }
+
+  // A TRAVES DE ESTA FUNCION SE APRUEBA O RECHAZA UNA EVIDENCIA, EN SI SOLO SE CAMBIA EL VALOR DE SU STATUS
   handleChange = (event, index, value) => {
     if( value === "Desaprobada")
       {
         let {evidencia} = this.state;
         evidencia.status = value
-        this.setState({textFieldDisabled:false,evidencia,value})
+        this.setState({textFieldDisabled:false,evidencia,value,botonGavel:true})
       }
       else if ( value === "Aprobada")
       {
         let {evidencia} = this.state;
         evidencia.status = value
-        this.setState({textFieldDisabled:true,evidencia,value})
+        this.setState({textFieldDisabled:true,evidencia,value,botonGavel:false})
       }
   };
+
+  // CUANDO SE RECHAZA UNA EVIDENCIA SE DA LA OPORTUNIDAD DE MANDAR UNA NOTA DE PORQUE SE RECHAZA
+  // ESTE ES EL ONCHANGE QUE SE USA PARA GUARDAR EL MSJ DE ACLARACIÓN
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
     const {evidencia} = this.state;
+    if(field === "nota"){
+      this.setState({botonGavel:false})
+    }
     evidencia[field] = value;
     this.setState({evidencia});
   }
+
+  // SE MANDA LA EVIDENCIA DE VUELTA, PARA CAMBIAR SU ESTATUS Y SI FUE APROBADA PUES PROCEDER A DAR SU
+  // RECOMPENSA Y SI NO FUE APROBADA PUES MOSTRAR Y CREAR LA NOTA DE PORQUE FUE RECHAZADA
   sendEvidence = (e) => {
-    let { evidencia } = this.state;
+    let { evidencia,dinamica } = this.state;
     let {boton} = this.state;
     let id = this.props.match.params.id
     evidencia.dueño = null;
@@ -100,13 +115,13 @@ class EvidenciaDetail extends Component{
     this.setState({boton})
     sendEvidencia(evidencia,id)
     .then(r=>{
-      this.props.history.push('/tickets');
+      this.props.history.push(`/tickets/${dinamica._id}`);
     })
     .catch(e=>console.log(e))
   }
 
   render(){
-    const {evidence,marcas} = this.state;
+    const {evidence,marcas,botonGavel} = this.state;
       return (
         <div>
           <Dash/>
@@ -132,9 +147,9 @@ class EvidenciaDetail extends Component{
               <MenuItem value="Desaprobada" primaryText="Desaprobada" />
             </SelectField>
             <TextField
-            floatingLabelStyle={{fontSize:15}}
-            hintText="¿Explicale porqué?"
-            floatingLabelText="¿Desaprobada?"
+            hintText="desaprobaste su evidencia"
+            floatingLabelStyle={this.state.textFieldDisabled ? {color:'#E0E0E0',fontSize:15} : {color:'#a4c639',fontSize:15}}
+            floatingLabelText="Explicale porqué"
             name="nota"
             type="text"
             onChange={this.onChange}
@@ -148,6 +163,7 @@ class EvidenciaDetail extends Component{
               icon={<FontIcon color="white" className="material-icons">gavel</FontIcon>}
               style={style2}
               onClick={this.sendEvidence}
+              disabled={botonGavel}
             />
             </div>
             </div>

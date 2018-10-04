@@ -20,12 +20,15 @@
 }
 .buscadorEvidencias{
   margin-left: 2%;
+  width: 100%
 }
 
-.buscadorEvidencias > input {
+.inputEvidencias {
   width: 220px;
   height: 25px;
   border-color: black;
   border-radius: 10px;
   font-size: 14px
 }
+
+

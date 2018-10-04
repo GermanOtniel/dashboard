@@ -15,6 +15,7 @@ import UsuarioDetail from './Components/Usuarios/UsuarioDetail';
 import Reportes from './Components/Reportes/Reportes';
 import DinamicaDetail from './Components/Reportes/DinamicaDetail';
 import Mensajes from './Components/Mensajes/Mensajes';
+import Dash from './Components/Dash/Dashboard';
 
 
 export const Routes = () => {
@@ -28,13 +29,14 @@ export const Routes = () => {
       <Route  path="/dinamicas" component={Dinamicas}/>
       <Route  path="/brands" component={Brands}/>
       <Route  path="/marcas" component={Marcas}/>
-      <Route  path="/tickets" component={Evidencias}/>
+      <Route  path="/tickets/:id" component={Evidencias}/>
       <Route  path="/evidencia/:id" component={EvidenciaDetail}/>
       <Route  path="/usuarios" component={Usuarios}/>
       <Route  path="/usuario/:id" component={UsuarioDetail}/>
       <Route  path="/reportes" component={Reportes}/>
       <Route  path="/dinamica/:id" component={DinamicaDetail}/>
       <Route  path="/mensajes" component={Mensajes}/>
+      <Route  path="/dash" component={Dash}/>
     </Switch>
   );
 }

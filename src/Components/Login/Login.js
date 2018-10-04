@@ -24,7 +24,7 @@ class Login extends Component {
     userLogged:{},
     correo:{}
   }
-
+  //REVISAR SI HAY DATOS GUARDADOS EN EL LOCALSTORAGE, SI LOS HAY UTILIZARLOS PARA AUTOCOMPLETAR EL FORMULARIO DE LOGIN
   componentWillMount(){
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLoggedDash'))}`;
@@ -41,7 +41,7 @@ class Login extends Component {
       this.setState({userLogged,user:userLogged})
     }
  }
-
+//ABRIR Y CERRAR DIALOGOS
   handleOpen = () => {
     this.setState({open: true});
   };
@@ -66,6 +66,7 @@ class Login extends Component {
   handleClose4 = () => {
     this.setState({open4: false});
   };
+  //GUARDAR LA INFORMACIÓN QUE EL USUARIO INGRESA EN EL FORMULARIO DE LOGIN
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -73,6 +74,7 @@ class Login extends Component {
     user[field] = value;
     this.setState({user});
   }
+  //GUARDAR EL CORREO QUE EL USUARIO INGRESA PARA RECUPERAR SU CONTRASEÑA
   onChange2 = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -80,7 +82,8 @@ class Login extends Component {
     correo[field] = value;
     this.setState({correo}); 
   }
-  
+  //LA FUNCIÓN QUE ENVIA LOS DATOS INGRESADOS DEL USUARIO (CORREO/CONTRASEÑA) PARA QUE NUESTRO BACKEND LOS RECIBA, PROCESE Y EJECUTE ACCIONES
+  //LA FUNCION login ES EL SERVICIO QUE CONECTA NUESTRO FRONTEND CON NUESTRO BACKEND Y LA RUTA DESEADA.
   sendUser = (e) => {
     localStorage.setItem('userLoggedDash', JSON.stringify(this.state.user))
     login(this.state.user)
@@ -92,7 +95,8 @@ class Login extends Component {
     })
     .catch(e=>this.handleOpen2())
   }
-
+//ESTA FUNCION PERMITE QUE EL USUARIO SI QUIERE CAMBIAR LOS VALORES DEL INPUT CORREO E INPUT PASSWORD LOS PUEDA CAMBIAR
+//ES DECIR SI HACEN CLICK EN EL INPUT EL INPUT SE VUELVA UN STRING VACIO Y PERMITA ESCRIBIR ALGO AL USUARIO
   onCheck = (e) =>{
     let {userLogged} = this.state;
     let {user} = this.state;
@@ -106,9 +110,12 @@ class Login extends Component {
       user.password = ""
       this.setState({userLogged,user})
   }
+  //SE HIZO ESTA FUNCION QUE NO HACE NADA PARA UTILIZAR UN TERNARIO EN EL ONCLICK DEL RESPECTIVO INPUT
   nada = (e) =>{
     //jajaja no hace nada pero a la vez si...esto es la programacion beibe!!!
   }
+  //ES LA FUNCION QUE UTILIZA EL SERVICIO PARA QUE NUETSROS USUARIOS PUEDAN OBTENER UNA CONTRASEÑA TEMPORAL SI ES QUE OLVIDARON 
+  //SU CONTRASEÑA, LES LLEGARA POR MEDIO DE SU CORREO ELECTRONICO 
   getNewPassword = () =>{
     let {correo} = this.state;
     getNewPasswordDash(correo)

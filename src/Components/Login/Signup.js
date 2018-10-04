@@ -23,13 +23,15 @@ class Signup extends Component {
     mensajeContraseñas:"",
     infoIncompleta:true
   }
-
+  // PARA GUARDAR LA INFO QUE EL USUARIO INGRESAPARA REGISTRARSE, 
+  //EL USUARIO DEBE LLENAR TODOS LOS CAMPOS PARA QUE EL BOTON DE 
+  //INGRESAR SE HABILITE Y PUEDA INGRESAR
   onChange = (e) => {
     const field = e.target.name;
     const value = e.target.value;
     const {user} = this.state;
     user[field] = value;
-    user.correo = user.correo.toLowerCase()
+    user.correo = user.correo.toLowerCase();
     if(user.correo.includes('@') && user.correo.includes('.') ){
       this.setState({boton:false})
     }
@@ -38,6 +40,7 @@ class Signup extends Component {
     }
     this.setState({user});
   }
+//REVISA QUE LAS CONTRASEÑAS COINCIDAN 
   onChangeContraseñas = (e) => {
     const field = e.target.name;
     const value = e.target.value;
@@ -54,6 +57,7 @@ class Signup extends Component {
       }
     this.setState({user}); 
   }
+  //ENVIA LOS DATOS INGRESADOS POR EL USUARIO MEDIANTE EL SERVICIO signup QUE HACE LA CONEXIÓN CON NUESTRO BACKEND
   sendUser = (e) => {
     signup(this.state.user)
     .then(r=>{
@@ -65,6 +69,7 @@ class Signup extends Component {
       }
     })
   }
+  //ABRIR Y CERRAR DIALOGOS INFORMATIVOS
   handleOpen = () => {
     this.setState({open: true});
   };
