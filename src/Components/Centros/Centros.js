@@ -18,7 +18,6 @@ import {
 import {green700,blue500} from 'material-ui/styles/colors';
 import { getZonas, createCenter, getCenters } from '../../Services/pez';
 import { getUsersByCenter } from '../../Services/centro';
-import './centros.css';
 
 
 const styles = {
@@ -58,7 +57,7 @@ class Centros extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     userss:[],
     cantidad:0,
@@ -166,20 +165,29 @@ sendCenter = (e) => {
         onClick={this.handleClose2}
       />,
     ];
+    const actions2 = [
+        <RaisedButton 
+          onClick={this.sendCenter}  
+          label="Crear Centro" 
+          backgroundColor="#0D47A1"
+          labelColor="#FAFAFA" 
+        />
+    ]
     return (
     <div>
        <Dash/>
        <div className="zona-container">
          <div>
           <RaisedButton
-            label="CREA UN CENTRO DE CONSUMO"
+            label="CREAR CENTRO"
             labelPosition="before"
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
-            style={styles.button}
+            //style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
+            className="crearDinamicaResponsive"
           /> 
          </div>
        </div>
@@ -237,6 +245,8 @@ sendCenter = (e) => {
             modal={false}
             open={this.state.open}
             onRequestClose={this.handleClose}
+            autoScrollBodyContent={true}
+            actions={actions2}
           >
           
           <AutoComplete
@@ -290,13 +300,6 @@ sendCenter = (e) => {
             errorStyle={styles.errorStyle}
           />                     
           <Divider />
-    
-          <RaisedButton 
-          onClick={this.sendCenter}  
-          label="Crear Centro" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA" 
-          />
           
         </Dialog> 
          </div>

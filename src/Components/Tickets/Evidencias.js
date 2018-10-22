@@ -1,10 +1,9 @@
 import React, { Component } from 'react';
 import Dash from '../Dash/Dashboard';
 import RaisedButton from 'material-ui/RaisedButton';
-import FontIcon from 'material-ui/FontIcon';
 import FlatButton from 'material-ui/FlatButton';
+import FontIcon from 'material-ui/FontIcon';
 import Dialog from 'material-ui/Dialog';
-import {green700,blue500} from 'material-ui/styles/colors';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import {Link} from 'react-router-dom';
@@ -16,27 +15,8 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import './evidencias.css';
 import {getAllEvidencesByDinamica,getEvidencesByDinamica,deleteEvidence} from '../../Services/evidencias';
 
-const styles = {
-  button: {
-    margin: 12,
-    width: 300,
-    height:50
-  },
-  button2: {
-    width:300,
-    height:40,
-    float: 'right'
-  },
-  errorStyle: {
-    color: green700,
-  },
-  floatingLabelFocusStyle: {
-    color: blue500,
-  }
-};
 
 
 class Evidencias extends Component {
@@ -57,23 +37,24 @@ class Evidencias extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     alReves:false,
     alReves2:false,
     evidenciaBorrar:{},
     open:false,
     statusEvidencia:"",
-    value:null
+    value:null,
+    nombreDinamica:""
   }
 
   // NUEVAMENTE SE HACE UNA DISTINCION ENTRE BRANDS, SI ES DEL BRAND DE 1PUNTOCINCO PUEDE VER TODO
   // SINO ES DE ESE BRAND SOLO PODRA VER LAS EVIDENCIAS DE SU BRAND
   componentWillMount(){
+    let {nombresitoPopo} = this.state;
     const id = this.props.match.params.id;
     let statusGuardada;
     let hayStatus = `${JSON.parse(localStorage.getItem('statusEvidencia'))}`;
-    console.log(hayStatus)
     if ( hayStatus === "null" ){
       statusGuardada = false
       getAllEvidencesByDinamica(id)
@@ -85,10 +66,10 @@ class Evidencias extends Component {
            evidencias[i].creador = nombre[i]
            evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
            evidencias[i].dinamica = dinamicas[i].nombreDinamica
-           
+           nombresitoPopo = dinamicas[i].nombreDinamica
          }
          evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-     this.setState({evidencias,evidenciasFilter:evidencias})
+     this.setState({evidencias,evidenciasFilter:evidencias,nombreDinamica:nombresitoPopo})
       })
       .catch(e=>console.log(e))
     }
@@ -107,10 +88,10 @@ class Evidencias extends Component {
            evidencias[i].creador = nombre[i]
            evidencias[i].created_at = evidencias[i].created_at.slice(0,10)
            evidencias[i].dinamica = dinamicas[i].nombreDinamica
-           
+           nombresitoPopo = dinamicas[i].nombreDinamica
          }
          evidencias.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
-     this.setState({evidencias,evidenciasFilter:evidencias})
+     this.setState({evidencias,evidenciasFilter:evidencias,nombreDinamica:nombresitoPopo})
       })
       .catch(e=>console.log(e))
       this.setState({statusEvidencia})
@@ -202,6 +183,7 @@ class Evidencias extends Component {
     window.location.reload()
   }
 
+
   render() {
     const actions = [
       <FlatButton
@@ -228,16 +210,16 @@ class Evidencias extends Component {
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">insert_photo</FontIcon>}
-            style={styles.button}
             labelStyle={{fontSize:'18px'}}
+            className="crearDinamicaResponsive"
           /> 
          </div>
        </div>
        <div className="buscadorEvidencias">
-       <div>
+       {/* <div>
          <span>Buscador: </span>
          <input className="inputEvidencias" placeholder="Dinámica ó Modalidad ó Estado" type="text" onChange={this.filterList}/>
-       </div>
+       </div> */}
        <div>
           <SelectField
             floatingLabelStyle={{fontSize:15}}
@@ -268,20 +250,16 @@ class Evidencias extends Component {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="7"  style={{textAlign: 'center'}}>
-                Marcas Existentes
+              <TableHeaderColumn colSpan="5"  style={{textAlign: 'center'}}>
+                Evidencias Producidas en {this.state.nombreDinamica}
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn><h2 onClick={this.orderByDate}>Fecha de Creación</h2></TableHeaderColumn>
-              <TableHeaderColumn><h3>Dinamica Perteneciente</h3></TableHeaderColumn>
+              <TableHeaderColumn><h2 onClick={this.orderByDate}>Fecha</h2></TableHeaderColumn>
               <TableHeaderColumn><h2 onClick={this.orderByState}>Status</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Usuario</h2></TableHeaderColumn>
-              <TableHeaderColumn><h2>Modalidad</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Revisar</h2></TableHeaderColumn>
               <TableHeaderColumn><h2>Borrar</h2></TableHeaderColumn>
-
-
             </TableRow>
           </TableHeader>
           <TableBody
@@ -294,10 +272,8 @@ class Evidencias extends Component {
             {this.state.evidenciasFilter.map( (evidencia, index) => (
               <TableRow key={evidencia._id} data={evidencia}>
                 <TableRowColumn>{evidencia.created_at}</TableRowColumn>
-                <TableRowColumn>{evidencia.dinamica}</TableRowColumn>
                 <TableRowColumn>{evidencia.status}</TableRowColumn>
                 <TableRowColumn>{evidencia.creador}</TableRowColumn>
-                <TableRowColumn>{evidencia.modalidad}</TableRowColumn>
                 <TableRowColumn><Link to={`/evidencia/${evidencia._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
                 <TableRowColumn><button onClick={()=>this.deleteEvidence(evidencia)} className="botonDinamicaBorrar">Borrar</button></TableRowColumn>
 

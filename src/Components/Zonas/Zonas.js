@@ -16,7 +16,6 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getCountry, createState, getStates, createZone, getZonas } from '../../Services/pez';
-import './zonas.css';
 
 const styles = {
   button: {
@@ -52,7 +51,7 @@ class Zonas extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
   }
 
@@ -165,32 +164,50 @@ class Zonas extends Component {
   }
 
   render() {
+    const actions = [
+      <RaisedButton 
+      onClick={this.sendEdit}  
+      label="Crear Estado" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA"  
+      />
+    ];
+    const actions2 = [
+      <RaisedButton 
+      onClick={this.sendZona}  
+      label="Crear Zona" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA" 
+      />
+    ]
     return (
     <div>
        <Dash/>
        <div className="zona-container">
          <div>
           <RaisedButton
-            label="CREA UN ESTADO"
+            label="CREAR ESTADO"
             labelPosition="before"
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >map</FontIcon>}
-            style={styles.button}
-            labelStyle={{fontSize:'18px'}}
+            //style={styles.button}
+            labelStyle={{fontSize:'12px'}}
             onClick={this.handleOpen}
+            className="crearZonaYEstadoResponsive"
           /> 
          </div>
          <div>
           <RaisedButton
-            label="CREA UNA ZONA"
+            label="CREAR ZONA"
             labelPosition="before"
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >place</FontIcon>}
-            style={styles.button}
-            labelStyle={{fontSize:'18px'}}
+            //style={styles.button}
+            labelStyle={{fontSize:'12px'}}
             onClick={this.handleOpen2}
+            className="crearZonaYEstadoResponsive"
           />
          </div>
        </div>
@@ -219,7 +236,7 @@ class Zonas extends Component {
             </TableRow>
             <TableRow>
               <TableHeaderColumn tooltip="The Name">Zona</TableHeaderColumn>
-              <TableHeaderColumn tooltip="The Name">Fecha de Creación</TableHeaderColumn>
+              <TableHeaderColumn tooltip="The Name">Creación</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Estado</TableHeaderColumn>
               <TableHeaderColumn tooltip="The Status">Editar</TableHeaderColumn>
 
@@ -245,13 +262,15 @@ class Zonas extends Component {
        </div>
        <div>
           <Dialog
-            title="Crea un estado"
+            title="Crea un Estado"
             modal={false}
             open={this.state.open}
+            autoScrollBodyContent={true}
+            actions={actions}
             onRequestClose={this.handleClose}
           >
           <AutoComplete
-            floatingLabelText="Selecciona el país"
+            floatingLabelText="Selecciona el País"
             filter={AutoComplete.caseInsensitiveFilter}
             openOnFocus={true}
             dataSource={this.state.country.map(country => country)}
@@ -276,13 +295,6 @@ class Zonas extends Component {
             errorStyle={styles.errorStyle}
             />
             <Divider />
-    
-          <RaisedButton 
-          onClick={this.sendEdit}  
-          label="Crear Estado" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA"  
-          />
           
         </Dialog> 
          </div>
@@ -291,11 +303,13 @@ class Zonas extends Component {
             title="Crea una Zona"
             modal={false}
             open={this.state.open2}
+            autoScrollBodyContent={true}
+            actions={actions2}
             onRequestClose={this.handleClose2}
           >
           
           <AutoComplete
-            floatingLabelText="Selecciona el estado"
+            floatingLabelText="Selecciona el Estado"
             filter={AutoComplete.caseInsensitiveFilter}
             dataSource={this.state.estados.map(state => state)}
             dataSourceConfig={ {text: 'nombre', value: '_id'}  }
@@ -320,13 +334,6 @@ class Zonas extends Component {
             errorStyle={styles.errorStyle}
             />
             <Divider />
-   
-          <RaisedButton 
-          onClick={this.sendZona}  
-          label="Crear Zona" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA" 
-          />
           
         </Dialog> 
          </div>

@@ -8,7 +8,6 @@ import Dialog from 'material-ui/Dialog';
 import {green700,blue500} from 'material-ui/styles/colors';
 import { getUser, editUser } from '../../Services/authDash';
 import { getBrands } from '../../Services/brands';
-import './usuarios.css';
 
 
 
@@ -97,6 +96,14 @@ class UsuarioDetail extends Component{
 
   render(){
     const {user} = this.state;
+    const actions = [
+      <RaisedButton 
+      onClick={this.sendEdit}  
+      label="Enviar Cambios" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA" 
+      />
+    ]
       return (
         <div>
           <Dash/>
@@ -105,14 +112,14 @@ class UsuarioDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE USUARIO" fullWidth={true} />
           <div className="userPadreDetail">
             <div>
-            <img alt="Imagen Usuario" width="500px" height="500px" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Ffoto-no-disponible.jpg?alt=media&token=c8c0d7a0-d1f2-418a-89d1-9d7688d0e801"}/>
+            <img alt="Imagen Usuario" className="imagenUserDetailResponsive" src={user.fotoPerfil ? user.fotoPerfil : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Ffoto-no-disponible.jpg?alt=media&token=c8c0d7a0-d1f2-418a-89d1-9d7688d0e801"}/>
             </div>
-            <div className="userSonDetail">
+            <div className="userSonDetailResponsive">
               <u>Correo del Usuario: </u><h4>{user.correo}</h4>
               <u>Puesto Actual: </u><h4>{user.puesto}</h4>
               <u>Fecha de Registro: </u><h4>{user.created_at}</h4>                                              
               <RaisedButton   
-                label="Editar Usuario" 
+                label="Editar" 
                 backgroundColor="#0D47A1"
                 labelColor="#FAFAFA" 
                 onClick={this.handleOpen} 
@@ -125,8 +132,10 @@ class UsuarioDetail extends Component{
           <Dialog
             title="Editar Usuario"
             modal={false}
+            actions={actions}
             open={this.state.open}
             onRequestClose={this.handleClose}
+            autoScrollBodyContent={true}
           >
            <AutoComplete
              floatingLabelText="Asignale su BRAND"
@@ -155,12 +164,6 @@ class UsuarioDetail extends Component{
              errorText="Este campo es obligatorio"
              errorStyle={styles.errorStyle}
             /> 
-          <RaisedButton 
-          onClick={this.sendEdit}  
-          label="Enviar Cambios" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA" 
-          />
         </Dialog> 
          </div>
         </div>

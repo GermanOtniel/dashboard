@@ -19,15 +19,8 @@ import {
 import FlatButton from 'material-ui/FlatButton';
 import DatePicker from 'material-ui/DatePicker';
 import firebase from '../../firebase/firebase';
-import './marcas.css';
 
-const styles = {
-  button: {
-    margin: 12,
-    width: 400,
-    height:70
-  }
-};
+
 
 const styles2 = {
   uploadButton: {
@@ -66,7 +59,7 @@ class Marcas extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     progresoImagen:0,
     botonMarca:true,
@@ -241,6 +234,15 @@ orderByMarca = (e) => {
         onClick={this.handleClose2}
       />,
     ];
+    const actions2 = [
+      <RaisedButton 
+      onClick={this.sendMarca}  
+      label="Crear Marca" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA"  
+      disabled={this.state.botonMarca}
+      />
+    ]
     const {detalleMarca} = this.state;
     return (
     <div>
@@ -253,7 +255,7 @@ orderByMarca = (e) => {
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">assistant</FontIcon>}
-            style={styles.button}
+            className="crearDinamicaResponsive"
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
           /> 
@@ -299,7 +301,7 @@ orderByMarca = (e) => {
               <TableRow key={marca._id} data={marca}>
                 <TableRowColumn>{marca.nombre}</TableRowColumn>
                 <TableRowColumn>{marca.brand}</TableRowColumn>
-                <TableRowColumn>{marca.fechaAlta}</TableRowColumn>
+                <TableRowColumn>{marca.created_at.slice(0,10)}</TableRowColumn>
                 <TableRowColumn><button onClick={() => this.marca(marca)} className="buttonDinamicasDetalle">Ver Marca</button></TableRowColumn>
 
               </TableRow>
@@ -311,10 +313,24 @@ orderByMarca = (e) => {
           <Dialog
             title="Crea una Marca"
             modal={false}
+            actions={actions2}
             open={this.state.open}
             onRequestClose={this.handleClose}
+            autoScrollBodyContent={true}
           >
-                    
+          <FlatButton
+            label="Elige una Imagen"
+            backgroundColor="#00897B"
+            labelPosition="before"
+            style={styles2.uploadButton}
+            containerElement="label"
+          > 
+            <input onChange={this.getFile} name="imagen" type="file" style={styles2.uploadInput} />
+          </FlatButton>   
+          <br/><br/>
+          <LinearProgress mode="determinate" value={this.state.progresoImagen} />
+          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." : "La imagen tarda unos segundos en cargar")}</span>
+          <br/><br/>
             <TextField 
               onChange={this.onChange} 
               name="nombre" 
@@ -322,7 +338,6 @@ orderByMarca = (e) => {
               type="text"  
               underlineShow={true} 
             />  
-            <br/>
           <AutoComplete
             floatingLabelText="Selecciona Brand"
             filter={AutoComplete.caseInsensitiveFilter}
@@ -337,32 +352,10 @@ orderByMarca = (e) => {
             hintText="Fecha de Alta"
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
-          />
-          <br/>
-          <FlatButton
-            label="Elige una Imagen"
-            backgroundColor="#00897B"
-            labelPosition="before"
-            style={styles2.uploadButton}
-            containerElement="label"
-          > 
-            <input onChange={this.getFile} name="imagen" type="file" style={styles2.uploadInput} />
-          </FlatButton>
-          <br/><br/>
-          <LinearProgress mode="determinate" value={this.state.progresoImagen} />
-          <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se está cargando..." : "La imagen tarda unos segundos en cargar")}</span>
-          <br/><br/>
-          
-          
-    
-          <RaisedButton 
-          onClick={this.sendMarca}  
-          label="Crear Marca" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA"  
-          disabled={this.state.botonMarca}
-          />
-          
+            autoOk={true}
+            container="inline"
+            />
+
         </Dialog> 
          </div>
          <div>

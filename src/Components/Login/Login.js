@@ -9,7 +9,6 @@ import FontIcon from 'material-ui/FontIcon';
 import { Link } from 'react-router-dom';
 import Dialog from 'material-ui/Dialog';
 import { login,getNewPasswordDash } from '../../Services/authDash';
-import './login.css';
 
 
 
@@ -26,6 +25,8 @@ class Login extends Component {
   }
   //REVISAR SI HAY DATOS GUARDADOS EN EL LOCALSTORAGE, SI LOS HAY UTILIZARLOS PARA AUTOCOMPLETAR EL FORMULARIO DE LOGIN
   componentWillMount(){
+    console.log('SOY RESPONSIVEEEEEEE!!!')
+    console.log('VAMONOS A LA VISITA!!!!')
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLoggedDash'))}`;
     if ( hayUsuario === "null" ){
@@ -142,24 +143,23 @@ class Login extends Component {
     ];
     const {userLogged,user} = this.state;
     return (
-     <div className="padreLogin">
+     <div className="loginResponsive">
        <div>
         <AppBar
           style={{backgroundColor: "#78909C"}}
           iconElementLeft={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="180" height="60" alt=""/>}
           iconElementRight={
-         <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons icon" color="white">live_help</FontIcon></a>}
+         <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons iconResponsive" color="white">live_help</FontIcon></a>}
         />
        </div>
-       <div className="paper">
+       <div className="paperLoginResponsive">
         <Paper>
-          <br/><br/>
+          <br/>
         <FloatingActionButton backgroundColor="#0D47A1" >
         <FontIcon className="material-icons">https</FontIcon>
         </FloatingActionButton>
         <br/>
         <h3>Iniciar Sesión</h3>
-        <br/>
         <TextField
           hintText="Correo electrónico"
           floatingLabelText="Correo electrónico"
@@ -179,12 +179,12 @@ class Login extends Component {
           value={userLogged.correo ? userLogged.password : user.password }
         />
         <br/><br/>
-        <div className="hijoPaper">
+        <div>
         <RaisedButton onClick={this.sendUser} label="Ingresar" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
         <br/>
         <br/>
-        <b className="contraseñaOlvidada" onClick={this.handleOpen3}>Olvidé mi contraseña</b>
-        <h5>Si aún no estás registrado <Link to="/signup" className="linkReg">Regístrate</Link></h5>
+        <b className="contraseñaOlvidadaResponsive" onClick={this.handleOpen3}>Olvidé mi contraseña</b>
+        <h5>Si aún no estás registrado <Link to="/signup" className="linkRegResponsive">Regístrate</Link></h5>
         <br/>
         </div>
         </Paper>
@@ -250,7 +250,7 @@ class Login extends Component {
         </Dialog>  
 
         </div>  
-       <br/><br/><br/><br/><br/><br/><br/>
+       
      </div>
     );
   }

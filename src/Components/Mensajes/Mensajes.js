@@ -14,7 +14,6 @@ import {
 } from 'material-ui/Table';
 import {green700,blue500} from 'material-ui/styles/colors';
 import { sendNote,getNotesByBrand,getAllNotes,deleteNote } from '../../Services/notas';
-import './mensajes.css';
 
 const styles = {
   button: {
@@ -49,7 +48,7 @@ class Mensajes extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     mensajesFilter:[],
     detalleMensaje:{},
@@ -177,6 +176,14 @@ orderByDate = (e) =>{
   }
 }
   render() {
+    const actions = [
+      <RaisedButton 
+      onClick={this.sendMessage}  
+      label="Enviar Mensaje" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA"
+      />
+    ]
     let {mensajesFilter,detalleMensaje} = this.state;
     return (
     <div>
@@ -189,9 +196,10 @@ orderByDate = (e) =>{
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">message</FontIcon>}
-            style={styles.button}
+            //style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
+            className="crearDinamicaResponsive" 
           /> 
         </div>
         </div>
@@ -209,16 +217,16 @@ orderByDate = (e) =>{
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
-                Marcas Existentes
+              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
+                Mensajes Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
               <TableHeaderColumn tooltip="Mensaje"><h2>Mensaje</h2></TableHeaderColumn>
-              <TableHeaderColumn tooltip="Mensaje"><h2>Mensaje Global</h2></TableHeaderColumn>
-              <TableHeaderColumn tooltip="Fecha de Creación"><h2 onClick={this.orderByDate}>Fecha de Creación</h2></TableHeaderColumn>
-              <TableHeaderColumn tooltip="Ver Mensaje"><h2>Ver Mensaje</h2></TableHeaderColumn>
-              <TableHeaderColumn tooltip="Borrar Mensaje"><h2>Borrar Mensaje</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="Mensaje"><h2>Global</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="Fecha de Creación"><h2 onClick={this.orderByDate}>Fecha</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="Ver Mensaje"><h2>Ver</h2></TableHeaderColumn>
+              <TableHeaderColumn tooltip="Borrar Mensaje"><h2>Borrar</h2></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -245,6 +253,8 @@ orderByDate = (e) =>{
           title="Crea un mensaje"
           modal={false}
           open={this.state.open}
+          autoScrollBodyContent={true}
+          actions={actions}
           onRequestClose={this.handleClose}
         >
               <TextField
@@ -260,12 +270,6 @@ orderByDate = (e) =>{
             fullWidth={true}
             maxLength={250}
           />
-          <RaisedButton 
-          onClick={this.sendMessage}  
-          label="Enviar Mensaje" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA"
-          />
         </Dialog>
 
         <Dialog
@@ -273,6 +277,7 @@ orderByDate = (e) =>{
           modal={false}
           open={this.state.open2}
           onRequestClose={this.handleClose2}
+          autoScrollBodyContent={true}
         >
           <span>Cuerpo del Mensaje:</span>
           <h3>{detalleMensaje.cuerpo}</h3>

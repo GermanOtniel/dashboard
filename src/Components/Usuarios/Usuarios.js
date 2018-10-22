@@ -12,16 +12,8 @@ import {
   TableRow,
   TableRowColumn,
 } from 'material-ui/Table';
-import './usuarios.css';
 
 
-const styles = {
-  button: {
-    margin: 12,
-    width: 400,
-    height:70
-  }
-};
 
 class Usuarios extends Component {
 
@@ -37,7 +29,7 @@ class Usuarios extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     alReves:false,
     alReves2:false,
@@ -128,8 +120,8 @@ orderByPuesto = (e) => {
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">face</FontIcon>}
-            style={styles.button}
             labelStyle={{fontSize:'18px'}}
+            className="crearDinamicaResponsive"
           /> 
          </div>
        </div>
@@ -152,14 +144,14 @@ orderByPuesto = (e) => {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="5" tooltip="Super Header" style={{textAlign: 'center'}}>
-                Zonas Existentes
+              <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
+                Usuarios Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn ><h2 onClick={this.orderByEmail}>Correo Electrónico</h2></TableHeaderColumn>
+              <TableHeaderColumn ><h2 onClick={this.orderByEmail}>Mail</h2></TableHeaderColumn>
               <TableHeaderColumn > <h2 onClick={this.orderByPuesto}>Puesto</h2></TableHeaderColumn>
-              <TableHeaderColumn ><h2 onClick={this.orderByDate}>Fecha de Registro</h2></TableHeaderColumn>
+              {/* <TableHeaderColumn ><h2 onClick={this.orderByDate}>Registro</h2></TableHeaderColumn> */}
               <TableHeaderColumn > <h2>Nombre</h2></TableHeaderColumn>
               <TableHeaderColumn ><h2>Editar</h2></TableHeaderColumn>
 
@@ -174,7 +166,7 @@ orderByPuesto = (e) => {
               <TableRow key={user._id} data={user}>
                 <TableRowColumn>{user.correo}</TableRowColumn>
                 <TableRowColumn>{user.puesto}</TableRowColumn>
-                <TableRowColumn>{user.created_at}</TableRowColumn>
+                {/* <TableRowColumn>{user.created_at}</TableRowColumn> */}
                 <TableRowColumn>{user.nombre}</TableRowColumn>
                 <TableRowColumn><Link to={`/usuario/${user._id}`}><button className="buttonDinamicasDetalle">Ver Detalle</button></Link></TableRowColumn>
               </TableRow>

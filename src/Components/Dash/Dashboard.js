@@ -8,7 +8,6 @@ import Drawer from 'material-ui/Drawer';
 import { getUser,changePasswordDash } from '../../Services/authDash';
 import MenuItem from 'material-ui/MenuItem';
 import {Link} from 'react-router-dom';
-import './dash.css';
 
 const styleMenu = {
   fontSize: 22,
@@ -16,6 +15,10 @@ const styleMenu = {
   marginTop:20
 }
 
+const customContentStyle = {
+  width: '100%',
+  maxWidth: 'none'
+};
 
 class Dash extends Component {
 
@@ -59,7 +62,7 @@ class Dash extends Component {
     this.setState({open2: true,cambios:{}});
   };
   handleClose = () => {
-    this.setState({open2: false});
+    this.setState({open2: false,passwordIncorrecta:true,passwordCoinciden:true});
   };
   handleOpen2 = () => {
     this.setState({open3: true});
@@ -79,10 +82,10 @@ class Dash extends Component {
     cambios[field] = value;
     if (e.target.name === "passwordAntigua"){
       if(cambios.passwordAntigua !== passwordd){
-        this.setState({passwordIncorrecta:false})
+        this.setState({passwordIncorrecta:true})
       }
       else if(cambios.passwordAntigua === passwordd){
-        this.setState({passwordIncorrecta:true})
+        this.setState({passwordIncorrecta:false})
       }
     }
    else if (e.target.name === "passwordNew2" || e.target.name === "passwordNew"){
@@ -120,7 +123,7 @@ class Dash extends Component {
         primary={true}
         keyboardFocused={true}
         onClick={this.sendNewPassword}
-        disabled={!this.state.passwordIncorrecta}
+        disabled={this.state.passwordIncorrecta}
       />,
       <FlatButton
         label="Cancelar"
@@ -134,9 +137,9 @@ class Dash extends Component {
      <div>
         <AppBar
           style={{backgroundColor: "#78909C"}}
-          title={<img src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed" width="200" height="73" alt="Logo de 1puntocinco"/>}
+          title={<img className="imagenLogoResponsive" src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed"  alt="Logo de 1puntocinco"/>}
           onLeftIconButtonClick={this.handleToggle}
-          iconElementRight={<h6 className="correoDash">{user.correo}</h6>}
+          iconElementRight={<h6 className="correoDashResponsive">{user.correo}</h6>}
         />
       <div>
       <Drawer
@@ -166,7 +169,9 @@ class Dash extends Component {
           modal={false}
           actions={actions}
           open={this.state.open2}
+          contentStyle={customContentStyle}
           onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
         >
         <b>Primero ingresa tu contraseña actual y despues tu nueva contraseña.</b>
         <br/>
@@ -178,7 +183,7 @@ class Dash extends Component {
           onChange={this.onChange}
         />
          <div>
-          <b style={passwordIncorrecta ? {color:'green'} : {color:'red'}} className="msjContraseñas">{passwordIncorrecta ? "" : "La contraseña que estas ingresando es incorrecta"}</b>
+          <b style={!passwordIncorrecta ? {color:'green'} : {color:'red'}} className="msjContraseñas">{!passwordIncorrecta ? "Bien hecho!" : "Ingresa tu contraseña actual"}</b>
         </div>
          <TextField
           hintText="Nueva contraseña"

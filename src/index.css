@@ -12,3 +12,446 @@ h1,h2,h3,h4,h5,h6,b,span,p,big{
 div{
   font-family: 'Lato', sans-serif;
 }
+
+.buscadorCentros{
+  margin-left: 2%
+}
+.buscadorCentros > input {
+  width: 200px;
+  height: 25px;
+  border-color: black;
+  border-radius: 10px;
+  font-size: 13px
+}
+.menu{
+  text-decoration: none;
+  color: yellow
+}
+.senDinamica{
+  display: flex;
+  justify-content: center;
+  align-items: center;}
+
+.margin{
+  display: inline-block;
+}
+.buscador{
+  margin-left: 2%
+}
+.buscador > input {
+  width: 200px;
+  height: 25px;
+  border-color: rgb(150, 150, 150);
+  border-radius: 10px;
+  font-size: 17px
+}
+.imagenDinamicaDetail{
+  background-color: yellow;
+  color: black
+}
+.buttonDinamicasDetalle{
+  background-color: rgb(0, 0, 155);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%
+}
+.chipDinamica{
+  margin-right: 10%
+}
+.botonInfoDinamicas{
+  color: white;
+  background-color: blue
+}
+.botonDinamicaEditar{
+  background-color: rgb(0, 140, 196);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%;
+  font-size: .9rem
+}
+.botonDinamicaBorrar{
+  background-color: rgb(238, 0, 0);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%;
+  font-size: .9rem
+}
+.spanAprobarDinamicas{
+  font-size: 1.2rem;
+  background-color: yellow;
+  color: black
+}
+.buttonBorrarMensaje{
+  background-color: rgb(211, 0, 0);
+  color: white;
+  font-family: 'Lato';
+  height: 30px;
+  width: 90px;
+  border-radius: 30%
+}
+.chipCentroReporte{
+  margin-bottom: 20px
+}
+.buscadorEvidencias{
+  margin-left: 2%;
+  width: 100%
+}
+.inputEvidencias {
+  width: 220px;
+  height: 25px;
+  border-color: black;
+  border-radius: 10px;
+  font-size: 14px
+}
+
+.imagenLogoResponsive{
+  width:140px;
+  height:50px;
+  margin-top: 10px
+}
+.correoDashResponsive{
+  margin: 15% 0px 10px 0;
+  color:rgb(255, 255, 255);
+  font-size: .8rem
+}
+.zona-container {
+  display: flex;
+  flex-wrap: nowrap;
+}
+.zona-container > div {
+  margin: auto;
+  margin-top: 1.5% 
+}
+.crearDinamicaResponsive{
+  margin: 12px;
+  width:  250px;
+}
+.outDinamicasResponsive{
+  float: right;
+  margin-top: 16px;
+  margin-right: 10px;
+}
+.bEvidenciaDetail {
+  background-color: yellow;
+}
+.userPadreDetail {
+  display: flex;
+  justify-content: center;
+}
+.padreDetail {
+  display: flex;
+  justify-content:center
+}
+@media screen and (max-width: 1000px) and (min-width: 300px) {
+  /* LOGIN */
+.padreLogin{
+  background-color: rgb(218, 218, 218);
+  width: 100vw;
+  height: 100vh
+}
+.loginResponsive{
+  background-color: rgb(218, 218, 218);
+  width: 100vw;
+  height: 100vh;
+}
+.paperLoginResponsive{
+  width: 75vw;
+  margin: 10% auto 0 auto;
+  text-align: center;
+}
+.contraseñaOlvidadaResponsive{
+  font-size: 0.8rem;
+  color: rgb(61, 145, 255)
+}
+.linkRegResponsive{
+  text-decoration: none;
+}
+.iconResponsive{
+  margin-top: 50%;   
+}
+/* LOGIN */
+
+/* ---------------------------------------------- */
+
+/* REGISTRATE */
+.paperSignupResponsive{
+  width: 75vw;
+  margin: 7% auto 0 auto;
+  text-align: center;
+}
+/* se repiten las clases loginResponsive,iconResponsive y linkRegResponsive */
+
+/* REGISTRATE */
+
+/* ---------------------------------------------- */
+
+
+/* MARCAS */
+
+
+/* se reutiliza la class crearDinamicaResponsive para el boton de crear marca */
+
+/* MARCAS */
+
+/* ---------------------------------------------- */
+
+
+/* REPORTES */
+/* Se reutiliza la clase crearDinamicaResponsive para el boton de reportes que en si no es un boton */
+/* REPORTES */
+
+/* ---------------------------------------------- */
+
+
+/* BRANDS */
+/* Se reutiliza la clase crearDinamicaResponsive para el boton de crear BRAND */
+/* BRANDS */
+
+/* ---------------------------------------------- */
+
+
+/* CENTROS */
+/* Se reutiliza la clase crearDinamicaResponsive para el boton de crear CENTRO  */
+/* CENTROS */
+
+/* ---------------------------------------------- */
+
+
+/* USUARIOS */
+/* Se reutiliza la clase crearDinamicaResponsive para el boton de USUARIOS que en si no es un boton  */
+/* USUARIOS */
+
+/* ---------------------------------------------- */
+
+
+/* ZONAS */
+.crearZonaYEstadoResponsive{
+  margin: 12px;
+  width:  148px;
+}
+/* ZONAS */
+
+/* ---------------------------------------------- */
+
+
+/* MENSAJES */
+/* Se reutiliza la clase crearDinamicaResponsive para el boton de CREAR MENSAJE que ES PARA CREAR UN MENSAJE  */
+/* MENSAJES */
+
+/* ---------------------------------------------- */
+
+
+/* EVIDENCIA DETAIL */
+
+.padreDetailEvidenciaResponsive {
+  display: flex;
+  width: 50vw;
+  text-align: justify
+}
+.imagenEvidenciaDetailResponsive{
+  width: 50vw;
+  height: 250px
+}
+.hijoDetailEvidenciasResponsive {
+  font-size: .8rem;
+  width: 50vw;
+}
+.spanEvidenciaResponsive{
+  font-size: .7rem
+}
+
+/* EVIDENCIA DETAIL */
+
+
+/* ---------------------------------------------- */
+
+
+/* REPORTE DETAIL */
+
+/* SE REUTILIZA LA CLASE PADREDETAIL */
+
+.imgReporteResponsive{
+  width: 250px;
+  height: 230px;
+}
+
+/* ESTA CLASE ES NUEVA LA CREAMOS PARA ACOMODAR ELEMENTOS */
+.datosReporteResponsive{
+  width:280px;
+  font-size: 15px;
+}
+.reportDinamicDetailHijo{
+  float: left;
+}
+/* .padreDetail {
+  display: flex;
+  justify-content: center;
+} */
+.padreDetailReporteDetail {
+  display: flex;
+  justify-content: center;
+}
+/* esta clase es nueva la cree */
+.centrarReporteDetailResponsive{
+  margin-left: -220px;
+  margin-top: 30%;
+}
+
+.bDetalleCreador{
+  background-color: rgb(255, 255, 127);
+  color: black
+}
+/* REPORTE DETAIL */
+
+/* ---------------------------------------------- */
+
+/* USUARIO DETAIL */
+
+.imagenUserDetailResponsive{
+  width: 150px;
+  height: 180px;
+}
+.userSonDetailResponsive {
+  width: 50vw;
+  text-align: center;
+  font-size: .7rem;
+  margin-bottom: 10px
+}
+/* USUARIO DETAIL */
+
+/* ------------------------------------------------ */
+
+}
+
+
+@media screen and (min-width: 1001px) {
+      /* LOGIN */
+.loginResponsive{
+  background-color: rgb(218, 218, 218);
+  width: 100vw;
+  height: 100vh;
+}
+.paperLoginResponsive{
+  width: 35vw;
+  margin: auto;
+  text-align: center;
+  margin-top: 7%
+}
+.contraseñaOlvidadaResponsive{
+  font-size: 0.8rem;
+  color: rgb(61, 145, 255)
+}
+.linkRegResponsive{
+  text-decoration: none;
+}
+.iconResponsive{
+  margin-top: 13px;
+  width:100px;  
+}
+/* LOGIN */
+
+/* ---------------------------------------------- */
+
+/* REGISTRATE */
+
+.paperSignupResponsive{
+  width: 35vw;
+  margin: auto;
+  text-align: center;
+  margin-top: 4%
+}
+/* se repiten las clases loginResponsive,iconResponsive y linkRegResponsive */
+
+/* REGISTRATE */
+
+/* ---------------------------------------------- */
+/* ZONAS */
+.crearZonaYEstadoResponsive{
+  margin: 10px;
+  width:  248px;
+}
+/* ZONAS */
+
+/* ---------------------------------------------- */
+
+/* EVIDENCIA DETAIL */
+
+.padreDetailEvidenciaResponsive {
+  display: flex;
+  width: 50vw;
+}
+.imagenEvidenciaDetailResponsive{
+  width: 540px;
+  height: 450px
+}
+.hijoDetailEvidenciasResponsive {
+  font-size: 1rem;
+  width: 50vw;
+}
+
+.spanEvidenciaResponsive{
+  font-size: 1.2rem
+}
+
+/* EVIDENCIA DETAIL */
+
+/* ---------------------------------------------- */
+/* REPORTE DETAIL */
+
+/* SE REUTILIZA LA CLASE PADREDETAIL */
+
+.imgReporteResponsive{
+  max-width: 600px;
+  min-width: 400px;
+  max-height: 400px;
+  min-height: 300px
+}
+
+/* ESTA CLASE ES NUEVA LA CREAMOS PARA ACOMODAR ELEMENTOS */
+.datosReporteResponsive{
+  width: 50vw;
+  font-size: 1.1rem
+}
+
+.reportDinamicDetailHijo{
+  float: left;
+}
+/* .padreDetail {
+  display: flex;
+  justify-content: center;
+} */
+.padreDetailReporteDetail {
+  display: flex;
+  justify-content: center;
+}
+
+.bDetalleCreador{
+  background-color: rgb(255, 255, 127);
+  color: black
+}
+/* REPORTE DETAIL */
+
+/* ---------------------------------------------- */
+
+/* USUARIO DETAIL */
+
+.imagenUserDetailResponsive{
+  width: 400px;
+  height: 350px;
+}
+.userSonDetailResponsive {
+  text-align: center;
+  font-size: 1rem;
+  margin-bottom: 10px;
+  margin-left: 70px;
+
+}
+/* USUARIO DETAIL */
+}
+

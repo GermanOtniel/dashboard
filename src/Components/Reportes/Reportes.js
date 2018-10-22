@@ -12,28 +12,8 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getDinamics,getDinamicsByBrand } from '../../Services/dinamicas';
-import './reportes.css';
 
-const styles = {
-  button: {
-    margin: 12,
-    width: 400,
-    height:70
-  },
-  uploadButton: {
-    verticalAlign: 'middle',
-  },
-  uploadInput: {
-    cursor: 'pointer',
-    position: 'absolute',
-    top: 0,
-    bottom: 0,
-    right: 0,
-    left: 0,
-    width: '100%',
-    opacity: 0,
-  }
-};
+
 
 class Reportes extends Component {
 
@@ -53,7 +33,7 @@ class Reportes extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     alReves:false,
     alReves2:false
@@ -79,8 +59,8 @@ class Reportes extends Component {
          dinamics[i].fechaF = dinamics[i].fechaFin.slice(0,10)
 
        }
-       dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
-      this.setState({dinamicasFilter:dinamics,dinamics})
+       dinamics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+       this.setState({dinamicasFilter:dinamics,dinamics})
     })
     .catch(e=>console.log(e))
     }
@@ -94,7 +74,7 @@ class Reportes extends Component {
           dinamics[i].fechaI = dinamics[i].fechaInicio.slice(0,10)
           dinamics[i].fechaF = dinamics[i].fechaFin.slice(0,10)
         }
-        dinamics.sort((a, b) => new Date(a.fechaFin) - new Date(b.fechaFin))
+        dinamics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
@@ -152,8 +132,8 @@ orderByFechaF = () => {
             labelColor="#FAFAFA"
             backgroundColor="#0D47A1"
             icon={<FontIcon className="material-icons">signal_cellular_alt</FontIcon>}
-            style={styles.button}
             labelStyle={{fontSize:'18px'}}
+            className="crearDinamicaResponsive"
           /> 
          </div>
        </div>
@@ -177,17 +157,17 @@ orderByFechaF = () => {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="7" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="5" style={{textAlign: 'center'}}>
                 Reportes de Dinámicas
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn><h3>Modalidad</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
+              {/* <TableHeaderColumn><h3>Modalidad</h3></TableHeaderColumn> 
+              <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn> */}
               <TableHeaderColumn><h3>Nombre</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Status</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3 onClick={this.orderByFechai}>Fecha de Inicio</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3 onClick={this.orderByFechaF}>Fecha de Término</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFechai}>Inicia</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFechaF}>Termina</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
 
             </TableRow>
@@ -199,8 +179,8 @@ orderByFechaF = () => {
           >
             {this.state.dinamicasFilter.map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
-                <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
-                <TableRowColumn>{dinamic.brand}</TableRowColumn>
+                {/* <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
+                <TableRowColumn>{dinamic.brand}</TableRowColumn> */}
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.fechaI}</TableRowColumn>

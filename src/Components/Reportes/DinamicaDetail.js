@@ -15,12 +15,16 @@ import {green700} from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {GridList, GridTile} from 'material-ui/GridList';
-import './reportes.css';
+
+
+const customContentStyle = {
+  width: '100%',
+  maxWidth: 'none'
+};
 
 const style = {
   height: '100%',
-  width: '80%',
-  margin: 20,
+  width: '100%',
   textAlign: 'center',
   display: 'inline-block'
 };
@@ -589,41 +593,40 @@ class DinamicaDetail extends Component{
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="REPORTE DE DINÁMICA" fullWidth={true} />
           <br/> <br/>
           <div className="padreDetail">
-        
             <div>
-            <img alt="Imagen Premio" className="img" src={dinamica.imagenPremio}/>
+            <img alt="Imagen Premio" className="imgReporteResponsive" src={dinamica.imagenPremio}/>
             <br/><br/><br/><br/>
             <div>  
             <RaisedButton
-              label="Cambiar Visualización del Reporte"
+              label="FECHA / COMPLETO"
               labelColor="#FAFAFA"
               backgroundColor="#607D8B"
               onClick={this.refresh}
             />
             </div>
             </div>
-          
-
-            <div>
+            <div className="datosReporteResponsive">
             <b>Nombre de la Dinámica:</b>
             <h3>{dinamica.nombreDinamica}</h3>
             <b>Descripción:</b>
             <h6>{dinamica.descripcion}</h6>
             <b>Modalidad de la Dinámica:</b>
             <br/>
-            <span className="modalidadReporte">{dinamica.modalidad}</span>
+            <span className="b">{dinamica.modalidad}</span>
             <br/><br/>
             <b>Tiempo de Duración:</b>
             <br/>
             <b>{dinamica.fechaInicio}</b>/<b>{dinamica.fechaFin}</b>
             <br/>
+            <div className="centrarReporteDetailResponsive">
               <h4>Centros de Consumo:</h4>
-              <div className="padreDetail" >
+              <div className="padreDetailReporteDetail" style={styles.wrapper} >
               {centros.map( (centro, index) => (
                 <div key={index} >
               <Chip
               key={index}
-              className="reportDinamicDetailHijo"
+              style={styles.chip}
+              //className="reportDinamicDetailHijo"
               onClick={() => this.centros(centro)}
               >
                 {centro.nombre}
@@ -634,7 +637,7 @@ class DinamicaDetail extends Component{
               <h4>Marcas:</h4>
               <div style={styles.wrapper}>
               {marcas.map( (marca, index) => (
-                <div key={index}>
+                <div  key={index}>
               <Chip
               style={styles.chip}
               key={index}
@@ -645,7 +648,8 @@ class DinamicaDetail extends Component{
               </Chip> 
                 </div>
               ))}
-              </div>   
+              </div> 
+            </div>  
             </div>  
           </div>
           <hr/>
@@ -709,7 +713,6 @@ class DinamicaDetail extends Component{
         {marcasCreador.map( (marca, index) => (
               <div key={index}>
               <Chip
-              className="dinamicDetailHijo"
               >
               <Avatar src={marca._id.imagen} />
                 <span>{marca._id.nombre} </span> 
@@ -745,6 +748,7 @@ class DinamicaDetail extends Component{
               actions={actions3}
               modal={false}
               open={this.state.open3}
+              autoScrollBodyContent={true}
               onRequestClose={this.handleClose3}
             >
               <img alt="Imagen Marca" width="200px" height="150px" src={marcaVentas.imagen} />
@@ -759,6 +763,7 @@ class DinamicaDetail extends Component{
               actions={actions4}
               modal={false}
               open={this.state.open4}
+              autoScrollBodyContent={true}
               onRequestClose={this.handleClose4}
             >
               <div>
@@ -793,7 +798,6 @@ class DinamicaDetail extends Component{
         {marcasGanador.map( (marca, index) => (
               <div key={index}>
               <Chip
-              className="dinamicDetailHijo"
               >
               <Avatar src={marca._id.imagen} />
                 <span>{marca._id.nombre} </span>
@@ -814,27 +818,32 @@ class DinamicaDetail extends Component{
           modal={false}
           open={this.state.open6}
           autoScrollBodyContent={true}
+          contentStyle={customContentStyle}
         >
-        <b>Si deseas ver el reporte de ventas por DETERMINADA FECHA, por favor define la <span className="reporteFecha">Fecha Inicial</span> y la <span className="reporteFecha">Fecha Final</span> de búsqueda y presiona la opción ' ENVIAR FECHA '</b>
+        <b>Si deseas ver el reporte de ventas por DETERMINADA FECHA, por favor define la <span>Fecha Inicial</span> y la <span>Fecha Final</span> de búsqueda y presiona la opción ' ENVIAR FECHA '</b>
         <br/><br/>
-        <div className="padre">
-            <div className="margin">
+        <div>
+            <div>
             <DatePicker
             hintText="Fecha Inicial"
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
             errorText="Define la fecha inicial de búsqueda"
             errorStyle={styles.errorStyle}
+            autoOk={true}
+            container="inline"
           /> 
             </div>
             <br/>
-            <div className="margin">
+            <div>
           <DatePicker
             hintText="Fecha Final"
             value={this.state.newObj2.fecha}
             onChange={this.handleChange2}
             errorText="Define la fecha final de búsqueda"
             errorStyle={styles.errorStyle}
+            autoOk={true}
+            container="inline"
           />
           </div>
           </div> 

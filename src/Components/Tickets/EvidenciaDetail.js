@@ -4,17 +4,15 @@ import Dash from '../Dash/Dashboard';
 import Paper from 'material-ui/Paper';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
+import FlatButton from 'material-ui/FlatButton';
 import SelectField from 'material-ui/SelectField';
 import MenuItem from 'material-ui/MenuItem';
 import TextField from 'material-ui/TextField';
 import Avatar from 'material-ui/Avatar';
 import Chip from 'material-ui/Chip';
-import './evidencias.css';
 
 const style = {
-  height: '100%',
-  width: '80%',
-  margin: 20,
+  width: '100%',
   textAlign: 'center',
   display: 'inline-block'
 };
@@ -27,8 +25,12 @@ const styles = {
   },
   wrapper: {
     display: 'flex',
+    justifyContent: 'center',
     flexWrap: 'wrap',
   },
+  dontSee: {
+    display: 'none'
+  }
 };
 
 class EvidenciaDetail extends Component{
@@ -120,92 +122,102 @@ class EvidenciaDetail extends Component{
     .catch(e=>console.log(e))
   }
 
+    // PARA IR A LA PAGINA ANTERIOR
+    goBack =()=>{
+      let {dinamica} = this.state;
+      this.props.history.push(`/tickets/${dinamica._id}`)
+    }
+
   render(){
     const {evidence,marcas,botonGavel} = this.state;
-      return (
+    return (
+      <div>
+        <Dash/>
         <div>
-          <Dash/>
-          <div className="padreDetail">
           <Paper style={style} >
-          <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
-            <div className="padreDetail">
-            <div>
-            <img alt="Imagen de evidencia" className="imagenEvidenciaDetail" src={evidence.archivo ? evidence.archivo : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340"}/>
-            <div>
-            <br/> <br/>
-            <b className="b">{evidence.imagen ? "Esta Dinámica SI requeria imagen como evidencia" : "Esta Dinámica NO requeria imagen como evidencia" }</b>
-            </div>
-            <div>
-              <div className="padreDetail">
-              <SelectField
-              floatingLabelStyle={{fontSize:25}}
-              floatingLabelText="Acción"
-              value={this.state.value}
-              onChange={this.handleChange}
-            >
-              <MenuItem value="Aprobada" primaryText="Aprobada" />
-              <MenuItem value="Desaprobada" primaryText="Desaprobada" />
-            </SelectField>
-            <TextField
-            hintText="desaprobaste su evidencia"
-            floatingLabelStyle={this.state.textFieldDisabled ? {color:'#E0E0E0',fontSize:15} : {color:'#a4c639',fontSize:15}}
-            floatingLabelText="Explicale porqué"
-            name="nota"
-            type="text"
-            onChange={this.onChange}
-            disabled={this.state.textFieldDisabled}
-          />
-              </div>
-            </div>
-            <div>
-            <RaisedButton
-              backgroundColor="#a4c639"
-              icon={<FontIcon color="white" className="material-icons">gavel</FontIcon>}
-              style={style2}
-              onClick={this.sendEvidence}
-              disabled={botonGavel}
-            />
-            </div>
-            </div>
-            <div className="hijoDetail">
-           <u>Mensaje del Usuario: </u><h4>{evidence.mensaje ? evidence.mensaje : "El usuario decidio no enviar mensaje" }</h4>
-            <u>Cantidad Vendida según Usuario: </u>
-            <br/><br/>
-            <div style={styles.wrapper} className="padreDetail">
-            {marcas.map( (marca, index) => (
-              <div  key={index}>
-              <Chip
-              style={styles.chip}
-              >
-              <Avatar  src={marca._id.imagen} />
-                <span className="span">{marca._id.nombre+" "}</span>
-                 <b className="b">{  marca.ventas + " "}</b> <span> Ventas</span>
-              </Chip> 
-              <br/>
-              </div>
-              ))}
-            </div>
-
-
-                   
-            <u>Status: </u><b className="b">{evidence.status}</b>
-            <br/><br/>
-            <u>Fecha: </u><b>{evidence.fecha2}</b>
-            <br/><br/>        
-            <u>Hora: </u><b>{evidence.fechaChida}</b>
-            <br/><br/>        
-            <u>Usuario: </u><b>{evidence.dueño}</b> 
-            <br/><br/>        
-            <u>Correo del Usuario: </u><b>{evidence.correo}</b> 
-            <br/><hr/>
-            <u>Requerimientos de la dinámica: </u><h5>{evidence.descripcion}</h5>        
-            <u>Modalidad: </u><b>{evidence.modalidad}</b>                                                 
-            </div>
-            </div>
+            <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
+              <div className="padreDetail">                             
+                  <div>
+                    <div>
+                      <br/>
+                      <img alt="Imagen de evidencia" className="imagenEvidenciaDetailResponsive" src={evidence.archivo ? evidence.archivo : "https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo15.jpg?alt=media&token=70b5662e-bdb4-4d88-9174-7731e6c94340"}/>
+                      <br/>
+                      <b style={{fontSize:'14px'}} className="bEvidenciaDetail">{evidence.imagen ? "Esta Dinámica SI requeria imagen como evidencia" : "Esta Dinámica NO requeria imagen como evidencia" }</b>
+                      <br/>
+                      <FlatButton onClick={this.goBack} label="Atrás" style={{backgroundColor:"#B71C1C",color:"white"}} />
+                      <br/>
+                    </div>
+                    <div>
+                      <div className="padreDetailEvidenciaResponsive">
+                        <SelectField
+                          floatingLabelStyle={{fontSize:20}}
+                          floatingLabelText="Acción"
+                          value={this.state.value}
+                          onChange={this.handleChange}
+                        >
+                            <MenuItem value="Aprobada" primaryText="Aprobada" />
+                            <MenuItem value="Desaprobada" primaryText="Desaprobada" />
+                        </SelectField>
+                        <TextField
+                          hintText="desaprobaste su evidencia"
+                          floatingLabelStyle={this.state.textFieldDisabled ? {color:'#E0E0E0',fontSize:12} : {color:'#a4c639',fontSize:15}}
+                          floatingLabelText="Explicale porqué"
+                          name="nota"
+                          type="text"
+                          onChange={this.onChange}
+                          disabled={this.state.textFieldDisabled}
+                        />
+                      </div>
+                    </div>
+                    <div>
+                      <RaisedButton
+                        backgroundColor="#a4c639"
+                        icon={<FontIcon color="white" className="material-icons">gavel</FontIcon>}
+                        style={style2}
+                        onClick={this.sendEvidence}
+                        disabled={botonGavel}
+                      />
+                    </div>
+                  </div>
+                  <div  className="hijoDetailEvidenciasResponsive">
+                    <u>Usuario: </u><b>{evidence.dueño ? evidence.dueño : evidence.correo}</b> 
+                    <br/><br/> 
+                    <u>Status: </u><b className="bEvidenciaDetail">{evidence.status}</b>
+                    <br/><br/>
+                    <u>Mensaje del Usuario: </u><h4>{evidence.mensaje ? evidence.mensaje : "El usuario decidio no enviar mensaje" }</h4>
+                    <u>Cantidad Vendida según Usuario: </u>
+                    <br/><br/>
+                      <div style={styles.wrapper}>
+                        {marcas.map( (marca, index) => (
+                        <div  key={index}>
+                        <Chip
+                          style={marca.ventas !== 0 ? styles.chip : styles.dontSee}
+                        >
+                        <Avatar  src={marca._id.imagen} />
+                          <div className="spanEvidenciaResponsive">
+                            <span >{marca._id.nombre.length > 14 ? marca._id.nombre.slice(0,14)+" " : marca._id.nombre+" "}</span>
+                            <b className="bEvidenciaDetail">{  marca.ventas + " "}</b> <span> Ventas</span>
+                          </div>
+                        </Chip> 
+                        <br/>
+                        </div>
+                        ))}
+                      </div> 
+                    <u>Fecha: </u><b>{evidence.fecha2}</b>
+                    <br/><br/>        
+                    <u>Hora: </u><b>{evidence.fechaChida}</b>
+                    <br/><br/>               
+                    <u>Correo del Usuario: </u><b>{evidence.correo}</b> 
+                    <br/><hr/>
+                    <u>Requerimientos de la dinámica: </u><h5>{evidence.descripcion}</h5>        
+                    <u>Modalidad: </u><b>{evidence.modalidad}</b>                                                 
+                  
+                  </div>
+                    </div>
           </Paper>
-          </div>
         </div>
-      );
+      </div>
+    );
     }
     
   }

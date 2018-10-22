@@ -1,9 +1,0 @@
-.zona-container {
-  display: flex;
-  flex-wrap: nowrap;
-}
-
-.zona-container > div {
-  margin: auto;
-  margin-top: 1.5% 
-}

@@ -9,7 +9,6 @@ import FontIcon from 'material-ui/FontIcon';
 import { signup } from '../../Services/authDash';
 import { Link } from 'react-router-dom';
 import Dialog from 'material-ui/Dialog';
-import './login.css';
 
 
 
@@ -100,24 +99,23 @@ class Signup extends Component {
       />,
     ];
     return (
-     <div className="padreLogin">
+     <div className="loginResponsive">
        <div>
         <AppBar
           style={{backgroundColor: "#78909C"}}
           iconElementLeft={<img src="http://1puntocinco.com/wp-content/uploads/2018/03/logoazul-1024x319.png" width="180" height="60" alt=""/>}
           iconElementRight={
-         <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons icon" color="white">live_help</FontIcon></a>}
+         <a href="https://15onzas.teachable.com/"><FontIcon className="material-icons iconResponsive" color="white">live_help</FontIcon></a>}
         />
        </div>
-       <div className="paperSignup">
+       <div className="paperSignupResponsive">
         <Paper>
-          <br/><br/>
+          <br/>
         <FloatingActionButton backgroundColor="#0D47A1" >
         <FontIcon className="material-icons">https</FontIcon>
         </FloatingActionButton>
         <br/>
         <h3>Regístrate</h3>
-        <br/>
         <TextField
           hintText="Correo electrónico"
           name="correo"
@@ -142,11 +140,11 @@ class Signup extends Component {
         />
         <br/>
         <span style={mensajeContraseñas === "Bien, tus contraseñas SI coinciden" ? {color:'green'} : {color:'red'}}>{mensajeContraseñas}</span>
-        <br/><br/>
+        <br/>
         <div className="hijoPaper">
         <RaisedButton onClick={this.sendUser} disabled={this.state.infoIncompleta} label="Registrarme" backgroundColor="#0D47A1" labelColor="#FAFAFA"  />
         <br/>
-        <h5>Si ya estás registrado <Link to="/" className="linkReg">Inicia Sesión</Link></h5>
+        <h5>Si ya estás registrado <Link to="/" className="linkRegResponsive">Inicia Sesión</Link></h5>
         <br/>
         </div>
         </Paper>
@@ -171,7 +169,6 @@ class Signup extends Component {
           </Dialog>
         </div>
        </div>
-       <br/><br/><br/><br/><br/><br/><br/>
      </div>
     );
   }

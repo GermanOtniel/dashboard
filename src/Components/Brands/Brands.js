@@ -17,15 +17,8 @@ import {
 } from 'material-ui/Table';
 import { createBrand, getBrands, getUsersByBrand } from '../../Services/brands';
 import DatePicker from 'material-ui/DatePicker';
-import './brands.css';
 
-const styles = {
-  button: {
-    margin: 12,
-    width: 400,
-    height:70
-  }
-};
+
 const dataSource = [
   {text: "Activo",value:"Activo"},
   {text:"Inactivo",value:"Inactivo"}
@@ -51,7 +44,7 @@ class Brands extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
   }
 
@@ -138,6 +131,14 @@ sendBrand = (e) => {
         onClick={this.handleClose2}
       />,
     ];
+    const actions2 = [
+      <RaisedButton 
+      onClick={this.sendBrand}  
+      label="Crear Brand" 
+      backgroundColor="#0D47A1"
+      labelColor="#FAFAFA"  
+      />
+    ]
     return (
     <div>
        <Dash/>
@@ -149,9 +150,9 @@ sendBrand = (e) => {
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons">work</FontIcon>}
-            style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
+            className="crearDinamicaResponsive"
           /> 
          </div>
        </div>
@@ -203,8 +204,10 @@ sendBrand = (e) => {
           <Dialog
             title="Crea un Brand"
             modal={false}
+            actions={actions2}
             open={this.state.open}
             onRequestClose={this.handleClose}
+            autoScrollBodyContent={true}
           >
                      
             <TextField onChange={this.onChange} name="nombre" hintText="Nombre del Brand" type="text"  underlineShow={false} />
@@ -222,14 +225,9 @@ sendBrand = (e) => {
             hintText="Fecha de Alta"
             value={this.state.newObj.fecha}
             onChange={this.handleChange}
+            autoOk={true}
+            container="inline"
           />
-          <RaisedButton 
-          onClick={this.sendBrand}  
-          label="Crear Brand" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA"  
-          />
-          
         </Dialog> 
          </div>
          <div>

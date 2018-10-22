@@ -28,11 +28,8 @@ import Chip from 'material-ui/Chip';
 import {green700,blue500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
 import firebase from '../../firebase/firebase';
-import './dinamicas.css';
 
-const styleButtonOut = {
-  float: 'right'
-}
+
 
 const styles = {
   button: {
@@ -109,7 +106,7 @@ class Dinamicas extends Component {
     multiSelectable: false,
     enableSelectAll: true,
     deselectOnClickaway: true,
-    showCheckboxes: true,
+    showCheckboxes: false,
     height: '300px',
     terminaStateTabla:"TERMINASTATE DE LA TABLA",
     progresoImagen:0,
@@ -125,7 +122,8 @@ class Dinamicas extends Component {
     progresoImagen2:0,
     value:null,
     puesto:null,
-    hayEvidencias:false
+    hayEvidencias:false,
+    boton:true
   }
   // REVISA EL BRAND AL QUE PERTENECE EL USUARIO QUE SE LOGUEO
   //SI ES DEL BRAND 1PUNTOCINCO "5b71bd925c65d40353ffda4c" TRAE TODAS LAS DINAMICAS EXISTENTES, TODAS LAS MARCAS EXISTENTES, VAYA UTILIZA SERVICIOS 
@@ -144,7 +142,7 @@ class Dinamicas extends Component {
         {
           dinamics[i].brand = brands[i]
         }
-        dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
+        dinamics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
        this.setState({dinamicasFilter:dinamics,dinamics})
      })
      .catch(e=>console.log(e))
@@ -164,7 +162,7 @@ class Dinamicas extends Component {
          {
            dinamics[i].brand = brands[i]
          }
-         dinamics.sort((a, b) => new Date(b.fechaInicio) - new Date(a.fechaInicio))
+         dinamics.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
         this.setState({dinamicasFilter:dinamics,dinamics})
       })
       .catch(e=>console.log(e))
@@ -192,7 +190,7 @@ class Dinamicas extends Component {
     this.setState({open: true});
   };
   handleClose = () => {
-    this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[],progresoImagen:0});
+    this.setState({newDinamic:{}, open: false,newObj:{},newObj2:{},chipData:[],chipData2:[],progresoImagen:0,boton:true});
   };
   handleOpen2 = () => {
     this.setState({open2: true});
@@ -390,7 +388,7 @@ handleChangeDinamic = (event, index, value) => {
   .then(r=>{
     const {newDinamic} = this.state;
     newDinamic.imagenPremio =  r.downloadURL;
-    this.setState({newDinamic})
+    this.setState({newDinamic,boton:false})
   })
   .catch(e=>console.log(e)) //task
   //aqui reviso el progreso
@@ -448,12 +446,12 @@ orderByName = (e) => {
   let {alReves} = this.state;
   if(alReves === false){
     let {dinamicasFilter} = this.state;
-    dinamicasFilter.sort((a, b) => a.nombreDinamica !== b.nombreDinamica ? a.nombreDinamica < b.nombreDinamica ? -1 : 1 : 0)
+    dinamicasFilter.sort((a, b) => a.nombreDinamica.toLowerCase() !== b.nombreDinamica.toLowerCase() ? a.nombreDinamica.toLowerCase() < b.nombreDinamica.toLowerCase() ? -1 : 1 : 0)
     this.setState({dinamicasFilter,alReves:true})
   }
   else if(alReves === true){
     let {dinamicasFilter} = this.state;
-    dinamicasFilter.sort((a, b) => b.nombreDinamica !== a.nombreDinamica ? b.nombreDinamica < a.nombreDinamica ? -1 : 1 : 0)
+    dinamicasFilter.sort((a, b) => b.nombreDinamica.toLowerCase() !== a.nombreDinamica.toLowerCase() ? b.nombreDinamica.toLowerCase() < a.nombreDinamica.toLowerCase() ? -1 : 1 : 0)
     this.setState({dinamicasFilter,alReves:false})
   }
 }
@@ -515,6 +513,7 @@ outUser = (e) => {
   .then(logoutUser=>{
     this.props.history.push("/");
     window.localStorage.removeItem("user");
+    window.localStorage.removeItem("statusEvidencia");
   })
   .catch(e=>alert(e))
 }
@@ -630,6 +629,15 @@ renderChip2(data) {
   );
 }
   render() {
+    const actions6 = [
+      <RaisedButton 
+        onClick={this.sendDinamic}  
+        label="Crear Dinámica" 
+        backgroundColor="#0D47A1"
+        labelColor="#FAFAFA" 
+        disabled={this.state.boton}
+      />
+    ]
     const actions5 = [
       <FlatButton
         label="Si estoy seguro"
@@ -688,18 +696,26 @@ renderChip2(data) {
        <Dash/>
        <div>
        <div>
-       <RaisedButton label="Salir" secondary={true} onClick={this.outUser} style={styleButtonOut}/>
+       <RaisedButton 
+       label="Salir"  
+       onClick={this.outUser} 
+       className="outDinamicasResponsive" 
+       labelStyle={{fontSize:'12px'}}
+       backgroundColor="#B71C1C"
+       labelColor="#FAFAFA"
+       />
        </div>
        </div>
        <div className="zona-container">
          <div>
           <RaisedButton
-            label="CREA UNA DINAMICA"
+            label="CREAR DINÁMICA"
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             labelPosition="before"
             icon={<FontIcon className="material-icons">queue_play_next</FontIcon>}
-            style={styles.button}
+            //style={styles.button}
+            className="crearDinamicaResponsive"
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
           /> 
@@ -725,20 +741,20 @@ renderChip2(data) {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="9" style={{textAlign: 'center'}}>
-                Marcas Existentes
+              <TableHeaderColumn colSpan="6" style={{textAlign: 'center'}}>
+                Dinámicas Existentes
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
-              <TableHeaderColumn><h3 onClick={this.orderByModality}>Modalidad</h3></TableHeaderColumn>
+              {/* <TableHeaderColumn><h3 onClick={this.orderByModality}>Modalidad</h3></TableHeaderColumn> */}
               <TableHeaderColumn><h3>BRAND</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Estatus</h3></TableHeaderColumn>
               <TableHeaderColumn><h3 onClick={this.orderByName}>Nombre</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn>
+              {/* <TableHeaderColumn><h3 onClick={this.orderByInitDate}>Fecha de Inicio</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3 onClick={this.orderByFinishDate}>Fecha de Término</h3></TableHeaderColumn> */}
               <TableHeaderColumn><h3>Ver</h3></TableHeaderColumn>
               <TableHeaderColumn><h3>Editar</h3></TableHeaderColumn>
-              <TableHeaderColumn><h3>Borrar</h3></TableHeaderColumn>
+              <TableHeaderColumn><h3>Evidencias</h3></TableHeaderColumn>
 
             </TableRow>
           </TableHeader>
@@ -749,12 +765,12 @@ renderChip2(data) {
           >
             {this.state.dinamicasFilter.map( (dinamic, index) => (
               <TableRow key={dinamic._id} data={dinamic}>
-                <TableRowColumn>{dinamic.modalidad}</TableRowColumn>
+                {/* <TableRowColumn>{dinamic.modalidad}</TableRowColumn> */}
                 <TableRowColumn>{dinamic.brand}</TableRowColumn>
                 <TableRowColumn>{dinamic.status}</TableRowColumn>
                 <TableRowColumn>{dinamic.nombreDinamica}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
-                <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn>
+                {/* <TableRowColumn>{dinamic.fechaInicio.slice(0,10)}</TableRowColumn>
+                <TableRowColumn>{dinamic.fechaFin.slice(0,10)}</TableRowColumn> */}
                 <TableRowColumn><button className="buttonDinamicasDetalle" onClick={() => this.detalleDinamica(dinamic)}>Ver Detalle</button></TableRowColumn>
                 <TableRowColumn><button className="botonDinamicaEditar" onClick={() => this.editarDinamica(dinamic)}>Editar</button></TableRowColumn>
                 <TableRowColumn><button className="botonDinamicaBorrar" onClick={() => this.evidenciasPorDinamica(dinamic)}>Evidencias</button></TableRowColumn>
@@ -772,6 +788,7 @@ renderChip2(data) {
           <Dialog
             title="Crea una Dinámica"
             modal={false}
+            actions={actions6}
             open={this.state.open}
             onRequestClose={this.handleClose}
             autoScrollBodyContent={true}
@@ -844,6 +861,8 @@ renderChip2(data) {
             onChange={this.handleChange}
             errorText="Este campo es obligatorio"
             errorStyle={styles.errorStyle}
+            autoOk={true}
+            container="inline"
           /> 
             </div>
             <div className="margin">
@@ -853,6 +872,8 @@ renderChip2(data) {
             onChange={this.handleChange2}
             errorText="Este campo es obligatorio"
             errorStyle={styles.errorStyle}
+            autoOk={true}
+            container="inline"
           />
           </div>
           </div>  
@@ -937,14 +958,6 @@ renderChip2(data) {
           <LinearProgress mode="determinate" value={this.state.progresoImagen} />
           <span>{this.state.progresoImagen >= 100 ? "Listo tu imagen se ha cargado correctamente!" : (this.state.progresoImagen > 0 && this.state.progresoImagen < 98 ? "Espera la imagen se esta cargando..." : "Adjunta una imagen")}</span>
           <br/><br/>
-          <div className="senDinamica">
-          <RaisedButton 
-          onClick={this.sendDinamic}  
-          label="Crear Dinámica" 
-          backgroundColor="#0D47A1"
-          labelColor="#FAFAFA" 
-          />
-          </div>
           {/* vidcar.gonzalez@cuamoc.com  */}
       </Dialog> 
     </div>
