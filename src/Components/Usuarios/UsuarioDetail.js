@@ -107,6 +107,7 @@ class UsuarioDetail extends Component{
       return (
         <div>
           <Dash/>
+          <br/><br/><br/>
           <div className="userPadreDetail">
           <Paper style={style} >
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE USUARIO" fullWidth={true} />

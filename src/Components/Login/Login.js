@@ -25,8 +25,7 @@ class Login extends Component {
   }
   //REVISAR SI HAY DATOS GUARDADOS EN EL LOCALSTORAGE, SI LOS HAY UTILIZARLOS PARA AUTOCOMPLETAR EL FORMULARIO DE LOGIN
   componentWillMount(){
-    console.log('SOY RESPONSIVEEEEEEE!!!')
-    console.log('VAMONOS A LA VISITA!!!!')
+    console.log('HABILIDADES Y DOCUMENTOS!!!')
     let usuarioGuardado;
     let hayUsuario = `${JSON.parse(localStorage.getItem('userLoggedDash'))}`;
     if ( hayUsuario === "null" ){

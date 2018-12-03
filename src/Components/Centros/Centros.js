@@ -18,6 +18,11 @@ import {
 import {green700,blue500} from 'material-ui/styles/colors';
 import { getZonas, createCenter, getCenters } from '../../Services/pez';
 import { getUsersByCenter } from '../../Services/centro';
+import { getUsersByDinamics } from '../../Services/dinamicas';
+import IconMenu from 'material-ui/IconMenu';
+import MenuItem from 'material-ui/MenuItem';
+import IconButton from 'material-ui/IconButton';
+import MoreVertIcon from 'material-ui/svg-icons/navigation/more-vert';
 
 
 const styles = {
@@ -61,28 +66,48 @@ class Centros extends Component {
     height: '300px',
     userss:[],
     cantidad:0,
-    centro:{}
+    centro:{},
+    superadmin:false,
+    open3:false,
+    cuantos:0
   }
  //ESTE COMPONENTE SOLO LO VISUALIZAN LOS SUPERADMINS
  //TRAE TODAS LAS ZONAS
  //TRAE TODOS LOS CENTROS DE CONSUMO
 componentWillMount(){
-  getZonas()
-   .then(zonas=>{
-    this.setState({zonas})
-   })
-   .catch(e=>alert(e))
-   getCenters()
-   .then(centros=>{
-    var centross =  centros.map(centro=> centro.zona.nombre);
-    for(let i= 0; i < centros.length;i++) 
-      {
-        centros[i].zona = centross[i]
-        centros[i].created = centros[i].created_at.slice(0,10)
-      }
-     this.setState({centrosFilter:centros,centros})
-   })
-   .catch(e=>console.log(e))
+  let puestoUser = `${JSON.parse(localStorage.getItem('user')).puesto}`
+  let brandUser = `${JSON.parse(localStorage.getItem('user')).brand}`
+  if(puestoUser === "SUPERADMIN"){
+    getZonas()
+    .then(zonas=>{
+     this.setState({zonas})
+    })
+    .catch(e=>alert(e))
+    getCenters()
+    .then(centros=>{
+     var centross =  centros.map(centro=> centro.zona.nombre);
+     for(let i= 0; i < centros.length;i++) 
+       {
+         centros[i].zona = centross[i]
+         centros[i].created = centros[i].created_at.slice(0,10)
+       }
+      this.setState({centrosFilter:centros,centros,superadmin:true,cuantos:centros.length})
+    })
+    .catch(e=>console.log(e))
+  }
+  else{
+    getUsersByDinamics(brandUser)
+    .then(centros=>{
+      var centross =  centros.map(centro=> centro.zona.nombre);
+      for(let i= 0; i < centros.length;i++) 
+        {
+          centros[i].zona = centross[i]
+          centros[i].created = centros[i].created_at.slice(0,10)
+        }
+       this.setState({centrosFilter:centros,centros,superadmin:false,cuantos:centros.length})
+    })
+    .catch(e=>console.log(e))
+  }
  }
 
  // ABRIR Y CERRAR DIALOGOS
@@ -97,6 +122,12 @@ handleOpen2 = () => {
 };
 handleClose2 = () => {
   this.setState({open2: false});
+};
+handleOpen3 = () => {
+  this.setState({open3: true});
+};
+handleClose3 = () => {
+  this.setState({open3: false});
 };
 
 // AGREGA LA ZONA ELEGIDA AL CENTRO DE CONSUMO QUE SE VA A CREAR
@@ -155,8 +186,13 @@ sendCenter = (e) => {
   .catch(e=>console.log(e))
 }
 
+// CLICK A LOS DETALLES DE UN USUARIO
+goToUser = (user) =>{
+  this.props.history.push(`/user/${user._id}`)
+}
+
   render() {
-    const {userss,cantidad,centro} = this.state;
+    const {userss,cantidad,centro,superadmin,cuantos} = this.state;
     const actions = [
       <FlatButton
         label="Ok"
@@ -172,21 +208,40 @@ sendCenter = (e) => {
           backgroundColor="#0D47A1"
           labelColor="#FAFAFA" 
         />
-    ]
+    ];
+    const actions3 = [
+      <FlatButton 
+        onClick={this.handleClose3}  
+        label="Ok" 
+        primary={true}
+        />
+  ]
     return (
     <div>
        <Dash/>
+       <br/><br/><br/>
        <div className="zona-container">
-         <div>
+         <div style={superadmin ? {color:'white'} : {display:'none'}}>
           <RaisedButton
             label="CREAR CENTRO"
             labelPosition="before"
             backgroundColor="#0D47A1"
             labelColor="#FAFAFA"
             icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
-            //style={styles.button}
             labelStyle={{fontSize:'18px'}}
             onClick={this.handleOpen}
+            className="crearDinamicaResponsive"
+          /> 
+         </div>
+         <div style={!superadmin ? {color:'white'} : {display:'none'}}>
+          <RaisedButton
+            label="CENTROS"
+            labelPosition="before"
+            backgroundColor="#0D47A1"
+            labelColor="#FAFAFA"
+            icon={<FontIcon className="material-icons" >store_mall_directory</FontIcon>}
+            labelStyle={{fontSize:'18px'}}
+            onClick={this.handleOpen3}
             className="crearDinamicaResponsive"
           /> 
          </div>
@@ -211,7 +266,7 @@ sendCenter = (e) => {
           >
             <TableRow>
               <TableHeaderColumn colSpan="4" tooltip="Super Header" style={{textAlign: 'center'}}>
-                Centros de Consumo
+                {cuantos + " "}Centros de Consumo
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
@@ -327,14 +382,14 @@ sendCenter = (e) => {
             enableSelectAll={this.state.enableSelectAll}
           >
             <TableRow>
-              <TableHeaderColumn colSpan="2" tooltip="Super Header" style={{textAlign: 'center'}}>
+              <TableHeaderColumn colSpan="3" tooltip="Super Header" style={{textAlign: 'center'}}>
                 Usuarios por Centro de Consumo
               </TableHeaderColumn>
             </TableRow>
             <TableRow>
               <TableHeaderColumn >Nombre</TableHeaderColumn>
               <TableHeaderColumn >Correo</TableHeaderColumn>
-
+              <TableHeaderColumn >Más</TableHeaderColumn>
             </TableRow>
           </TableHeader>
           <TableBody
@@ -347,6 +402,17 @@ sendCenter = (e) => {
               <TableRow key={user._id} data={user}>
                 <TableRowColumn>{user.nombre + " " + user.apellido}</TableRowColumn>
                 <TableRowColumn>{user.correo}</TableRowColumn>
+                <TableRowColumn>
+                  <div>
+                    <IconMenu
+                      iconButtonElement={<IconButton><MoreVertIcon /></IconButton>}
+                      anchorOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                      targetOrigin={{horizontal: 'right', vertical: 'bottom'}}
+                    >
+                      <MenuItem onClick={()=>this.goToUser(user)} primaryText="Ver Usuario" />
+                    </IconMenu>
+                  </div>
+  </TableRowColumn>
               </TableRow>
               ))}
           </TableBody>
@@ -354,6 +420,18 @@ sendCenter = (e) => {
        </div>
         </Dialog>
           </div>
+          <div>
+          <Dialog
+            title="Información"
+            modal={false}
+            open={this.state.open3}
+            onRequestClose={this.handleClose3}
+            autoScrollBodyContent={true}
+            actions={actions3}
+          >
+            Aquí podrás observar los Centros de Consumo en donde tienes dinámicas activas y los usuarios que están inscritos en los respectivos Centros de Consumo.
+        </Dialog> 
+         </div>
     </div>
     );
   }

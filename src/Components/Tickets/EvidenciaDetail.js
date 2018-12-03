@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
 import { getSingleEvidence,sendEvidencia } from '../../Services/evidencias';
+import {getCenter} from '../../Services/centro';
 import Dash from '../Dash/Dashboard';
 import Paper from 'material-ui/Paper';
+import Dialog from 'material-ui/Dialog';
 import FontIcon from 'material-ui/FontIcon';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
@@ -43,7 +45,10 @@ class EvidenciaDetail extends Component{
     textFieldDisabled:true,
     boton: false,
     botonGavel:true,
-    dinamica:{}
+    dinamica:{},
+    centro:{},
+    open: false,
+    marcaDetail:{}
   }
 
   // BUSCAMOS EL DETALLE DE CIERTA EVIDENCIA A TRAVES DEL SERVICIO getSingleEvidence
@@ -51,27 +56,42 @@ class EvidenciaDetail extends Component{
      let id = this.props.match.params.id
     getSingleEvidence(id)
     .then(evidence=>{
+      let idCentro = evidence.creador.centroConsumo
       let marcas = evidence.marcas.map(marca=>marca);
+      let marcasDescripcion = evidence.dinamica.marcaPuntosVentas;
       let { evidencia,dinamica } = this.state;
       evidencia = evidence;
-      evidence.dueño = evidence.creador.nombre +' '+ evidence.creador.apellido;
-      evidence.fecha2 = evidence.created_at.slice(0,10);
-      evidence.hora = evidence.created_at.slice(11,19);
-      let año = evidence.created_at.slice(0,4);
-      let mes = evidence.created_at.slice(5,7)
-      let dia = evidence.created_at.slice(8,10)
-      let hora = evidence.created_at.slice(11,13)
-      let min = evidence.created_at.slice(14,16)
-      let seg = evidence.created_at.slice(17,19)
-      let fechaChida = new Date(año,mes - 1,dia,hora - 5 ,min,seg)
-      evidence.fechaChida = String(fechaChida).slice(16,24)       
-      evidence.correo = evidence.creador.correo;
-      evidence.descripcion = evidence.dinamica.descripcion
-      evidence.imagen = evidence.dinamica.imagen
-      dinamica = evidence.dinamica
+      evidence.dueño        = evidence.creador.nombre +' '+ evidence.creador.apellido;
+      evidence.telefono     = evidence.creador.telefono;
+      evidence.fecha2       = evidence.created_at.slice(0,10);
+      evidence.hora         = evidence.created_at.slice(11,19);
+      let año               = evidence.created_at.slice(0,4);
+      let mes               = evidence.created_at.slice(5,7)
+      let dia               = evidence.created_at.slice(8,10)
+      let hora              = evidence.created_at.slice(11,13)
+      let min               = evidence.created_at.slice(14,16)
+      let seg               = evidence.created_at.slice(17,19)
+      let fechaChida        = new Date(año,mes - 1,dia,hora - 5 ,min,seg)
+      evidence.fechaChida   = String(fechaChida).slice(16,24)       
+      evidence.correo       = evidence.creador.correo;
+      evidence.descripcion  = evidence.dinamica.descripcion
+      evidence.imagen       = evidence.dinamica.imagen
+      dinamica              = evidence.dinamica
+      for(let i = 0; i < marcas.length; i++){
+        for(let j = 0; j < marcasDescripcion.length; j++){
+          if(marcas[i]._id._id === marcasDescripcion[j]._id){
+            marcas[i].descripcion = marcasDescripcion[j].descripcion
+          }
+        }
+      }
+        getCenter(idCentro)
+        .then(centro=>{
+          this.setState({centro})
+        })
+        .catch(e=>{console.log(e)})
       this.setState({evidence,evidencia,marcas,dinamica})
     })
-    .catch(e=>alert(e));
+    .catch(e=>console.log(e));
   }
 
   // A TRAVES DE ESTA FUNCION SE APRUEBA O RECHAZA UNA EVIDENCIA, EN SI SOLO SE CAMBIA EL VALOR DE SU STATUS
@@ -90,6 +110,17 @@ class EvidenciaDetail extends Component{
       }
   };
 
+  // SE VE MAS INFO DE UNA MARCA COMO LA DESCRIPCION
+  handleOpen =(marca)=>{
+    this.setState({open:true,marcaDetail:{
+      descripcion:marca.descripcion,
+      nombre: marca._id.nombre,
+      imagen: marca._id.imagen
+    }})
+  }
+  handleClose =()=>{
+    this.setState({open:false})
+  }
   // CUANDO SE RECHAZA UNA EVIDENCIA SE DA LA OPORTUNIDAD DE MANDAR UNA NOTA DE PORQUE SE RECHAZA
   // ESTE ES EL ONCHANGE QUE SE USA PARA GUARDAR EL MSJ DE ACLARACIÓN
   onChange = (e) => {
@@ -129,12 +160,21 @@ class EvidenciaDetail extends Component{
     }
 
   render(){
-    const {evidence,marcas,botonGavel} = this.state;
+    const {evidence,marcas,botonGavel,centro,marcaDetail} = this.state;
+    const actions = [
+      <FlatButton
+        label="Ok"
+        primary={true}
+        keyboardFocused={true}
+        onClick={this.handleClose}
+      />,
+    ];
     return (
       <div>
         <Dash/>
+        <br/><br/><br/>
         <div>
-          <Paper style={style} >
+          <Paper style={style}>
             <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="DETALLE DE EVIDENCIA" fullWidth={true} />
               <div className="padreDetail">                             
                   <div>
@@ -182,6 +222,10 @@ class EvidenciaDetail extends Component{
                   <div  className="hijoDetailEvidenciasResponsive">
                     <u>Usuario: </u><b>{evidence.dueño ? evidence.dueño : evidence.correo}</b> 
                     <br/><br/> 
+                    <u>Teléfono: </u><b>{evidence.telefono ? evidence.telefono : 's/n'}</b> 
+                    <br/><br/> 
+                    <u>Venue: </u><b>{centro.nombre}</b> 
+                    <br/><br/> 
                     <u>Status: </u><b className="bEvidenciaDetail">{evidence.status}</b>
                     <br/><br/>
                     <u>Mensaje del Usuario: </u><h4>{evidence.mensaje ? evidence.mensaje : "El usuario decidio no enviar mensaje" }</h4>
@@ -192,6 +236,7 @@ class EvidenciaDetail extends Component{
                         <div  key={index}>
                         <Chip
                           style={marca.ventas !== 0 ? styles.chip : styles.dontSee}
+                          onClick={()=>this.handleOpen(marca)}
                         >
                         <Avatar  src={marca._id.imagen} />
                           <div className="spanEvidenciaResponsive">
@@ -216,6 +261,19 @@ class EvidenciaDetail extends Component{
                     </div>
           </Paper>
         </div>
+        <div>
+          <Dialog
+          title={"Detalle de " + marcaDetail.nombre}
+          actions={actions}
+          modal={false}
+          open={this.state.open}
+          onRequestClose={this.handleClose}
+          autoScrollBodyContent={true}
+        >
+        <img width="100px" src={marcaDetail.imagen} alt="Fotito Marcadetail"/>
+        <p>{marcaDetail.descripcion}</p>
+        </Dialog>
+          </div>
       </div>
     );
     }

@@ -15,7 +15,7 @@ import {
   TableRowColumn,
 } from 'material-ui/Table';
 import { getZonas} from '../../Services/pez';
-import { outUserDash } from '../../Services/authDash';
+import { outUserDash, getUser } from '../../Services/authDash';
 import { createDinamic, getDinamics,getDinamicsByBrand,sendChangesDinamic,deleteDinamic } from '../../Services/dinamicas';
 import { getMarcas } from '../../Services/marcas';
 import DatePicker from 'material-ui/DatePicker';
@@ -27,6 +27,7 @@ import Dialog from 'material-ui/Dialog';
 import Chip from 'material-ui/Chip';
 import {green700,blue500} from 'material-ui/styles/colors';
 import LinearProgress from 'material-ui/LinearProgress';
+import {Mixpanel} from '../../mixpanel/mixpanel';
 import firebase from '../../firebase/firebase';
 
 
@@ -84,6 +85,7 @@ class Dinamicas extends Component {
     open5:false,
     open6:false,
     open7:false,
+    open8:false,
     centros:[],
     zonas:[],
     marcas:[],
@@ -123,12 +125,16 @@ class Dinamicas extends Component {
     value:null,
     puesto:null,
     hayEvidencias:false,
-    boton:true
+    boton:true,
+    brandd:{},
+    userr:{}
   }
   // REVISA EL BRAND AL QUE PERTENECE EL USUARIO QUE SE LOGUEO
   //SI ES DEL BRAND 1PUNTOCINCO "5b71bd925c65d40353ffda4c" TRAE TODAS LAS DINAMICAS EXISTENTES, TODAS LAS MARCAS EXISTENTES, VAYA UTILIZA SERVICIOS 
   //PARA TRAER DATOS GENERALES PORQUE ES UN SUPERADMIN.
   componentWillMount(){
+    let branddd = {}
+    let idUser = `${JSON.parse(localStorage.getItem('user'))._id}`
     const puestoUser = `${JSON.parse(localStorage.getItem('user')).puesto}`
         //ID DEL BRAND
     const id = `${JSON.parse(localStorage.getItem('user')).brand}`;
@@ -152,6 +158,13 @@ class Dinamicas extends Component {
        this.setState({marcas})
      })
      .catch(e=>console.log(e))
+     getBrand(id)
+     .then(brand=>{
+       branddd = brand;
+       localStorage.setItem('brand', JSON.stringify(brand))
+       this.setState({brandd:brand})
+     })
+     .catch(e=>console.log(e))
      }
      //SI NO ES SUPERADMIN TRAE LA INFO DE SU BRAND AL QUE PERTENECE
      else if (id !== "5b71bd925c65d40353ffda4c"){
@@ -171,7 +184,9 @@ class Dinamicas extends Component {
     .then(brand=>{
       let {marcas} = this.state;
       marcas = brand.marcas
-      this.setState({marcas})
+      branddd = brand
+      localStorage.setItem('brand', JSON.stringify(brand))
+      this.setState({marcas,brandd:brand})
     })
     .catch(e=>console.log(e))
      }
@@ -180,6 +195,19 @@ class Dinamicas extends Component {
     getZonas()
      .then(zonas=>{
       this.setState({zonas,puesto:puestoUser})
+     })
+     .catch(e=>console.log(e))
+     getUser(idUser)
+     .then(user=>{
+       Mixpanel.identify(user._id)
+       Mixpanel.people.set({
+        "$id": user._id,
+        "brand":branddd.nombre,
+        "nameUser":user.nombre + ' ' + user.apellido,
+        "$email": user.correo,    // only special properties need the $
+        "$last_login": new Date(),         // properties can be dates...          
+      });
+      this.setState({userr:user})
      })
      .catch(e=>console.log(e))
    }
@@ -227,6 +255,12 @@ class Dinamicas extends Component {
   }
   handleClose7 = () =>{
     this.setState({open7: false});
+  }
+  handleOpen8 = () =>{
+    this.setState({open8: true});
+  }
+  handleClose8 = () =>{
+    this.setState({open8: false});
   }
 
   // NO COMPRENDI BIEN SU FUNCIONAMIENTO PERO LO QUE HACEN ES BORRAR LOS CHIPS DE LAS MARCAS SELECCIONADAS
@@ -536,14 +570,27 @@ editarDinamica = (dinamica) =>{
 // ENVIA LA DINAMICA QUE SE ESTA CREAND...REPITOLA DINAMICA QUE SE ESTA CREEEAAAANDOOOOO.
 // USA UN SERVICIO QUE NOS UNE CON NUESTRO BACKEND
 sendDinamic = (e) => {
-  const { newDinamic } = this.state;
+  let nombre = `${JSON.parse(localStorage.getItem('user')).nombre}`;
+  let espacio = " ";
+  let apellido = `${JSON.parse(localStorage.getItem('user')).apellido}`
+  const { newDinamic,brandd } = this.state;
   newDinamic.brand = `${JSON.parse(localStorage.getItem('user')).brand}`;
   createDinamic(newDinamic)
   .then(dinamic=>{
+    Mixpanel.track('Dinamic created Dashboard',{
+      "dinamicBrand": brandd.nombre,
+      "dinamicCreatedName": dinamic.nombreDinamica,
+      "dinamicCreator": nombre+espacio+apellido,
+      "dinamicDateCreated": new Date()
+    })
     this.handleClose();
     window.location.reload()
   })
-  .catch(e=>console.log(e))
+  .catch(e=>{
+    this.handleOpen8()
+    console.log(e)
+    Mixpanel.track('Failed dinamic create Dashboard')
+  })
 }
 // ENVIA LOS CAMBIOS DE LA DINAMICA QUE SE ESTA EDITAAAAANDOOOOOO REPITO EEEEEDIIIITAAAAAANDOOOOOOO
 // USA UN SERVICIO QUE NOS UNE CON NUESTRO BACKEND
@@ -629,6 +676,13 @@ renderChip2(data) {
   );
 }
   render() {
+    const actions7 = [
+      <RaisedButton 
+        onClick={this.handleClose8}  
+        label="Ok" 
+        primary={true}
+      />
+    ]
     const actions6 = [
       <RaisedButton 
         onClick={this.sendDinamic}  
@@ -694,6 +748,7 @@ renderChip2(data) {
     return (
     <div>
        <Dash/>
+       <br/><br/><br/>
        <div>
        <div>
        <RaisedButton 
@@ -1161,6 +1216,17 @@ renderChip2(data) {
           <br/><br/>
           Si deseas borrar una dinámica en donde el boton de borrar esta inhabilitado 
           por favor contacta a soporte al correo <b>german@1puntocinco.com</b>, ¡Gracias!
+        </Dialog>
+          </div>
+          <div>
+          <Dialog
+          modal={false}
+          open={this.state.open8}
+          onRequestClose={this.handleClose8}
+          autoScrollBodyContent={true}
+          actions={actions7}
+        >
+          Parece que ha habido un error. Revisa tu conexión a internet y que ha singresado correctamente todos los datos. 
         </Dialog>
           </div>
     </div>

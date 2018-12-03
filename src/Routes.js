@@ -12,6 +12,7 @@ import Evidencias from './Components/Tickets/Evidencias';
 import EvidenciaDetail from './Components/Tickets/EvidenciaDetail';
 import Usuarios from './Components/Usuarios/Usuarios';
 import UsuarioDetail from './Components/Usuarios/UsuarioDetail';
+import UserDetail from './Components/Users/UserDetail';
 import Reportes from './Components/Reportes/Reportes';
 import DinamicaDetail from './Components/Reportes/DinamicaDetail';
 import Mensajes from './Components/Mensajes/Mensajes';
@@ -33,6 +34,7 @@ export const Routes = () => {
       <Route  path="/evidencia/:id" component={EvidenciaDetail}/>
       <Route  path="/usuarios" component={Usuarios}/>
       <Route  path="/usuario/:id" component={UsuarioDetail}/>
+      <Route  path="/user/:id" component={UserDetail}/>
       <Route  path="/reportes" component={Reportes}/>
       <Route  path="/dinamica/:id" component={DinamicaDetail}/>
       <Route  path="/mensajes" component={Mensajes}/>

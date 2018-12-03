@@ -33,19 +33,22 @@ class Usuarios extends Component {
     height: '300px',
     alReves:false,
     alReves2:false,
-    alReves3:false
+    alReves3:false,
+    arr:[]
   }
 // ESTE COMPONENTE SOLO LO VISUALIZAN LOS SUPERADMINS ASI QUE USAMOS UN SERVICIO PARA TRAER TODOS LOS 
 // USUARIOS QUE EXISTEN EN NUESTRA BASE DE DATOS
   componentWillMount(){
     getUsers()
     .then(users=>{
+      let {arr} = this.state;
       for(let i= 0; i < users.length;i++) 
         {
           users[i].created_at = users[i].created_at.slice(0,10) 
+          arr.push(users[i].correo)
         }
         users.sort((a, b) => a.correo !== b.correo ? a.correo < b.correo ? -1 : 1 : 0)
-      this.setState({usuariosFilter:users,users})
+      this.setState({usuariosFilter:users,users,arr})
     })
     .catch(e=>console.log(e))
  }
@@ -112,6 +115,7 @@ orderByPuesto = (e) => {
     return (
     <div>
        <Dash/>
+       <br/><br/><br/>
        <div className="zona-container">
          <div>
           <RaisedButton
@@ -174,6 +178,22 @@ orderByPuesto = (e) => {
           </TableBody>
         </Table>
        </div>
+       <div style={{display:'none'}}>
+            <table id="tableMarcas">
+              <thead>
+                <tr>
+                  <th>Correos:</th>
+                </tr>
+              </thead>
+              <tbody>
+                {this.state.arr.map( (correo, index) => (
+                  <tr key={index}>
+                  <td>{correo}</td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
     </div>
     );
   }

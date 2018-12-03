@@ -136,7 +136,7 @@ class Dash extends Component {
     return (
      <div>
         <AppBar
-          style={{backgroundColor: "#78909C"}}
+          style={{backgroundColor: "#78909C",position:"fixed"}}
           title={<img className="imagenLogoResponsive" src="https://firebasestorage.googleapis.com/v0/b/filetest-210500.appspot.com/o/testing%2Flogo1.5.png?alt=media&token=3288401a-902f-4601-a984-e564365bd3ed"  alt="Logo de 1puntocinco"/>}
           onLeftIconButtonClick={this.handleToggle}
           iconElementRight={<h6 className="correoDashResponsive">{user.correo}</h6>}
@@ -155,10 +155,10 @@ class Dash extends Component {
           {/* <MenuItem leftIcon={<FontIcon className="material-icons">insert_photo</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/tickets`}>Evidencias</Link></MenuItem> */}
           <MenuItem leftIcon={<FontIcon className="material-icons icon">signal_cellular_alt</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/reportes`}>Reportes</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">work</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/brands`}>Brands</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>
+          <MenuItem leftIcon={<FontIcon className="material-icons icon">store_mall_directory</FontIcon>} style={styleMenu}><Link style={{ textDecoration: 'none',color:'black' }} to={`/centros`}>Centros de Consumo</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">face</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/usuarios`}>Usuarios</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">room</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/zonas`}>Zonas</Link></MenuItem>
-          <MenuItem leftIcon={<FontIcon className="material-icons icon">message</FontIcon>} style={styleMenu} ><Link style={{ textDecoration: 'none',color:'black' }} to={`/mensajes`}>Mensajes</Link></MenuItem>
+          <MenuItem leftIcon={<FontIcon className="material-icons icon">message</FontIcon>} style={user.puesto === "SUPERADMIN" ? styleMenu : {display:"none"}}><Link style={{ textDecoration: 'none',color:'black' }} to={`/mensajes`}>Mensajes</Link></MenuItem>
           <MenuItem leftIcon={<FontIcon className="material-icons icon">apps</FontIcon>} style={styleMenu} onClick={this.handleOpen}>Cambiar contraseña</MenuItem>
         </div>
           </Drawer>

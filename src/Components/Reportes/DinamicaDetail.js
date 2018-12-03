@@ -15,6 +15,8 @@ import {green700} from 'material-ui/styles/colors';
 import RaisedButton from 'material-ui/RaisedButton';
 import FlatButton from 'material-ui/FlatButton';
 import {GridList, GridTile} from 'material-ui/GridList';
+import ReactToExcel from 'react-html-table-to-excel';
+import {Mixpanel} from '../../mixpanel/mixpanel';
 
 
 const customContentStyle = {
@@ -80,7 +82,6 @@ class DinamicaDetail extends Component{
     posibleGanador:{},
     marcaVentas:{},
     newMarcas:[],
-    centroDetalle:{},
     centro:{},
     ganadores:[],
     detalleGanador:{},
@@ -89,7 +90,7 @@ class DinamicaDetail extends Component{
     reporteCompleto:false,
     newObj:{},
     newObj2:{},
-    botonFecha:true
+    botonFecha:true,
   }
 
   // ESTE SE COMPONENTE LE D APRIMERO LA OPCION AL USUARIO DE ELEGIR SI QUIERE VER EL REPORTE POR FECHA DETERMINADA 
@@ -102,19 +103,23 @@ class DinamicaDetail extends Component{
   // SI EL USUARIO ELIGE LA OPCION DE FECHA, DEBE D EINGRESAR FECHA INCIAL Y FECHA FINAL
   //Y POSTERIORMENTE SE EJECUTA ESTA FUNCION
   quieroFecha = () =>{
-    let id = this.props.match.params.id
+    let nombre = `${JSON.parse(localStorage.getItem('user')).nombre}`;
+    let espacio = " ";
+    let apellido = `${JSON.parse(localStorage.getItem('user')).apellido}`
+    let id               = this.props.match.params.id
+    let numberofMarcas;
     let {newObj,newObj2} = this.state;
-    let dia = newObj.fecha.getDate()
-    let mes = newObj.fecha.getMonth() 
-    let año = newObj.fecha.getFullYear()
-    let dia2 = newObj2.fecha.getDate()
-    let mes2 = newObj2.fecha.getMonth()
-    let año2 = newObj2.fecha.getFullYear()
-    let fechaInicio = new Date(año,mes,dia).getTime();
-    let fechaFin    = new Date(año2,mes2,dia2).getTime();
-    let diff = fechaFin - fechaInicio;
-    let diasNumero = diff/(1000*60*60*24) 
-    let fechasArray = []
+    let dia              = newObj.fecha.getDate()
+    let mes              = newObj.fecha.getMonth() 
+    let año              = newObj.fecha.getFullYear()
+    let dia2             = newObj2.fecha.getDate()
+    let mes2             = newObj2.fecha.getMonth()
+    let año2             = newObj2.fecha.getFullYear()
+    let fechaInicio      = new Date(año,mes,dia).getTime();
+    let fechaFin         = new Date(año2,mes2,dia2).getTime();
+    let diff             = fechaFin - fechaInicio;
+    let diasNumero       = diff/(1000*60*60*24) 
+    let fechasArray      = []
     for(let i = 0; i <= diasNumero; i++){
       fechasArray.push(String(new Date(año,mes,dia + i)).slice(0,15))
     }
@@ -122,12 +127,12 @@ class DinamicaDetail extends Component{
     // LLAMADO getEvidencesByDinamicAndByDate
     getSingleDinamic(id)
     .then(dinamica=>{
-        let {ganadores} = this.state;
-        let marcas = dinamica.marcaPuntosVentas.map(marca=>marca._id);
-        let { centros } = this.state;
-      dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
-      dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
-      centros = dinamica.centroConsumo.map(centro=>centro);
+        let {ganadores,centros}     = this.state;
+        let marcas          = dinamica.marcaPuntosVentas.map(marca=>marca._id);
+      dinamica.fechaInicio  = dinamica.fechaInicio.slice(0,10)
+      dinamica.fechaFin     = dinamica.fechaFin.slice(0,10)
+      centros               = dinamica.centroConsumo.map(centro=>centro);
+      numberofMarcas = dinamica.marcaPuntosVentas.length;
       getEvidencesByDinamicAndByDate(id,fechasArray)
       .then(evidencias=>{  
         // CUANDO YA TENEMOS LAS EVIDENCIAS POR FECHA DETERMINADA HACEMOS USO DE LA FUNCION this.usuariosUnicos QUE ESTA MAS ABAJO
@@ -214,9 +219,26 @@ class DinamicaDetail extends Component{
            }
          }
        }
+       for (let ppp = 0; ppp < numberofMarcas; ppp++){
+        if(centros[s].ventasUsuario[0]){
+          centros[s].ventas.push(centros[s].ventasUsuario[ppp])
+         }
+      }
+     for (let ooo = 0; ooo < centros[s].ventas.length; ooo++){
+       for(let ñññ = 0; ñññ < centros[s].ventasUsuario.length; ñññ++){
+         if(centros[s].ventas[ooo]._id._id === centros[s].ventasUsuario[ñññ]._id._id){
+          centros[s].ventas[ooo]._id.total += centros[s].ventasUsuario[ñññ].ventas
+         }
+       }
      }
-
-
+     }
+     for (let iu=0;iu<centros.length;iu++){
+      for (let sd=0;sd<newCreadores.length;sd++){
+        if(centros[iu]._id === newCreadores[sd].centroConsumo){
+          newCreadores[sd].centrito = centros[iu].nombre
+        }
+      }
+    }
      // TERMINA VT POR CC
       this.setState({newCreadores,dinamica, centros,marcas,ganadores}) 
       })
@@ -224,13 +246,24 @@ class DinamicaDetail extends Component{
       this.handleClose6()
     })
     .catch(e=>alert(e));
+    Mixpanel.track('Report Dashboard',{
+      "whoBrandWantReport": `${JSON.parse(localStorage.getItem('brand')).nombre}`,
+      "typeReport": "By Date",
+      "whoWantReport": nombre + espacio + apellido,
+      "idWantReport": `${JSON.parse(localStorage.getItem('user'))._id}`
+
+    })
   }
 
   //ESTA ES LA FUNCION QUE NOS TRAE EL REPORTE COMPLETO, NO LE MANDAMOS FECHA, 
   //SOLO TRAEMOS TOOOODAS LAS EVIENCIAS APROBADAS QUE HA RECOLECTADO ESTA DINAMICA Y 
   //TRABAJAMOS A PARTIR DE ELLAS
   quieroReporteCompleto = () =>{
+    let nombre = `${JSON.parse(localStorage.getItem('user')).nombre}`;
+    let espacio = " ";
+    let apellido = `${JSON.parse(localStorage.getItem('user')).apellido}`
     let id = this.props.match.params.id
+    let numberofMarcas;
     getSingleDinamic(id)
     .then(dinamica=>{
         let {ganadores} = this.state;
@@ -239,8 +272,9 @@ class DinamicaDetail extends Component{
       dinamica.fechaInicio = dinamica.fechaInicio.slice(0,10)
       dinamica.fechaFin = dinamica.fechaFin.slice(0,10)
       centros = dinamica.centroConsumo.map(centro=>centro);
+      numberofMarcas = dinamica.marcaPuntosVentas.length;
       getEvidencesByDinamic(id)
-      .then(evidencias=>{  
+      .then(evidencias=>{ 
         //HACEMOS USO TAMBIEN AQUI DE ESTA FUNCION QUE LO QUE HACE ES SACARNOS LA LISTA DE USUARIOS UNICOS 
         this.usuariosUnicos(evidencias)  
         // HASTA AQUI YA TENEMOS A LOS USUARIOS Y SUS RESPECTIVAS EVIDENCIAS
@@ -322,15 +356,40 @@ class DinamicaDetail extends Component{
            }
          }
        }
+       for (let ppp = 0; ppp < numberofMarcas; ppp++){
+         if(centros[s].ventasUsuario[0]){
+          centros[s].ventas.push(centros[s].ventasUsuario[ppp])
+         }
+       }
+       for (let ooo = 0; ooo < centros[s].ventas.length; ooo++){
+         for(let ñññ = 0; ñññ < centros[s].ventasUsuario.length; ñññ++){
+           if(centros[s].ventas[ooo]._id._id === centros[s].ventasUsuario[ñññ]._id._id){
+            centros[s].ventas[ooo]._id.total += centros[s].ventasUsuario[ñññ].ventas
+           }
+         }
+       }
      }
-     //console.log(newCreadores)
+      for (let iu=0;iu<centros.length;iu++){
+        for (let sd=0;sd<newCreadores.length;sd++){
+          if(centros[iu]._id === newCreadores[sd].centroConsumo){
+            newCreadores[sd].centrito = centros[iu].nombre
+          }
+        }
+      }
      // TERMINA VT POR CC
-      this.setState({newCreadores,dinamica, centros,marcas,ganadores}) 
+      this.setState({newCreadores,dinamica,centros,marcas,ganadores}) 
       })
       .catch(e=>console.log(e))
       this.handleClose6()
     })
     .catch(e=>alert(e));
+    Mixpanel.track('Report Dashboard',{
+      "whoBrandWantReport": `${JSON.parse(localStorage.getItem('brand')).nombre}`,
+      "typeReport": "Complete",
+      "whoWantReport": nombre + espacio + apellido,
+      "idWantReport": `${JSON.parse(localStorage.getItem('user'))._id}`
+
+    })
   }
     // DEJA UNA LISTA DE USUARIOS QUE HAN PARTICIPADO EN ESTA DINAMICA
   usuariosUnicos = (evidencias) =>{
@@ -351,7 +410,7 @@ class DinamicaDetail extends Component{
       newCreadores.push(lookupObject[iii]);
    }
    // HASTA AQUI YA TENEMOS A LOS USUARIOS QUE NO SE REPITEN ES DECIR UNICOS ----> "newCreadores"
-
+    //console.log(newCreadores)
    // LE MANDA A LA FUNCION EVIDENCIAS POR USUARIO, LOS USUARIOS Y LAS EVIDENCIAS PARA QUE ESTA TRABAJE CON ELLOS
    this.evidenciasPorUsuario(newCreadores,evidencias)
   }
@@ -395,7 +454,7 @@ class DinamicaDetail extends Component{
     this.setState({open4: true});
   };
   handleClose4 = () => {
-    this.cerosTotal(this.state.newMarcas)
+    //this.cerosTotal(this.state.newMarcas) SE OCUPABA ANTES PERO CREO QUE YA NO SERA NECESARIO
     this.setState({open4: false,newMarcas:[]});
   };
   handleOpen5 = () => {
@@ -462,48 +521,23 @@ class DinamicaDetail extends Component{
   // SE USA PARA VER LAS VENTAS TOTALES POR DETERMINADO CENTRO DE CONSUMO, 
   //ESTO FUE MAS DIFICIL QUE LO DE LAS MARCAS PORQUE SE TUVIERON QUE EMPLEAR VARIOS LOOPS
   // Y AGRUPAR DISTINTOS ELEMENTOS POR CENTRO DE CONSUMO
-  centros = (centro) =>{
-    let {newMarcas} = this.state;
-    let {centroDetalle} = this.state;
-    let ventas = centro.ventasUsuario
-    centroDetalle = centro
-        //El array "marcas" trae a todas las marcas. 
-        //Esta lista traera marcas repetidas.
-        let marcas = centro.ventasUsuario.map(ventas=>ventas._id)
-
-        // No sabemos para que es pero es util, parece q aqui se guardan las marcas que si estan repetidos...
-        var lookupObject  = {};
-
-        //Aqui comienzan los ciclos para dejar un array con marcas unicas:
-
-        for(var iii in marcas) {
-          lookupObject[marcas[iii]['_id']] = marcas[iii];
-        }
-        for(iii in lookupObject) {
-          newMarcas.push(lookupObject[iii]);
-       }
-       // HASTA AQUI YA TENEMOS A LaS marcas QUE NO SE REPITEN ES DECIR UNICaS ----> "newMarcas"
-       //console.log('MARCAS:   ',newMarcas)
-       //console.log('VENTAS:   ',ventas)
-       for ( let io = 0; io < newMarcas.length; io++){
-         for( let ioi = 0; ioi < ventas.length; ioi++){
-           if( newMarcas[io]._id === ventas[ioi].id ){
-            newMarcas[io].total += ventas[ioi].ventas
-           }
-         }
-       }
-       this.handleOpen4()
-       this.setState({newMarcas,centroDetalle,centro})
+  centros = (centroo) =>{
+    this.setState({centro:centroo,newMarcas:centroo.ventas,open4:true})
   }
 
   // ESTA FUNCION ES IMPORTANTE PORQUE HACE QUE LAS MARCAS REGRESEN A CERO, SINO 
   //TUVIERAMOS ESTA FUNCION NUESTRAS MARCAS SUMARIAN LAS VENTAS UNA Y OTRA Y OTRA VEZ
-  cerosTotal = (newMarcas) => {
-    for ( let ceros = 0; ceros < newMarcas.length; ceros++){
-      newMarcas[ceros].total = 0
-    }
-    this.setState({newMarcas})
-  }
+
+  // PERO CREO QUE YA NO SE OCUPARA...
+  
+  // cerosTotal = (newMarcas) => {
+  //   for ( let ceros = 0; ceros < newMarcas.length; ceros++){
+  //     newMarcas[ceros].total = 0
+  //   }
+  //   this.setState({newMarcas})
+  // }
+
+
   // EN ESTA FUNCION HAY QUE SEGUIR TRABAJANDO PERO SOLO ESTA DISPONIBLE CUANDO LA DINAMICA ES DE VENTAS
   // LO QUE HACE ES QUE SI UN USUARIO HA TENIDO UN BUEN RENDIMIENTO LO PUEDES CONVERTIR EN GANADOR
   enviarGanador = (ganador) => {
@@ -522,7 +556,9 @@ class DinamicaDetail extends Component{
   refresh = () =>{
     window.location.reload()
   }
-
+  regresar = () =>{
+    this.props.history.push('/reportes')
+  }
   render(){
     const actions = [
       <FlatButton
@@ -571,6 +607,13 @@ class DinamicaDetail extends Component{
     ];
     const actions6 = [
       <FlatButton
+        label="REGRESAR"
+        primary={true}
+        keyboardFocused={false}
+        onClick={this.regresar}
+        style={{float:'left'}}
+      />,
+      <FlatButton
         label="ENVIAR FECHA"
         primary={true}
         keyboardFocused={false}
@@ -584,10 +627,11 @@ class DinamicaDetail extends Component{
         onClick={this.quieroReporteCompleto}
       />
     ];
-    const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador,marcaVentas,newMarcas,centroDetalle,ganadores,detalleGanador,marcasGanador} = this.state;
+    const {dinamica,centros,marcas,newCreadores,detalleCreador,marcasCreador,marcaVentas,newMarcas,ganadores,detalleGanador,marcasGanador,centro} = this.state;
       return (
         <div>
           <Dash/>
+          <br/><br/><br/>
           <div className="padreDetail">
           <Paper style={style} >
           <RaisedButton labelColor="#FAFAFA" backgroundColor="#37474F" label="REPORTE DE DINÁMICA" fullWidth={true} />
@@ -619,7 +663,15 @@ class DinamicaDetail extends Component{
             <b>{dinamica.fechaInicio}</b>/<b>{dinamica.fechaFin}</b>
             <br/>
             <div className="centrarReporteDetailResponsive">
-              <h4>Centros de Consumo:</h4>
+              <h4>Centros de Consumo:
+              <ReactToExcel
+                  buttonText="&darr;"
+                  table="tableCentros"
+                  filename="Excel Centros"
+                  sheet="Excel de Centros"
+                  className="btnExcel"
+                />
+              </h4>
               <div className="padreDetailReporteDetail" style={styles.wrapper} >
               {centros.map( (centro, index) => (
                 <div key={index} >
@@ -634,7 +686,15 @@ class DinamicaDetail extends Component{
               </div>
               ))}
               </div>
-              <h4>Marcas:</h4>
+              <h4>Marcas: 
+                <ReactToExcel
+                  buttonText="&darr;"
+                  table="tableMarcas"
+                  filename="Excel Marcas"
+                  sheet="Excel de Marcas"
+                  className="btnExcel"
+                />
+              </h4>
               <div style={styles.wrapper}>
               {marcas.map( (marca, index) => (
                 <div  key={index}>
@@ -654,7 +714,15 @@ class DinamicaDetail extends Component{
           </div>
           <hr/>
           <div className="padreDetail">
-              <h2> Ranking: </h2>
+              <h2>Ranking:
+              <ReactToExcel
+                  buttonText="&darr;"
+                  table="tableUsuarios"
+                  filename="Excel Usuarios"
+                  sheet="Excel de Usuarios"
+                  className="btnExcel"
+                />
+              </h2>
           </div>
           <div style={styles.root}>
     <GridList style={styles.gridList} cols={1} padding={4}>
@@ -674,7 +742,7 @@ class DinamicaDetail extends Component{
   </div>
   <hr/>
 
-  <div className="padreDetail">
+  <div style={ganadores[0] ? {display:'inline'} : {display:'none'}} className="padreDetail">
               <h2> Ganadores: </h2>
           </div>
           <div style={styles.root}>
@@ -759,7 +827,7 @@ class DinamicaDetail extends Component{
       </div>
       <div>
             <Dialog
-              title={"Detalle de Venta de "+ centroDetalle.nombre}
+              title={"Detalle de Venta de "+ centro.nombre}
               actions={actions4}
               modal={false}
               open={this.state.open4}
@@ -772,9 +840,9 @@ class DinamicaDetail extends Component{
               <Chip
               key={index}
               >
-              <Avatar src={marca.imagen} />
-                {marca.nombre+'   '}
-                <b>{marca.total+' unidades vendidas'}</b>
+              <Avatar src={marca._id.imagen} />
+                {marca._id.nombre+'   '}
+                <b>{marca._id.total+' unidades vendidas'}</b>
               </Chip> 
                 </div>
               ))}
@@ -852,6 +920,76 @@ class DinamicaDetail extends Component{
       
         </Dialog>
           </div>
+          </div>
+          {/* la tabla de MARCAS que se descargara en excel */}
+          <div style={{display:'none'}}>
+            <table id="tableMarcas">
+              <thead>
+                <tr>
+                  <th>Producto</th>
+                  <th>Total de Venta</th>
+                </tr>
+              </thead>
+              <tbody>
+                {marcas.map( (marca, index) => (
+                  <tr key={index}>
+                  <td>{marca.nombre}</td>
+                  <td>{marca.total}</td>
+                  </tr>
+              ))}
+              </tbody>
+            </table>
+          </div>
+          <br/><br/>
+          {/* la tabla de CENTROS que se descargara en excel */}
+          <div style={{display:'none'}}>
+            <table id="tableCentros">
+              <thead>
+                <tr>
+                  <th>Centro</th>
+                  {marcas.map( (marca, index) => (
+                    <th key={index}>{marca.nombre}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                 {centros.map( (centro, index) => ( 
+                    <tr key={index}>
+                      <td>{centro.nombre}</td>
+                      {centro.ventas.map((venta,index)=>(
+                        <td key={index}>{venta._id.total}</td>
+                      ))}
+                    </tr>
+                  ))} 
+              </tbody>
+            </table>
+          </div>
+                    {/* la tabla de USUARIOS que se descargara en excel */}
+                    <div style={{display:'none'}}>
+            <table id="tableUsuarios">
+              <thead>
+                <tr>
+                  <th>Usuario</th>
+                  <th>Centro</th>
+                  {marcas.map( (marca, index) => (
+                    <th key={index}>{marca.nombre}</th>
+                  ))}
+                  <th>Puntos</th>
+                </tr>
+              </thead>
+              <tbody>
+                 {newCreadores.map( (user, index) => ( 
+                    <tr key={index}>
+                      <td>{user.nombre && user.apellido ? user.nombre + " " + user.apellido : user.correo}</td>
+                      <td>{user.centrito}</td>
+                      {user.marcas.map((marca,index)=>(
+                        <td key={index}>{marca.puntosUsuario}</td>
+                      ))}
+                      <td>{user.total}</td>
+                    </tr>
+                  ))} 
+              </tbody>
+            </table>
           </div>
         </div>
       );

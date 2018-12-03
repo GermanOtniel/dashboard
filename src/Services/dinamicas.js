@@ -1,7 +1,7 @@
 // production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 //CREO QUE NO SIRVE PARA NADA 
 export function zoneById(id) {
@@ -116,4 +116,16 @@ export function deleteDinamic(id){
   .then(dinamica=>{
       return dinamica;
   });
+}
+
+//DINAMICAS POR BRAND PARA TRAER LOS CENTROS EN DONDE TIENEN DINAMICAS Y SALGAN LOS USUARIOS DE ESOS CENTROS
+export function getUsersByDinamics(id){
+  return fetch( baseURL + '/dinamica/dashdinacentusers/' + id )
+  .then(res=>{
+    if(!res.ok) return Promise.reject(res.statusText);
+    return res.json()
+  })
+  .then(dinamicas=>{
+    return dinamicas
+  })
 }

@@ -1,7 +1,7 @@
 // production 
-const baseURL = process.env.REACT_APP_BASE_URL;
+//const baseURL = process.env.REACT_APP_BASE_URL;
 // development
-//const baseURL = "http://localhost:3000"
+const baseURL = "http://localhost:3000"
 
 //SE USA EN EL COMPONENTE DE BRANDS {{{{{BRANDS}}}}}
 export function createBrand(formulario){
@@ -23,9 +23,7 @@ export function createBrand(formulario){
 //SE USA EN EL COMPONENTE DE BRANDS {{{{{BRANDS}}}}}
 
 export function getBrands(){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
+
   return fetch( baseURL + '/brand/' )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);
@@ -38,9 +36,6 @@ export function getBrands(){
 //SE USA EN EL COMPONENTE DE BRANDS {{{{{BRANDS}}}}} PARA TRAER EL BRAND UNICO DE MI USUARIO
 
 export function getBrandsById(id){
-  //console.log("peticion");
-  //  localhost  
-  // herokuapp  '/auth/profile/'
   return fetch( baseURL + '/brand/dash/' + id )
   .then(res=>{
     if(!res.ok) return Promise.reject(res.statusText);

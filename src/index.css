@@ -148,6 +148,14 @@ div{
   display: flex;
   justify-content:center
 }
+.btnExcel{
+  background-color: #B71C1C;
+  color: white;
+  font-weight: bolder;
+  height: 25px;
+  width: 25px;
+  text-decoration: underline;
+}
 @media screen and (max-width: 1000px) and (min-width: 300px) {
   /* LOGIN */
 .padreLogin{
@@ -444,13 +452,13 @@ div{
 .imagenUserDetailResponsive{
   width: 400px;
   height: 350px;
+  padding-right: 15%
 }
 .userSonDetailResponsive {
   text-align: center;
-  font-size: 1rem;
+  font-size: 1.2rem;
   margin-bottom: 10px;
-  margin-left: 70px;
-
+  padding-left: 15%
 }
 /* USUARIO DETAIL */
 }
